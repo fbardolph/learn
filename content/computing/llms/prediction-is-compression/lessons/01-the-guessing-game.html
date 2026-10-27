@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The guessing game</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .tape { font: 600 1.3rem/1.5 var(--mono); min-height: 3.2em; padding: .6rem .7rem; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); overflow-wrap: anywhere; }
+  .tape .c { position: relative; }
+  .tape .c[data-n="1"] { color: var(--good); }
+  .tape .c[data-n="2"], .tape .c[data-n="3"] { color: var(--ink); }
+  .tape .c.hard { color: var(--bad); }
+  .tape .cursor { display: inline-block; width: .6em; height: 1.1em; vertical-align: -.15em; background: var(--accent); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .keys { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .keys button { min-height: 44px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: 600 1.05rem var(--mono); cursor: pointer; padding: 0; }
+  .keys button:disabled { opacity: .25; cursor: default; text-decoration: line-through; }
+  .keys button.space { grid-column: span 3; font-size: .85rem; }
+  .hist { display: grid; grid-template-columns: 3.2rem 1fr 2.5rem; gap: .3rem .5rem; align-items: center; font: .9rem var(--mono); font-variant-numeric: tabular-nums; }
+  .hist .bar { height: 14px; border-radius: 4px; background: var(--accent); min-width: 2px; }
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.6rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats span { font-size: .8rem; color: var(--muted); }
+  .probs { display: grid; grid-template-columns: auto 1fr 3.2rem; gap: .35rem .6rem; align-items: center; font: .95rem var(--mono); }
+  .probs .bar { height: 16px; border-radius: 4px; background: var(--accent-soft); position: relative; overflow: hidden; }
+  .probs .bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+  #lm [aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+  .ctx { font: 500 1.05rem var(--serif); margin: 0; }
+  .ctx b { background: var(--mark); padding: 0 .2em; border-radius: 3px; font-weight: 500; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Prediction, compression and intelligence · Lesson 1</p>
+    <h1>The guessing game</h1>
+    <p class="lede">In 1951 Claude Shannon measured how predictable English is by making people guess text one letter at a time. You’re about to play his game, and in doing so you’ll do the exact job a language model does.</p>
+  </header>
+
+  <section>
+    <h2>Play</h2>
+    <p>There’s a hidden phrase (lowercase letters and spaces). Guess the next character. Wrong guesses get crossed out; keep going until you hit it. We count how many guesses each character took.</p>
+    <div class="widget" id="game">
+      <div class="tape" id="tape" aria-live="polite"></div>
+      <div class="keys" id="keys"></div>
+      <div class="stats">
+        <div><b id="st-chars">0</b><span>characters</span></div>
+        <div><b id="st-first">–</b><span>right first try</span></div>
+        <div><b id="st-bits">–</b><span>bits per character</span></div>
+      </div>
+      <div class="hist" id="hist"></div>
+      <button type="button" class="kit-btn" id="next-phrase" hidden>Next phrase</button>
+    </div>
+    <p>Green characters you got first try. Notice where they cluster: the second half of words, and anything after you’ve recognised the phrase.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>Where were you most likely to need many guesses?</p>
+    <button>In the middle of a word</button>
+    <button data-correct>At the start of a new word, especially early in the phrase</button>
+    <button>On spaces</button>
+    <div class="explain">The first letter of a word, before you know the topic, is where the real uncertainty is. Once a word starts, spelling constrains it; once you see the phrase, meaning constrains everything. Spaces are usually easy because you can tell when a word is complete.</div>
+  </div>
+
+  <section>
+    <h2>Counting surprise in bits</h2>
+    <p>If every one of the 27 symbols were equally likely, each character would carry $\log_2 27 \approx 4.75$ bits of information: the number of yes/no questions you’d need to pin it down.</p>
+    <p>Your guesses tell a different story. When you nail a letter on the first try, it carried almost no information; you already knew it. The <strong>bits per character</strong> number above is an estimate of how much each character actually told you, worked out from how your guess counts were spread. Shannon’s subjects landed around <strong>1 bit per character</strong>. By that measure English is roughly 75% redundant.</p>
+    <aside class="key"><p>The information in an event is $-\log_2 p$ bits, where $p$ is the probability you gave it. Expected things are cheap; surprises are expensive.</p></aside>
+    <div class="widget">
+      <label for="pslider">Probability you gave the character that actually came next: <span class="readout" id="pread"></span>
+        <input id="pslider" type="range" min="1" max="99" value="50"></label>
+      <p style="margin:0" id="pcost"></p>
+    </div>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="2" data-tol="0.001">
+    <p>You gave the next character probability $0.25$. How many bits of surprise was it? ($-\log_2 0.25$)</p>
+    <div class="explain">$0.25 = 2^{-2}$, so $-\log_2 0.25 = 2$ bits. Each halving of the probability adds one bit.</div>
+  </div>
+
+  <section>
+    <h2>Your guesses are a compression scheme</h2>
+    <p>Here’s Shannon’s clever observation. Suppose you have an identical twin: same brain, same guesses. To send them a sentence, you don’t send the letters. You send <em>how many guesses each letter took</em>: <code>1 1 3 1 1 1 2 1 …</code></p>
+    <p>Your twin plays the game, makes the same guesses in the same order, and stops on the guess number you sent. They reconstruct the sentence exactly. And that list is mostly 1s, which compress beautifully.</p>
+    <aside class="key"><p><strong>A good predictor is a good compressor.</strong> The better you predict the next symbol, the fewer bits it takes to send. The reverse holds too: any compressor secretly contains a predictor.</p></aside>
+    <p>Real compressors do this with probabilities instead of guess counts (a method called arithmetic coding, lesson 3), costing almost exactly $-\log_2 p$ bits per symbol.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="self">
+    <p>Explain in your own words why the list of guess counts is enough for your twin to rebuild the text.</p>
+    <div class="explain">Because the twin’s guessing is deterministic and identical to yours. Given the same text so far, they’ll make the same sequence of guesses, so “it was your 3rd guess” points at exactly one character. The shared predictor does the heavy lifting; only the surprises need sending.</div>
+  </div>
+
+  <section>
+    <h2>A language model plays the same game</h2>
+    <p>An LLM reads text so far and outputs a probability for every possible next token (a word or word-piece). Training means adjusting it so the token that actually came next gets a higher probability: fewer bits of surprise, averaged over trillions of tokens.</p>
+    <p>Illustrative numbers for three contexts (not from a real model):</p>
+    <div class="widget" id="lm">
+      <div class="fnpick" style="display:flex;gap:.4rem;flex-wrap:wrap" role="group" aria-label="Context">
+        <button type="button" class="kit-btn" data-c="0" aria-pressed="true">Geography</button>
+        <button type="button" class="kit-btn" data-c="1" aria-pressed="false">Pattern</button>
+        <button type="button" class="kit-btn" data-c="2" aria-pressed="false">Physics</button>
+      </div>
+      <p class="ctx" id="ctx"></p>
+      <div class="probs" id="probs"></div>
+    </div>
+    <p>Look at what each prediction <em>requires</em>. Geography needs a fact. The pattern needs you to spot doubling. To predict the next word of a physics paper well, you’d need to understand the physics. That is the argument for why next-token prediction, pushed hard enough, forces a model to learn about the world. We will test that argument in lesson 5.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Random text drawn evenly from 32 symbols. How many bits per character?</p>
+    <button>4.75</button>
+    <button data-correct>5</button>
+    <button>32</button>
+    <button>1</button>
+    <div class="explain">$\log_2 32 = 5$, because $2^5 = 32$. Five yes/no questions pick one of 32 equally likely symbols, and no predictor can do better on truly random text.</div>
+  </div>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Which would compress <em>worst</em>?</p>
+    <button>A legal contract</button>
+    <button>A children’s book</button>
+    <button data-correct>A randomly generated password list</button>
+    <button>Your email inbox</button>
+    <div class="explain">Random passwords are designed to be unpredictable, so no predictor gets them cheaply. Contracts are among the most predictable text there is: boilerplate everywhere.</div>
+  </div>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>Model A gives the true next token probability 0.5; model B gives it 0.125. How many more bits does B pay for that token?</p>
+    <button>0.375</button>
+    <button>4</button>
+    <button data-correct>2</button>
+    <div class="explain">A pays $-\log_2 0.5 = 1$ bit. B pays $-\log_2 0.125 = 3$ bits. The difference is 2 bits. Training loss for an LLM is this cost averaged over tokens (usually in nats rather than bits, but same idea).</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="self">
+    <p>Why might someone argue that a model which compresses Wikipedia extremely well must “understand” a lot?</p>
+    <div class="explain">To compress well it must predict well, and Wikipedia is full of text whose continuation depends on facts, causes, arithmetic and reasoning. Every bit saved reflects some regularity the model has captured. Whether that amounts to understanding is the debate in lesson 6, but the pressure toward modelling the world is real.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  // ---- Shannon game ----
+  const PHRASES = ['the early bird catches the worm', 'she opened the door and walked in', 'two plus two is four', 'once upon a time there lived a king', 'thank you very much for your help'];
+  const ALPHA = 'abcdefghijklmnopqrstuvwxyz ';
+  let order = PHRASES.map((p, i) => i).sort(() => Math.random() - .5);
+  let pi = 0, phrase = PHRASES[order[0]], pos = 0, tries = 0;
+  const counts = []; // guesses per char, across phrases
+  const tape = document.getElementById('tape'), keys = document.getElementById('keys');
+  const revealed = [];
+  ALPHA.split('').forEach((ch) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.ch = ch;
+    b.textContent = ch === ' ' ? 'space' : ch;
+    if (ch === ' ') b.className = 'space';
+    b.setAttribute('aria-label', ch === ' ' ? 'space' : ch);
+    b.addEventListener('click', () => guess(ch, b));
+    keys.appendChild(b);
+  });
+  function drawTape() {
+    tape.innerHTML = revealed.map(([c, n]) => `<span class="c ${n > 3 ? 'hard' : ''}" data-n="${n}">${c === ' ' ? '&nbsp;' : c}</span>`).join('') + (pos < phrase.length ? '<span class="cursor"></span>' : '');
+  }
+  function resetKeys() { keys.querySelectorAll('button').forEach((b) => { b.disabled = false; }); }
+  function guess(ch, btn) {
+    if (pos >= phrase.length) return;
+    tries++;
+    if (ch !== phrase[pos]) { btn.disabled = true; return; }
+    revealed.push([ch, tries]); counts.push(tries);
+    pos++; tries = 0; resetKeys(); drawTape(); stats();
+    if (pos >= phrase.length) {
+      keys.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      document.getElementById('next-phrase').hidden = pi >= PHRASES.length - 1;
+      Study.event({ type: 'shannon', chars: counts.length, bits: Number(bits().toFixed(2)) });
+    }
+  }
+  function bits() {
+    // Shannon's upper bound: entropy of the distribution of guess numbers
+    const n = counts.length; if (!n) return NaN;
+    const freq = {}; counts.forEach((c) => { freq[c] = (freq[c] || 0) + 1; });
+    return -Object.values(freq).reduce((s, k) => s + (k / n) * Math.log2(k / n), 0);
+  }
+  function stats() {
+    const n = counts.length;
+    document.getElementById('st-chars').textContent = n;
+    document.getElementById('st-first').textContent = n ? Math.round(100 * counts.filter((c) => c === 1).length / n) + '%' : '–';
+    document.getElementById('st-bits').textContent = n >= 5 ? bits().toFixed(2) : '–';
+    const buckets = [1, 2, 3, 4, 5].map((k) => counts.filter((c) => (k < 5 ? c === k : c >= 5)).length);
+    const max = Math.max(1, ...buckets);
+    document.getElementById('hist').innerHTML = buckets.map((v, i) => `<span>${['1st','2nd','3rd','4th','5th+'][i]}</span><div class="bar" style="width:${(v / max) * 100}%"></div><span>${v}</span>`).join('');
+  }
+  document.getElementById('next-phrase').addEventListener('click', (e) => {
+    pi++; phrase = PHRASES[order[pi]]; pos = 0; tries = 0; revealed.length = 0;
+    resetKeys(); drawTape(); e.target.hidden = true;
+  });
+  drawTape(); stats();
+
+  // ---- surprise slider ----
+  const ps = document.getElementById('pslider');
+  function pc() {
+    const p = Number(ps.value) / 100;
+    document.getElementById('pread').textContent = p.toFixed(2);
+    document.getElementById('pcost').innerHTML = `Cost: <strong>${(-Math.log2(p)).toFixed(2)} bits</strong>. ${p >= .9 ? 'Barely a surprise.' : p >= .4 ? 'About a coin flip’s worth.' : p >= .1 ? 'A real surprise.' : 'Very expensive: the model was badly wrong.'}`;
+  }
+  ps.addEventListener('input', pc); pc();
+
+  // ---- illustrative LM distributions ----
+  const CTX = [
+    { text: 'The capital of France is', probs: [[' Paris', .91], [' a', .03], [' the', .02], [' located', .01], [' Lyon', .005]] },
+    { text: '2, 4, 8, 16,', probs: [[' 32', .86], [' 24', .04], [' 64', .02], [' 18', .01], [' 20', .01]] },
+    { text: 'The ratio of a circle’s circumference to its diameter is written', probs: [[' π', .48], [' as', .37], [' pi', .08], [' using', .02], [' in', .01]] },
+  ];
+  function showCtx(i) {
+    const c = CTX[i];
+    document.getElementById('ctx').innerHTML = `${c.text} <b>___</b>`;
+    document.getElementById('probs').innerHTML = c.probs.map(([t, p]) => `<span>${t.replace(' ', '␣')}</span><div class="bar"><i style="width:${p * 100}%"></i></div><span>${(p * 100).toFixed(p < .01 ? 1 : 0)}%</span>`).join('');
+    document.querySelectorAll('#lm [data-c]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.c) === i)));
+  }
+  document.querySelectorAll('#lm [data-c]').forEach((b) => b.addEventListener('click', () => showCtx(Number(b.dataset.c))));
+  showCtx(0);
+})();
+</script>
+</body></html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>From Waterloo to 1914 in fifteen minutes</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .engines { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .engine { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: .75rem .8rem; font: .95rem/1.4 var(--sans); }
+  .engine b { display: block; font: 650 1.1rem var(--serif); margin-bottom: .2rem; }
+  @media (max-width: 420px) { .engines { grid-template-columns: 1fr; } }
+  .filters { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .filters button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+  .tl { list-style: none; margin: 0; padding: 0 0 0 1.1rem; border-left: 2px solid var(--line); display: flex; flex-direction: column; gap: .2rem; }
+  .tl li { position: relative; padding: .45rem .2rem .45rem .5rem; border-radius: 8px; transition: opacity .2s; font-family: var(--sans); }
+  .tl li::before { content: ""; position: absolute; left: -1.55rem; top: .85rem; width: 12px; height: 12px; border-radius: 6px; background: var(--panel); border: 2px solid var(--muted); }
+  .tl li.hinge::before { background: var(--accent); border-color: var(--accent); width: 14px; height: 14px; left: -1.6rem; }
+  .tl li.dim { opacity: .28; }
+  .tl .yr { font: 600 .95rem var(--mono); font-variant-numeric: tabular-nums; margin-right: .4rem; }
+  .tl .tag { font: 600 .68rem var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .05rem .4rem; vertical-align: 2px; }
+  .tl .what { font-weight: 600; }
+  .tl .more { display: block; color: var(--muted); font-size: .92rem; margin-top: .15rem; }
+  .halves { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .half { border-radius: 12px; padding: .8rem; font: .95rem/1.45 var(--sans); }
+  .half h3 { margin: 0 0 .3rem; font: 650 1.05rem var(--serif); }
+  .half.a { background: var(--accent-soft); }
+  .half.b { background: var(--panel); border: 1px solid var(--line); }
+  @media (max-width: 420px) { .halves { grid-template-columns: 1fr; } }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">History · The 19th century · A map of the century · Lesson 1</p>
+    <h1>From Waterloo to 1914 in fifteen minutes</h1>
+    <p class="lede">Before zooming in on 1873, get the whole century in your head: four forces that drove it, and the hinge in the middle where the mood turned.</p>
+  </header>
+
+  <section>
+    <h2>Why start with a map</h2>
+    <p>Liaquat Ahamed’s <em>1873</em> (2026) makes its claim in its subtitle: <em>The Rothschilds, the First Great Depression, and the Making of the Modern World</em>. A financial crash, a long slump, and a banking family, put forward as the hinge of an era.</p>
+    <p>To judge a claim like that you need to know what came before and after. Historians often call the period from the French Revolution to the First World War the <strong>long nineteenth century</strong> (Eric Hobsbawm’s phrase). We’ll start a little later, at Waterloo in 1815, when Europe finally stopped fighting Napoleon.</p>
+  </section>
+
+  <section>
+    <h2>Four engines</h2>
+    <p>Almost everything in the century runs on one of these four, and they keep feeding each other.</p>
+    <div class="engines">
+      <div class="engine"><b>Industry</b>Steam power, railways, factories, cities. Output and speed multiply; Britain goes first and Germany and the United States catch up fast.</div>
+      <div class="engine"><b>Money</b>The gold standard, London as the world’s banker, bond markets that finance railways and governments everywhere, and dynasties like the Rothschilds at the centre.</div>
+      <div class="engine"><b>Nations</b>Nationalism and mass politics. Italy and Germany are forged by war; the United States nearly splits and is rebuilt.</div>
+      <div class="engine"><b>Empire</b>Steamships, telegraphs and the Suez Canal shrink the world. Trade and migration boom, then a rush to grab colonies.</div>
+    </div>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>A German bank lends to an American railroad, paid back in gold-backed money. Which two engines is that mostly?</p>
+    <button>Nations and Empire</button>
+    <button data-correct>Money and Industry</button>
+    <button>Industry and Nations</button>
+    <div class="explain">Cross-border capital (money) financing railways (industry). This exact pairing is what blew up in 1873: railroad bonds sold across the Atlantic, financed on credit.</div>
+  </div>
+
+  <section>
+    <h2>The timeline</h2>
+    <p>Filter by engine to see each thread. The filled dots mark the hinge years around 1873.</p>
+    <div class="filters" role="group" aria-label="Filter by engine">
+      <button type="button" class="kit-btn" data-e="all" aria-pressed="true">All</button>
+      <button type="button" class="kit-btn" data-e="industry" aria-pressed="false">Industry</button>
+      <button type="button" class="kit-btn" data-e="money" aria-pressed="false">Money</button>
+      <button type="button" class="kit-btn" data-e="nations" aria-pressed="false">Nations</button>
+      <button type="button" class="kit-btn" data-e="empire" aria-pressed="false">Empire</button>
+    </div>
+    <ol class="tl" id="tl"></ol>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>What did Britain’s repeal of the Corn Laws in 1846 do?</p>
+    <button>Banned grain exports to protect British bakers</button>
+    <button data-correct>Scrapped tariffs on imported grain, committing Britain to free trade</button>
+    <button>Put the pound on the gold standard</button>
+    <div class="explain">The Corn Laws protected British landowners by taxing imported grain. Repeal meant cheaper bread for industrial workers and signalled that Britain, the workshop of the world, would trade freely. Free trade spread from there, peaking with treaties like Cobden–Chevalier (1860).</div>
+  </div>
+
+  <section>
+    <h2>Two halves</h2>
+    <p>One classic way to read the century is as two halves split in the 1870s. Hobsbawm’s trilogy draws the line there too: <em>The Age of Capital</em> ends in 1875, and <em>The Age of Empire</em> picks up from it.</p>
+    <div class="halves">
+      <div class="half a"><h3>Before ~1873</h3>Growth, railway booms, free trade spreading, confidence in markets and progress. Britain dominant. Money and goods move more freely than ever before.</div>
+      <div class="half b"><h3>After ~1873</h3>Two decades of falling prices and squeezed profits. Tariffs return (Germany 1879), mass politics and socialism grow, and the great powers race for colonies. Rivalries harden toward 1914.</div>
+    </div>
+    <aside class="key"><p>The 1873 crash sits at the seam between an age of liberal optimism and an age of protection, empire and rivalry. Whether it <em>caused</em> the turn or merely <em>marked</em> it is the question to carry into the rest of this topic.</p></aside>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>In 1873 a crash came in two waves. Which order is right?</p>
+    <button>New York in May, then Vienna in September</button>
+    <button data-correct>Vienna in May, then New York in September</button>
+    <button>London first, then Paris</button>
+    <div class="explain">The Vienna stock exchange collapsed in May 1873 after a speculative boom. In September the American bank Jay Cooke &amp; Company, overextended on railroad bonds, failed, and the New York Stock Exchange shut for days. Lesson 4 of the 1873 topic goes through both.</div>
+  </div>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>What best describes the “Long Depression” that followed?</p>
+    <button>A collapse in output, like 1930s mass unemployment</button>
+    <button data-correct>Long-running falling prices and squeezed profits and farm incomes, with growth continuing unevenly</button>
+    <button>Runaway inflation as governments printed money</button>
+    <div class="explain">It was mainly deflation. Prices fell for over two decades, which hurt debtors, farmers and profit margins, even as output in many countries kept growing. Historians still argue about whether “depression” is the right word.</div>
+  </div>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Which came first?</p>
+    <button data-correct>The Suez Canal opens</button>
+    <button>The German Empire is proclaimed</button>
+    <button>The Berlin Conference on Africa</button>
+    <div class="explain">Suez in 1869, the German Empire in January 1871 (proclaimed at Versailles, of all places), the Berlin Conference in 1884–85.</div>
+  </div>
+
+  <div class="q" data-id="q6" data-type="self">
+    <p>In two sentences: why might a long slump push governments toward tariffs and colonies?</p>
+    <div class="explain">When prices and profits fall for years, farmers and manufacturers demand protection from cheap imports, and politicians facing newly enfranchised voters listen. Colonies promised protected markets, raw materials and prestige at a time when open trade looked like it was hurting rather than helping.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const EV = [
+    [1815, 'nations', 'Waterloo and the Congress of Vienna', 'Napoleon’s final defeat; the great powers redraw Europe to keep revolution down.'],
+    [1830, 'industry', 'Liverpool and Manchester Railway', 'The first intercity line worked entirely by steam locomotives. Railway mania follows in the 1840s.'],
+    [1844, 'money', 'Bank Charter Act', 'Ties the Bank of England’s note issue to its gold reserves, the backbone of the British gold standard.'],
+    [1846, 'money', 'Corn Laws repealed', 'Britain commits to free trade.'],
+    [1848, 'nations', 'Revolutions across Europe', 'Uprisings from Paris to Vienna. Most fail within a year, but nationalism and mass politics are out of the box.'],
+    [1851, 'industry', 'The Great Exhibition, London', 'Britain shows off as the workshop of the world.'],
+    [1858, 'empire', 'Crown rule in India', 'After the 1857 rebellion, Britain takes India from the East India Company.'],
+    [1860, 'money', 'Cobden–Chevalier treaty', 'Anglo-French free trade; a web of similar treaties follows.'],
+    [1861, 'nations', 'American Civil War (1861–65)', 'The Union survives; the US emerges as an industrial nation-state.'],
+    [1866, 'empire', 'Transatlantic telegraph', 'News and prices cross the Atlantic in minutes instead of weeks.'],
+    [1869, 'empire', 'Suez Canal opens', 'The route to Asia shortens by thousands of miles. In the same year the first US transcontinental railroad is completed.'],
+    [1871, 'nations', 'German Empire proclaimed', 'After beating France. France owes a huge indemnity, and Germany uses the windfall to move onto gold.', true],
+    [1873, 'money', 'Crash in Vienna, then New York', 'May: the Vienna exchange collapses. September: Jay Cooke & Co. fails and panic hits America. The Long Depression begins.', true],
+    [1879, 'money', 'Germany’s protective tariff', 'Bismarck’s “iron and rye” tariff protects industry and farmers. The free-trade tide turns.', true],
+    [1884, 'empire', 'Berlin Conference', 'European powers set rules for carving up Africa.'],
+    [1896, 'money', 'Prices bottom out', 'The long deflation ends roughly here, helped by new gold from South Africa and the Klondike.'],
+    [1914, 'nations', 'The First World War', 'The long nineteenth century ends.'],
+  ];
+  const tl = document.getElementById('tl');
+  tl.innerHTML = EV.map(([y, e, w, m, h]) => `<li data-e="${e}" class="${h ? 'hinge' : ''}"><span class="yr">${y}</span><span class="tag">${e}</span><br><span class="what">${w}</span><span class="more">${m}</span></li>`).join('');
+  document.querySelectorAll('.filters [data-e]').forEach((b) => b.addEventListener('click', () => {
+    const e = b.dataset.e;
+    document.querySelectorAll('.filters [data-e]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    tl.querySelectorAll('li').forEach((li) => li.classList.toggle('dim', e !== 'all' && li.dataset.e !== e));
+  }));
+})();
+</script>
+</body></html>

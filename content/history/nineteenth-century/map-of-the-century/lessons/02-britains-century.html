@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Britain’s century</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .years { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .years button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+  .bars { display: grid; grid-template-columns: 5.2rem 1fr 3rem; gap: .45rem .6rem; align-items: center; font: .95rem var(--sans); margin-top: .8rem; }
+  .bars .track { height: 18px; position: relative; }
+  .bars .track i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 0 4px 4px 0; transition: width .35s ease; min-width: 2px; }
+  .bars .row-uk { font-weight: 650; }
+  .bars .v { font: .9rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; color: var(--ink); }
+  .src { font: .8rem var(--sans); color: var(--muted); margin: .6rem 0 0; }
+  .chain { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; counter-reset: s; }
+  .chain li { counter-increment: s; display: grid; grid-template-columns: 1.6rem 1fr; gap: .5rem; align-items: start; font-family: var(--sans); }
+  .chain li::before { content: counter(s); font: 650 .85rem/1.6rem var(--sans); width: 1.6rem; height: 1.6rem; border-radius: .8rem; background: var(--accent-soft); color: var(--accent); text-align: center; }
+  .chain .tag { font: 600 .68rem var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .05rem .4rem; margin-left: .3rem; vertical-align: 1px; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">History · The 19th century · A map of the century · Lesson 2</p>
+    <h1>Britain’s century</h1>
+    <p class="lede">A country with about 2% of the world’s people made nearly a quarter of its manufactures and lent money to half the planet. Here is how, and why it matters for 1873.</p>
+  </header>
+
+  <section>
+    <h2>Coal under, wages up</h2>
+    <p>Why did the industrial revolution start in Britain and not in France, China or the Netherlands? One influential answer, from the economic historian Robert Allen, is about prices.</p>
+    <p>British workers were <strong>expensive</strong> by the standards of the time, after a century of trade had pushed wages up. Meanwhile British coal was <strong>cheap</strong>, lying near the surface and near water transport. So a machine that replaced workers with coal-burning power paid for itself in Britain long before it did anywhere else. A spinning jenny or a steam engine in low-wage, wood-burning India would have lost money.</p>
+    <p>Once British engineers had built those machines, they kept improving them, until by mid-century they were cheap enough to pay off everywhere. Then Britain was selling the machines too.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>On Allen’s argument, what made mechanisation pay in Britain first?</p>
+    <button>Britain had more inventors and better schools</button>
+    <button data-correct>High wages and cheap coal made swapping labour for machine power profitable</button>
+    <button>Its empire forced colonies to buy British goods</button>
+    <div class="explain">Machines save labour and burn fuel. Where labour is dear and fuel is cheap, that trade is profitable early. Inventors and empire mattered too, but the price story explains <em>where</em> the incentive was strongest.</div>
+  </div>
+
+  <section>
+    <h2>The workshop of the world</h2>
+    <p>Pick a year. Bars show each economy’s estimated share of all the world’s manufacturing output.</p>
+    <div class="widget">
+      <div class="years" role="group" aria-label="Year">
+        <button type="button" class="kit-btn" data-y="0" aria-pressed="true">1830</button>
+        <button type="button" class="kit-btn" data-y="1" aria-pressed="false">1860</button>
+        <button type="button" class="kit-btn" data-y="2" aria-pressed="false">1880</button>
+        <button type="button" class="kit-btn" data-y="3" aria-pressed="false">1900</button>
+        <button type="button" class="kit-btn" data-y="4" aria-pressed="false">1913</button>
+      </div>
+      <div class="bars" id="bars" aria-live="polite"></div>
+      <p class="src">Share of world manufacturing output, %. Rough estimates by Paul Bairoch (1982); treat them as orders of magnitude.</p>
+    </div>
+    <p>Two stories in one chart. Britain rises to a peak around 1880, then is overtaken. And the old manufacturing giants, China and India, collapse: hand-spinners and weavers could not compete with Lancashire’s machine-made cloth, which flooded their markets.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>Using the chart: who had passed Britain by 1900?</p>
+    <button>Germany</button>
+    <button data-correct>The United States</button>
+    <button>India</button>
+    <div class="explain">The US was at about 24% in 1900 against Britain’s 19%. Germany passed Britain just before 1913. India’s share had fallen from about 18% in 1830 to under 2%.</div>
+  </div>
+
+  <section>
+    <h2>Free trade: a winner’s policy</h2>
+    <p>In 1846 Prime Minister Robert Peel split his own party to repeal the Corn Laws, the tariffs on imported grain that protected landowners. Richard Cobden’s Anti-Corn Law League had campaigned for years that cheap bread meant lower costs for factory owners and better lives for workers.</p>
+    <p>Free trade was a generous-sounding principle, but also a calculation. When your factories are the most efficient on earth, open markets favour you: you sell manufactures everywhere and buy food and raw materials cheaply in return. Countries trying to catch up, like Germany and the US later, often saw it the other way.</p>
+  </section>
+
+  <section>
+    <h2>The City: the world’s banker</h2>
+    <p>Industry made Britain rich. The City of London made it central.</p>
+    <p>After the Napoleonic wars Britain put the pound back on gold in 1821: a banknote could be swapped for a fixed weight of gold at the Bank of England. The Bank Charter Act of 1844 tied the Bank’s note issue to its gold reserves. Few currencies were as trusted, so the world started pricing trade in sterling.</p>
+    <p>The key instrument was the <strong>bill on London</strong>: a promise to pay a sum in London on a set date, usually 90 days out. A cotton buyer in Buenos Aires or a tea merchant in Shanghai could pay with one, once a respected London house had “accepted” it, putting its own name behind the promise. Those bills then traded in Lombard Street like cash.</p>
+    <p>Follow one shipment round the loop:</p>
+    <div class="widget">
+      <ol class="chain" data-steps>
+        <li><div><b>Manchester</b><span class="tag">industry</span><br>A mill ships cotton cloth to a merchant in Buenos Aires.</div></li>
+        <li><div><b>Buenos Aires</b><span class="tag">money</span><br>The merchant pays with a 90-day bill on London, accepted by a London merchant bank such as Barings.</div></li>
+        <li><div><b>Lombard Street</b><span class="tag">money</span><br>The mill doesn’t want to wait 90 days, so it sells (discounts) the bill to a London bank for slightly less than face value. The Bank of England’s interest rate sets how much less.</div></li>
+        <li><div><b>The City</b><span class="tag">money</span><br>British profits pile up looking for a home. Barings and others sell Argentine railway bonds to British savers.</div></li>
+        <li><div><b>The Pampas</b><span class="tag">empire</span><br>British-financed, British-built railways carry Argentine wheat and beef to the ports, to feed British workers more cheaply.</div></li>
+        <li><div><b>Back to Manchester</b><span class="tag">industry</span><br>Cheap food keeps wages and costs down; Argentina earns pounds to buy more cloth. The loop closes.</div></li>
+      </ol>
+    </div>
+    <aside class="key"><p>Industry, money and empire fed each other through London. When the loop ran, everyone grew. When lending outran the railways’ earnings, the bonds went bad, which is exactly the kind of bust 1873 was. (Barings itself nearly collapsed over Argentine loans in 1890.)</p></aside>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>What made a “bill on London” as good as cash for a merchant in Shanghai?</p>
+    <button>It was printed by the Bank of England</button>
+    <button data-correct>A trusted London house had accepted it, guaranteeing payment in gold-backed sterling</button>
+    <button>It was backed by the Chinese government</button>
+    <div class="explain">The acceptance put a famous name behind the debt, and the pound was convertible into gold. That pairing, trust in the name and in the money, is why sterling became the world’s trading currency.</div>
+  </div>
+
+  <section>
+    <h2>The Rothschilds</h2>
+    <p>Nathan Mayer Rothschild arrived in England from Frankfurt’s Jewish quarter in 1798 as a cotton buyer in Manchester. Within a decade he was in London, dealing in bills, gold and government debt. During the war against Napoleon he organised the shipment of gold to pay Wellington’s armies and Britain’s allies, using a network his four brothers ran from Frankfurt, Paris, Vienna and Naples.</p>
+    <p>The famous tale, that he made a killing on early news of Waterloo, was spread decades later in a hostile French pamphlet and is mostly legend. The real advantage was structural: five houses in five capitals that trusted each other, could move money across borders faster than any government, and shared information by private courier.</p>
+    <p>That is why Ahamed’s <em>1873</em> puts the family near the centre. By mid-century the Rothschilds were lending to governments across Europe. A world economy run through London’s bill market and a handful of banking houses is fast and efficient, and a shock in one capital travels to the others within days.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Why did free trade suit Britain especially well in the mid-1800s?</p>
+    <button>Britain had no farmers left to protect</button>
+    <button data-correct>Its factories were the most efficient, so open markets let it sell manufactures everywhere and import cheap food</button>
+    <button>Free trade was required by the gold standard</button>
+    <div class="explain">A leader gains most from open competition. The losers were British landowners (cheaper grain) and foreign manufacturers who couldn’t match British prices, which is why later industrialisers often chose tariffs.</div>
+  </div>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>What was the real source of the Rothschilds’ edge?</p>
+    <button>Inside knowledge of the result at Waterloo</button>
+    <button data-correct>A trusted family network of banks in five capitals, moving money and information across borders</button>
+    <button>Owning the Bank of England</button>
+    <div class="explain">The Waterloo story is largely a later legend. The network was real: brothers in London, Paris, Frankfurt, Vienna and Naples who could settle payments with each other and share news faster than rivals.</div>
+  </div>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>Roughly what share of world manufacturing did Britain have at its peak, around 1880?</p>
+    <button>About 5%</button>
+    <button data-correct>About a fifth to a quarter</button>
+    <button>More than half</button>
+    <div class="explain">Bairoch’s estimate is about 23% in 1880, from a country with only 2–3% of the world’s people.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="self">
+    <p>In two or three sentences: how could a railway bust in Argentina or America hurt a mill town in Lancashire?</p>
+    <div class="explain">British savings financed foreign railways through London bonds. When the railways couldn’t pay, British investors and banks took losses, credit in the City tightened and interest rates rose, and the foreign customers who had been buying British goods with borrowed money stopped buying. Orders at the mill fall, so the bust comes home.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  // Bairoch (1982), share of world manufacturing output, %: 1830, 1860, 1880, 1900, 1913
+  const DATA = [
+    ['Britain', [9.5, 19.9, 22.9, 18.5, 13.6]],
+    ['US', [2.4, 7.2, 14.7, 23.6, 32.0]],
+    ['Germany', [3.5, 4.9, 8.5, 13.2, 14.8]],
+    ['China', [29.8, 19.7, 12.5, 6.2, 3.6]],
+    ['India', [17.6, 8.6, 2.8, 1.7, 1.4]],
+  ];
+  const bars = document.getElementById('bars');
+  bars.innerHTML = DATA.map(([n], i) => `<span class="${i ? '' : 'row-uk'}">${n}</span><div class="track"><i></i></div><span class="v"></span>`).join('');
+  const tracks = bars.querySelectorAll('.track i'), vals = bars.querySelectorAll('.v');
+  function show(y) {
+    DATA.forEach(([, v], i) => { tracks[i].style.width = (v[y] / 32 * 100) + '%'; vals[i].textContent = v[y].toFixed(1); });
+    document.querySelectorAll('.years [data-y]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.y) === y)));
+  }
+  document.querySelectorAll('.years [data-y]').forEach((b) => b.addEventListener('click', () => show(Number(b.dataset.y))));
+  show(0);
+
+  // step-through: reveal one link of the chain per tap
+  document.querySelectorAll('[data-steps]').forEach((ol) => {
+    const items = [...ol.children];
+    items.forEach((li, i) => { li.hidden = i > 0; });
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'kit-btn'; btn.textContent = 'Next';
+    ol.after(btn);
+    let shown = 1;
+    btn.addEventListener('click', () => {
+      if (shown < items.length) { items[shown].hidden = false; shown++; }
+      if (shown >= items.length) btn.remove();
+    });
+  });
+})();
+</script>
+</body></html>

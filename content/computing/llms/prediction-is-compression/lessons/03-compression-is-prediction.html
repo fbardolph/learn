@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Compression is prediction</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats > div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats > div > span { font-size: .8rem; color: var(--muted); }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .row .kit-btn { min-height: 44px; }
+  .row .kit-btn[aria-pressed="true"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .msg { font: 1rem var(--mono); min-height: 1.5rem; letter-spacing: .1em; word-break: break-all; }
+  .zoom { display: grid; grid-template-columns: 1.4rem 1fr 3.4rem; gap: .3rem .5rem; align-items: center; font: .8rem var(--sans); }
+  .zoom .bar { display: flex; height: 22px; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+  .zoom .seg { height: 100%; border-right: 1px solid var(--paper); opacity: .25; display: flex; align-items: center; justify-content: center; font-size: .7rem; color: var(--ink); overflow: hidden; }
+  .zoom .seg.on { opacity: 1; color: var(--paper); font-weight: 650; }
+  .zoom .s-S { background: var(--accent); }
+  .zoom .s-C { background: var(--muted); }
+  .zoom .s-R { background: var(--good); }
+  .zoom .n { font: .8rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .zoom .h { color: var(--muted); font-size: .7rem; }
+  table.steps { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
+  table.steps th, table.steps td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Prediction, compression and intelligence · Lesson 3</p>
+    <h1>Compression is prediction</h1>
+    <p class="lede">You’ll build the machine that turns any predictor into a compressor and see why the file size comes out equal to the predictor’s total surprise.</p>
+  </header>
+
+  <section>
+    <h2>The whole-bit problem</h2>
+    <p>Last lesson, sun / cloud / rain at $\tfrac12, \tfrac14, \tfrac14$ got a perfect code: <code>0</code>, <code>10</code>, <code>11</code>. That worked because every probability was a power of $\tfrac12$, so every surprise was a whole number of bits.</p>
+    <p>Real predictions aren’t like that. A language model might give the next token probability $0.9$. Its surprise is $-\log_2 0.9 \approx 0.15$ bits, but a code that hands each symbol its own string of bits can’t spend less than <strong>1 whole bit</strong> on anything. When the model is confident, which is most of the time, that wastes almost all of its skill.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>A model gives the actual next symbol probability 0.99 a thousand times in a row. A one-codeword-per-symbol code spends at least 1,000 bits. About how many bits does the surprise say the message is worth?</p>
+    <button>About 990</button>
+    <button>About 100</button>
+    <button data-correct>About 15</button>
+    <div class="explain">Each symbol is worth $-\log_2 0.99 \approx 0.0145$ bits. Times 1,000 that’s about 14.5 bits. A whole-bit code wastes about 98.5% of the space here. That’s the gap arithmetic coding closes.</div>
+  </div>
+
+  <section>
+    <h2>The trick: a message is a slice of [0, 1)</h2>
+    <p>Arithmetic coding doesn’t give each symbol its own bits. It encodes the <em>whole message</em> as one number between 0 and 1.</p>
+    <ol>
+      <li>Start with the interval from 0 to 1.</li>
+      <li>Ask the model for its probabilities for the next symbol. Cut the current interval into slices whose widths are proportional to those probabilities.</li>
+      <li>Keep the slice for the symbol that actually happened. That slice becomes the new interval.</li>
+      <li>Repeat for every symbol. At the end, send any short binary number that lies inside the final interval.</li>
+    </ol>
+    <p>Each step multiplies the width by the probability of what happened. A likely symbol barely shrinks the interval. A surprising one shrinks it a lot.</p>
+  </section>
+
+  <section>
+    <h2>Watch it shrink</h2>
+    <p>Tap the weather day by day. Each row is the interval so far, stretched to full width, with the model’s slices inside it. Then switch models and see what happens to the bill for the same message.</p>
+    <div class="widget">
+      <div class="row" role="group" aria-label="Model">
+        <button type="button" class="kit-btn" data-model="uniform">Know-nothing</button>
+        <button type="button" class="kit-btn" data-model="climate">Climate</button>
+        <button type="button" class="kit-btn" data-model="persist">Same as yesterday</button>
+      </div>
+      <p class="h" id="mdesc" style="font: .85rem var(--sans); color: var(--muted); margin: .4rem 0"></p>
+      <div class="row">
+        <button type="button" class="kit-btn" data-add="S">+ Sun</button>
+        <button type="button" class="kit-btn" data-add="C">+ Cloud</button>
+        <button type="button" class="kit-btn" data-add="R">+ Rain</button>
+        <button type="button" class="kit-btn" id="undo">Undo</button>
+        <button type="button" class="kit-btn" id="preset">Example week</button>
+      </div>
+      <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="zoom" id="zoom"></div>
+      <div class="stats">
+        <div><b id="zw"></b><span>final width</span></div>
+        <div><b id="zb"></b><span>bits (total surprise)</span></div>
+        <div><b id="zp"></b><span>bits per day</span></div>
+      </div>
+    </div>
+    <p>Try the example week with each model. Know-nothing pays $\log_2 3 \approx 1.58$ bits every day, whatever happens. Climate pays less on sunny days and more on rainy ones. Same-as-yesterday wins because real weather comes in runs. Same message, different predictor, different file size.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="0.06" data-tol="0.0005">
+    <p>A model gives the actual symbols probabilities $0.5$, then $0.6$, then $0.2$. How wide is the final interval?</p>
+    <div class="explain">Each step multiplies the width by the probability of what happened: $1 \times 0.5 = 0.5$, then $0.5 \times 0.6 = 0.3$, then $0.3 \times 0.2 = 0.06$.</div>
+  </div>
+
+  <section>
+    <h2>Why width means bits</h2>
+    <p>A binary fraction with $k$ digits after the point, like $0.0111_2$, pins down a slot of width $2^{-k}$. To land a slot inside an interval of width $w$, you need about $k = -\log_2 w$ digits (plus one or two to be safe).</p>
+    <p>Now the final width is the product of the probabilities:</p>
+    <p>$$w = p_1 \times p_2 \times \cdots \times p_n$$</p>
+    <p>and the log of a product is the sum of the logs, so</p>
+    <p>$$-\log_2 w = (-\log_2 p_1) + (-\log_2 p_2) + \cdots + (-\log_2 p_n).$$</p>
+    <p>That’s the total surprise. A symbol with probability 0.99 adds just 0.0145 bits. The fractions of a bit pile up across symbols and nothing is wasted.</p>
+    <aside class="key"><p><strong>Compressed size ≈ the model’s total surprise on the message</strong>, within about 2 bits for the whole message. Better predictions mean a smaller file, with nothing else to tune.</p></aside>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="6" data-tol="0.001">
+    <p>A model gives the actual symbols probabilities $\tfrac12$, $\tfrac14$ and $\tfrac18$. About how many bits does arithmetic coding need (ignoring the 1–2 bit overhead)?</p>
+    <div class="explain">
+      <p>Surprises: $-\log_2\tfrac12 = 1$, $-\log_2\tfrac14 = 2$, $-\log_2\tfrac18 = 3$. Total $1 + 2 + 3 = 6$ bits.</p>
+      <p>Or by width: $\tfrac12 \times \tfrac14 \times \tfrac18 = \tfrac1{64} = 2^{-6}$, and $-\log_2 2^{-6} = 6$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>By hand, start to finish</h2>
+    <p>Two symbols: A with probability $\tfrac34$ (the bottom of each interval), B with $\tfrac14$ (the top). Message: <strong>A A B</strong>.</p>
+    <table class="steps">
+      <tr><th>Symbol</th><th>Interval</th><th>Width</th></tr>
+      <tr><td>start</td><td>$[0,\ 1)$</td><td>$1$</td></tr>
+      <tr><td>A</td><td>$[0,\ 0.75)$</td><td>$0.75$</td></tr>
+      <tr><td>A</td><td>$[0,\ 0.5625)$</td><td>$0.5625$</td></tr>
+      <tr><td>B</td><td>$[0.421875,\ 0.5625)$</td><td>$0.140625$</td></tr>
+    </table>
+    <p>The B step keeps the top quarter of $[0, 0.5625)$. Its bottom is $0.75 \times 0.5625 = 0.421875$.</p>
+    <p>Ideal cost: $-\log_2 0.140625$. Since $0.140625 = \tfrac{9}{64}$, that’s $\log_2 64 - \log_2 9 = 6 - 3.17 = 2.83$ bits. Check it by surprises: $0.415 + 0.415 + 2 = 2.83$. ✓</p>
+    <p>Now find a short binary number whose whole slot fits inside. $0.0111_2 = \tfrac14 + \tfrac18 + \tfrac1{16} = 0.4375$, and its slot runs from $0.4375$ to $0.4375 + \tfrac1{16} = 0.5$. That sits inside $[0.421875, 0.5625)$. So the message is sent as the 4 bits <strong>0111</strong>: 2.83 ideal plus about 1 of overhead.</p>
+    <details class="reveal"><summary>Show how the receiver decodes 0111</summary>
+      <p>The receiver has the <em>same model</em>, and knows the message is 3 symbols long. It reads $x = 0.4375$.</p>
+      <ol>
+        <li>Is $x$ below $0.75$? Yes, so the first symbol is <strong>A</strong>. Stretch $[0, 0.75)$ back to $[0, 1)$: $x \to 0.4375 \div 0.75 = 0.5833$.</li>
+        <li>Is $0.5833$ below $0.75$? Yes, so <strong>A</strong>. Stretch: $0.5833 \div 0.75 = 0.7778$.</li>
+        <li>Is $0.7778$ below $0.75$? No, so <strong>B</strong>.</li>
+      </ol>
+      <p>Out comes A A B. It’s the guess-count trick from Lesson 1 again: an identical predictor on the other end replays the same probabilities, so only the surprises have to travel.</p>
+    </details>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>The sender compresses with a great model, and the receiver decodes with a slightly different one. What happens?</p>
+    <button>The output is slightly blurry but mostly right</button>
+    <button data-correct>Decoding goes wrong: the slices are cut in different places, so the number lands in the wrong symbols</button>
+    <button>It works, just with a bigger file</button>
+    <div class="explain">Decoding asks “which slice is $x$ in?”, and the slices come from the model’s probabilities. Different probabilities give different slice boundaries, and after the first mismatch every later symbol is garbage. Sender and receiver must share the exact same predictor.</div>
+  </div>
+
+  <section>
+    <h2>And the other way round</h2>
+    <p>Any compressor also contains a predictor. If a code spends $\ell$ bits on some symbol, it’s acting as if that symbol has probability $2^{-\ell}$. Give something 3 bits and you’ve implicitly called it a 1-in-8 event. So “the best compressor” and “the best predictor” are the same object described two ways.</p>
+    <p>This isn’t just theory. In 2023 a DeepMind team (<a href="https://arxiv.org/abs/2309.10668">Delétang et al., “Language Modeling Is Compression”</a>) plugged large language models into an arithmetic coder. Chinchilla 70B, trained mostly on text, compressed ImageNet image patches to 43.4% of their raw size and LibriSpeech audio to 16.4%, beating PNG (58.5%) and FLAC (30.3%), which were designed for those jobs. The catch: that doesn’t count the model itself, which is vastly bigger than the data. Lesson 6 comes back to why that matters.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="0.125" data-tol="0.001">
+    <p>A compressor always spends 3 bits on the word “the”. What probability is it implicitly giving “the”?</p>
+    <div class="explain">$\ell$ bits means probability $2^{-\ell}$: $2^{-3} = \tfrac18 = 0.125$.</div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>Two models compress the same 1 MB of English. Model X averages 2.1 bits per character, model Y 1.4. Which made the better predictions, and how do you know?</p>
+    <button>X, because it used more bits to capture more detail</button>
+    <button data-correct>Y: fewer bits means it gave the actual characters higher probability on average</button>
+    <button>You can’t tell from file size alone</button>
+    <div class="explain">With arithmetic coding, bits per character is the model’s average surprise, $-\log_2 p$ of what actually came next. Lower surprise means higher probability on the truth, which is exactly what better prediction means.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="0.25" data-tol="0.001">
+    <p>An arithmetic coder’s interval has width $0.5$. The model gives the next actual symbol probability $0.5$. What’s the new width?</p>
+    <div class="explain">Multiply the width by the probability of what happened: $0.5 \times 0.5 = 0.25$. That’s 2 bits of total surprise so far: $-\log_2 0.25 = 2$.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>Why does arithmetic coding beat a code that gives each symbol its own bit string, like 0 / 10 / 11?</p>
+    <button>It uses a bigger alphabet</button>
+    <button data-correct>It can spend a fraction of a bit on a confident prediction, because it codes the whole message as one number</button>
+    <button>It throws away rare symbols</button>
+    <div class="explain">Separate codewords cost at least 1 bit each. Arithmetic coding multiplies widths across the whole message, so a symbol with probability 0.99 costs 0.0145 bits. It’s lossless: nothing is thrown away.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In your own words: why is a better next-symbol predictor automatically a better compressor?</p>
+    <div class="explain">Arithmetic coding shrinks an interval by the probability of each actual symbol, and the bits needed are $-\log_2$ of the final width, which is the sum of $-\log_2 p$ over the message: the model’s total surprise. A model that puts more probability on what actually happens has less total surprise, so the file is smaller. (And any code implies probabilities $2^{-\ell}$, so the link runs both ways.)</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const SYMS = ['S', 'C', 'R'], NAME = { S: 'Sun', C: 'Cloud', R: 'Rain' };
+  const CLIMATE = { S: 0.5, C: 0.3, R: 0.2 };
+  const MODELS = {
+    uniform: { desc: 'Every day: ⅓ each. Knows nothing about weather.', p: () => ({ S: 1 / 3, C: 1 / 3, R: 1 / 3 }) },
+    climate: { desc: 'Every day: sun 0.5, cloud 0.3, rain 0.2. Knows the local climate, ignores yesterday.', p: () => CLIMATE },
+    persist: { desc: 'Same as yesterday 0.8, each other kind 0.1. (Day 1 uses the climate.)',
+      p: (prev) => (prev ? Object.fromEntries(SYMS.map((s) => [s, s === prev ? 0.8 : 0.1])) : CLIMATE) },
+  };
+  const MAX = 14;
+  let model = 'persist', msg = [], tried = new Set();
+
+  const $ = (id) => document.getElementById(id);
+  const modelBtns = [...document.querySelectorAll('[data-model]')];
+
+  function draw() {
+    const m = MODELS[model];
+    modelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.model === model)));
+    $('mdesc').textContent = m.desc;
+    $('msg').textContent = msg.length ? msg.join(' ') : 'Tap a day to start.';
+    let bits = 0;
+    let html = '<span class="h">day</span><span class="h">interval so far (zoomed), slices = model’s odds</span><span class="h n">bits</span>';
+    msg.forEach((s, i) => {
+      const ps = m.p(msg[i - 1]);
+      const b = -Math.log2(ps[s]);
+      bits += b;
+      const segs = SYMS.map((k) => `<div class="seg s-${k}${k === s ? ' on' : ''}" style="width:${ps[k] * 100}%">${k}</div>`).join('');
+      html += `<span>${i + 1}</span><div class="bar" aria-label="${NAME[s]}, probability ${ps[s].toFixed(2)}">${segs}</div><span class="n">+${b.toFixed(2)}</span>`;
+    });
+    $('zoom').innerHTML = html;
+    $('zb').textContent = bits.toFixed(2);
+    $('zp').textContent = msg.length ? (bits / msg.length).toFixed(2) : '–';
+    $('zw').textContent = msg.length ? '2^−' + bits.toFixed(1) : '1';
+    if (msg.length >= 7) {
+      tried.add(model);
+      if (tried.size === 3) { tried.add('logged'); Study.event({ type: 'arith-coder', days: msg.length, model, bits: Number(bits.toFixed(2)) }); }
+    }
+  }
+
+  modelBtns.forEach((b) => b.addEventListener('click', () => { model = b.dataset.model; draw(); }));
+  document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => {
+    if (msg.length < MAX) { msg.push(b.dataset.add); draw(); }
+  }));
+  $('undo').addEventListener('click', () => { msg.pop(); draw(); });
+  $('preset').addEventListener('click', () => { msg = 'S S S S C C R R R S'.split(' '); draw(); });
+  draw();
+})();
+</script>
+</body></html>

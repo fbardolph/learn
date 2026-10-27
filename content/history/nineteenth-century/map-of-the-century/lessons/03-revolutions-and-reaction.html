@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Revolutions and reaction</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .month { font: 650 1.05rem var(--sans); }
+  .cities { display: grid; grid-template-columns: 1fr; gap: .4rem; list-style: none; margin: 0; padding: 0; }
+  .cities > li { display: grid; grid-template-columns: 1rem 6.2rem 1fr; gap: .5rem; align-items: start; font: .92rem/1.35 var(--sans); }
+  .cities .dot { width: .8rem; height: .8rem; border-radius: 50%; margin-top: .25rem; border: 2px solid var(--line); background: transparent; }
+  .cities .revolt .dot { background: var(--accent); border-color: var(--accent); }
+  .cities .crushed .dot { background: var(--muted); border-color: var(--muted); }
+  .cities .name { font-weight: 650; }
+  .cities .what { color: var(--muted); }
+  .cities .revolt .what { color: var(--ink); }
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; font: .8rem var(--sans); color: var(--muted); }
+  .legend .k { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .3rem; vertical-align: -1px; border: 2px solid var(--line); }
+  .legend .k.r { background: var(--accent); border-color: var(--accent); }
+  .legend .k.c { background: var(--muted); border-color: var(--muted); }
+  .sorter .pool, .sorter .picked { display: flex; flex-direction: column; gap: .4rem; }
+  .sorter .picked:empty { display: none; }
+  .sorter .picked > div { font: .95rem var(--sans); padding: .55rem .7rem; border-radius: 8px; background: var(--accent-soft); }
+  .sorter .picked > div.ok { background: var(--good-soft); }
+  .sorter .picked > div.no { background: var(--bad-soft); }
+  .sorter .picked .yr { font: 600 .85rem var(--mono); margin-left: .4rem; color: var(--muted); }
+  .sorter .pool button { min-height: 44px; text-align: left; }
+  .sorter .result { font: 600 .95rem var(--sans); }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">History · The 19th century · A map of the century · Lesson 3</p>
+    <h1>Revolutions and reaction</h1>
+    <p class="lede">In 1848 nearly every capital in Europe rose up within a few weeks, and nearly every revolt was crushed within two years. Why both happened, and what the winners learned from it.</p>
+  </header>
+
+  <section>
+    <h2>Warm-up: getting the order right</h2>
+    <p>In lesson 1 two questions went astray: what the Corn Laws were, and which came first among Suez, the German Empire and the Berlin Conference. Dates are the skeleton of a narrative, so here is a quick sort before the story starts. Tap the events in the order they happened, earliest first.</p>
+    <div class="widget sorter" id="sorter">
+      <div class="picked" aria-live="polite"></div>
+      <div class="pool"></div>
+      <p class="result" hidden></p>
+    </div>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>The Corn Laws that Peel repealed in 1846 were…</p>
+    <button>A ban on exporting British grain</button>
+    <button data-correct>Tariffs on <em>imported</em> grain that kept bread prices high and landowners’ rents up</button>
+    <button>Price controls that capped what bakers could charge</button>
+    <div class="explain">“Corn” is the old British word for grain. The laws taxed foreign grain coming <em>in</em>, which protected landlords. Repealing them was the free-trade move: cheaper food for the towns. Keep the date in mind: 1846 is in the middle of the “hungry forties”, right before 1848.</div>
+  </div>
+
+  <section>
+    <h2>1815: the lid goes on</h2>
+    <p>After Napoleon, the victors met at the Congress of Vienna (1814–15) to put Europe back together. Their host and organiser was the Austrian foreign minister, Prince Klemens von Metternich.</p>
+    <p>Metternich ruled a ramshackle empire of Germans, Hungarians, Czechs, Poles, Italians, Croats and more. Two ideas let loose by the French Revolution could each tear it apart: <strong>liberalism</strong> (constitutions, elected parliaments, a free press) and <strong>nationalism</strong> (each people should have its own state). So the system he built had one aim: keep both down. Kings were restored, the great powers met regularly to settle disputes (the “Concert of Europe”), and in the German states the 1819 Carlsbad Decrees censored the press and policed the universities.</p>
+    <p>For a generation it mostly worked. no war drew in all the great powers at once until 1914, a peace no one in 1815 would have dared predict. But the pressure underneath kept building.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>Why did Metternich fear nationalism in particular?</p>
+    <button>Austria had no army to fight other nations</button>
+    <button data-correct>His empire contained many peoples; “one nation, one state” would break it into pieces</button>
+    <button>Nationalists wanted to restore Napoleon</button>
+    <div class="explain">For France or Britain nationalism could be a source of unity. For a multinational empire like Austria it was a threat to existence: Hungarian, Italian or Czech nationalism meant pulling chunks away from Vienna.</div>
+  </div>
+
+  <section>
+    <h2>1830: a rehearsal</h2>
+    <p>In July 1830 King Charles X of France tried to muzzle the press and shrink the electorate. Paris built barricades, and after three days of street fighting (the “Three Glorious Days”) Charles fled to England.</p>
+    <p>But the people who had fought on the barricades did not get a republic. The liberal deputies and bankers who stepped in chose a new, safer king: Louis-Philippe, a cousin from the Orléans branch of the family, who styled himself “King of the French” and wore a businessman’s frock coat. His regime, the <strong>July Monarchy</strong>, gave the vote to only the richest men, under 1% of the population. It was a regime of property and money, and the Paris Rothschild, James, became one of its main lenders.</p>
+    <p>The spark spread. Belgium broke away from the Netherlands and became an independent kingdom. The Poles rose against Russian rule and were crushed in 1831. Italian revolts were put down by Austrian troops. The pattern was set: a shock in Paris, uprisings elsewhere, and the strong armies of the east restoring order.</p>
+  </section>
+
+  <section>
+    <h2>Britain bends instead of breaking</h2>
+    <p>Britain had riots in 1830–31 too, and its parliament was absurdly unrepresentative: booming Manchester had no MP of its own, while “rotten boroughs” with a handful of voters sent two each. The Whig government pushed through the <strong>Great Reform Act of 1832</strong>. It redrew seats toward the new industrial towns and widened the vote to the middle class, still only about one adult man in five.</p>
+    <p>That was the British pattern for the century: reform early, just enough, so that revolution never got going. The working-class Chartist movement demanded votes for all men in the late 1830s and 1840s, but its great London rally of April 1848 passed off peacefully. The repeal of the Corn Laws two years earlier, which made bread cheaper, had taken some of the heat out.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>Who ended up holding power in France after the revolution of July 1830?</p>
+    <button>A republic of the workers who fought on the barricades</button>
+    <button data-correct>A new king, Louis-Philippe, backed by liberal deputies and bankers, with a tiny wealthy electorate</button>
+    <button>Charles X, after his army retook Paris</button>
+    <div class="explain">The crowd won the street fight and the propertied liberals won the peace. That gap between the people who fight a revolution and the people who end up running it is the theme to watch in 1848 too.</div>
+  </div>
+
+  <section>
+    <h2>1848: hunger, then credit, then barricades</h2>
+    <p>Start with money and food. From 1845 potato blight ruined harvests across Europe; in Ireland about a million people died and another million emigrated. Grain harvests failed in 1846 too, so food prices soared just as people had less to spend. Then came a financial crash in 1847, after a railway-building boom in Britain and on the Continent went bust. Factories laid off workers in the towns that had most of the radicals.</p>
+    <p>In February 1848 Louis-Philippe’s government banned a political banquet in Paris (banquets were how the opposition got around the ban on political meetings). The barricades went up, and in three days the king was gone. This time France became a republic, the Second Republic, and gave the vote to all adult men.</p>
+    <p>The news travelled by railway and telegraph faster than any revolution before. Slide through the months and watch it spread.</p>
+    <div class="widget">
+      <label>Month: <span class="month" id="month">January 1848</span>
+        <input type="range" id="m" min="0" max="23" value="0" step="1" aria-label="Month, January 1848 to December 1849">
+      </label>
+      <div class="legend"><span><i class="k"></i>calm</span><span><i class="k r"></i>in revolt / revolutionaries in charge</span><span><i class="k c"></i>crushed</span></div>
+      <ul class="cities" id="cities"></ul>
+    </div>
+    <p>By the end of March, Metternich, the architect of 1815, had resigned and fled Vienna for (of all places) London. Even Salomon Rothschild left Vienna. Kings in Berlin, Munich and Turin granted constitutions. Hungary got its own government under Lajos Kossuth. In May an elected all-German parliament met in Frankfurt to write a constitution for a united Germany.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Which best describes the run-up to 1848?</p>
+    <button>A long boom that made workers confident enough to demand rights</button>
+    <button data-correct>Failed harvests and dear food, then a financial crash and layoffs, on top of long-standing political grievances</button>
+    <button>A war between France and Austria that weakened both governments</button>
+    <div class="explain">Ideas supplied the programme, but the timing came from the economy: the potato and grain failures of 1845–47 and the 1847 credit crisis. Hungry, jobless towns were the tinder; a banned banquet in Paris was the match.</div>
+  </div>
+
+  <section>
+    <h2>Why it failed</h2>
+    <p>Spring turned to reaction within months. Three reasons recur.</p>
+    <p><strong>The winners split.</strong> Liberals wanted constitutions and property rights; radicals and workers wanted jobs and social change. In Paris the republic set up “National Workshops” to employ the jobless. When it closed them in June, workers rose again, and the army crushed them in the “June Days”, killing thousands. Frightened middle-class liberals now preferred order to further revolution.</p>
+    <p><strong>The nations split.</strong> Germans in Frankfurt and Hungarians in Budapest wanted their own nation states, but the Czechs, Croats and Romanians living among them wanted theirs too. Vienna played them off against each other: Croatian troops marched against Hungary.</p>
+    <p><strong>The armies stayed loyal.</strong> Kings had lost their capitals, not their soldiers. Austrian troops retook Milan in August and bombarded Vienna into submission in October. Prussia’s king brought his troops back into Berlin in November. When the Frankfurt Parliament offered him the crown of a united Germany in 1849, he refused a “crown from the gutter” handed up by an elected assembly. Russia sent an army to finish off Hungary in August 1849.</p>
+    <aside class="key"><p>1848 failed because the revolutionaries split (liberals against radicals, nation against nation) while the old regimes kept their armies. The historian G. M. Trevelyan called it the turning point at which history “failed to turn”.</p></aside>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Why did many middle-class liberals turn against the revolution in Paris by mid-1848?</p>
+    <button>Louis-Philippe paid them to switch sides</button>
+    <button data-correct>The June Days rising of unemployed workers made them fear social upheaval more than the old order</button>
+    <button>They had already won everything they wanted in 1830</button>
+    <div class="explain">Once the closing of the National Workshops sent workers back to the barricades, property owners backed the army. In December 1848 France elected Louis-Napoleon Bonaparte, the great Napoleon’s nephew, as president, with about three-quarters of the vote: a vote for order.</div>
+  </div>
+
+  <section>
+    <h2>What the winners learned</h2>
+    <p>Not everything was undone. Serfdom was abolished across the Austrian lands in 1848 and stayed abolished. France kept the vote for all men. And the next generation of conservatives drew a lesson from 1848: the vote and national feeling did not have to be the enemy. They could be harnessed.</p>
+    <p>Louis-Napoleon seized full power in a coup in December 1851 and made himself Emperor Napoleon III a year later, both times confirmed by a vote of all adult men. He then bought popularity with growth: railways, the rebuilding of Paris under Baron Haussmann, and new investment banks like the Péreire brothers’ Crédit Mobilier (1852). Gold rushes in California (1848) and Australia (1851) poured new money into the world economy and fuelled the 1850s boom.</p>
+    <p>In Prussia, Otto von Bismarck would unify Germany not through a parliament in Frankfurt but through three short wars, the last ending in that proclamation at Versailles in 1871. Then he gave the new empire’s parliament a vote for all men, betting that peasants would vote conservative. Italy too was unified from above, by the kingdom of Piedmont and its prime minister Cavour, with Garibaldi’s volunteers.</p>
+    <p>So the revolution from below failed, and a revolution from above succeeded. Those regimes ran on booms, borrowing and national pride, which leads straight to the boom in Vienna and Berlin that crashed in 1873.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>What did Britain do differently from the continental monarchies?</p>
+    <button>It crushed its radicals with the army in 1848</button>
+    <button data-correct>It reformed early and just enough (1832 Reform Act, Corn Law repeal), so revolution never caught</button>
+    <button>It became a republic in 1832</button>
+    <div class="explain">Widening the vote to the middle class in 1832, and cheaper bread after 1846, meant the people most likely to lead a revolution had a stake in the system. The 1848 Chartist rally fizzled.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>Put these in order: (A) February revolution in Paris, (B) repeal of the Corn Laws, (C) Louis-Napoleon becomes emperor, (D) July Revolution in Paris.</p>
+    <button>B, D, A, C</button>
+    <button data-correct>D, B, A, C</button>
+    <button>D, A, B, C</button>
+    <div class="explain">July Revolution 1830, Corn Law repeal 1846, February revolution 1848, Napoleon III emperor December 1852. A memory hook: Britain repeals in ’46, so in ’48 it has less to revolt about.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>Which change from 1848 lasted?</p>
+    <button>A united Germany under the Frankfurt Parliament</button>
+    <button>An independent Hungary</button>
+    <button data-correct>The end of serfdom in the Austrian lands</button>
+    <div class="explain">The emperor’s government kept the abolition of serfdom because reversing it would have turned the peasants against the throne. Hungary was reconquered in 1849, and the Frankfurt Parliament broke up the same year.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In two or three sentences: how did rulers like Napoleon III and Bismarck turn the forces of 1848 to their own advantage?</p>
+    <div class="explain">Instead of fighting the vote and nationalism, they used them: votes of all men (plebiscites in France, the Reichstag in Germany) gave conservative regimes popular legitimacy, and national unification or glory won patriotic support. They paid for popularity with growth: railways, rebuilding and easy credit, which fed the boom that broke in 1873.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  // Timeline sorter: tap events in order, then see which were right
+  const EVENTS = [
+    ['Congress of Vienna', '1815'],
+    ['July Revolution in Paris', '1830'],
+    ['Corn Laws repealed', '1846'],
+    ['Revolutions across Europe', '1848'],
+    ['Suez Canal opens', '1869'],
+    ['German Empire proclaimed', '1871'],
+    ['Crash in Vienna and New York', '1873'],
+    ['Berlin Conference on Africa', '1884'],
+  ];
+  const sorter = document.getElementById('sorter');
+  const pool = sorter.querySelector('.pool'), picked = sorter.querySelector('.picked'), result = sorter.querySelector('.result');
+  let order = [], done = false;
+  function deal() {
+    order = []; done = false; picked.innerHTML = ''; result.hidden = true;
+    const idx = EVENTS.map((_, i) => i).sort(() => Math.random() - 0.5);
+    pool.innerHTML = '';
+    idx.forEach((i) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'kit-btn'; b.textContent = EVENTS[i][0];
+      b.addEventListener('click', () => pick(i, b));
+      pool.appendChild(b);
+    });
+  }
+  function pick(i, b) {
+    if (done) return;
+    b.remove(); order.push(i);
+    const d = document.createElement('div');
+    d.textContent = order.length + '. ' + EVENTS[i][0];
+    picked.appendChild(d);
+    if (order.length === EVENTS.length) finish();
+  }
+  function finish() {
+    done = true;
+    let right = 0;
+    [...picked.children].forEach((d, k) => {
+      const i = order[k], ok = i === k;
+      if (ok) right++;
+      d.className = ok ? 'ok' : 'no';
+      const y = document.createElement('span'); y.className = 'yr'; y.textContent = EVENTS[i][1];
+      d.appendChild(y);
+    });
+    result.hidden = false;
+    result.textContent = right + ' of ' + EVENTS.length + ' in the right place. Correct order: ' + EVENTS.map((e) => e[1]).join(' · ');
+    const again = document.createElement('button');
+    again.type = 'button'; again.className = 'kit-btn'; again.textContent = 'Shuffle and try again';
+    again.addEventListener('click', deal);
+    pool.appendChild(again);
+    Study.event({ type: 'timeline', right, total: EVENTS.length });
+  }
+  deal();
+
+  // 1848–49 month slider. Each city: [start of revolt, month crushed (or null), text while in revolt, text once crushed]
+  // Months counted from 0 = January 1848.
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const CITIES = [
+    ['Paris', 1, 5, 'King flees; Second Republic, votes for all men', 'June Days: army crushes the workers’ rising (the republic survives, for now)'],
+    ['Vienna', 2, 9, 'Metternich resigns and flees', 'Army bombards the city and retakes it'],
+    ['Berlin', 2, 10, 'Barricades; the king promises a constitution', 'Troops march back in; assembly shut down'],
+    ['Milan', 2, 7, 'Five Days: Austrians driven out', 'Austrian army retakes the city'],
+    ['Hungary', 2, 19, 'Hungary gets its own government under Kossuth', 'Russian and Austrian armies force surrender'],
+    ['Frankfurt', 4, 17, 'All-German parliament meets', 'Parliament dissolved; Prussia’s king refused its crown'],
+    ['Rome', 13, 18, 'Roman Republic declared (Mazzini, Garibaldi)', 'French troops take the city back for the Pope'],
+    ['London', null, null, 'Chartist rally, April 1848, passes off peacefully', ''],
+  ];
+  const ul = document.getElementById('cities'), label = document.getElementById('month'), slider = document.getElementById('m');
+  ul.innerHTML = CITIES.map((c) => `<li><span class="dot"></span><span class="name">${c[0]}</span><span class="what"></span></li>`).join('');
+  const rows = ul.children;
+  function show(m) {
+    label.textContent = MONTHS[m % 12] + ' ' + (1848 + Math.floor(m / 12));
+    CITIES.forEach(([name, start, end, during, after], i) => {
+      const li = rows[i], what = li.querySelector('.what');
+      li.className = '';
+      if (start === null) { what.textContent = m >= 3 ? during : 'Calm'; return; }
+      if (m < start) what.textContent = 'Calm';
+      else if (m < end) { li.className = 'revolt'; what.textContent = during; }
+      else { li.className = 'crushed'; what.textContent = after; }
+    });
+  }
+  slider.addEventListener('input', () => show(Number(slider.value)));
+  show(0);
+})();
+</script>
+</body></html>

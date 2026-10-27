@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Powers of two, both ways</title>
+<link rel="stylesheet" href="../../../../kit/lesson.css">
+<style>
+  .ladder-out { font-family: var(--sans); display: grid; gap: .5rem; }
+  .ladder-out .big { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .ladder-out .sub { color: var(--muted); font-size: .85rem; }
+  .chain { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; font: .95rem var(--mono); font-variant-numeric: tabular-nums; }
+  .chain > .step { padding: .15rem .45rem; border: 1px solid var(--line); border-radius: 6px; }
+  .chain > .step.end { border-color: var(--accent); color: var(--accent); font-weight: 650; }
+  .chain > .arr { color: var(--muted); font-size: .8rem; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .pair > div { border: 1px solid var(--line); border-radius: 10px; padding: .5rem .6rem; }
+  .pair .lab { display: block; font: .75rem var(--sans); color: var(--muted); }
+  .pair .stmt { font: 600 1.1rem var(--serif); font-variant-numeric: tabular-nums; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Mathematics · Exponents and logarithms · Lesson 1</p>
+    <h1>Powers of two, both ways</h1>
+    <p class="lede">A logarithm answers one question: how many times? Rebuild powers of two, run them backwards, and the minus sign in $-\log_2 p$ will stop looking mysterious.</p>
+  </header>
+
+  <section>
+    <h2>Doubling</h2>
+    <p>$2^n$ means “multiply $n$ twos together.” So $2^3 = 2 \times 2 \times 2 = 8$. Each step up the ladder doubles:</p>
+    <div class="table-wrap"><table>
+      <tr><th>$n$</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>10</td></tr>
+      <tr><th>$2^n$</th><td>1</td><td>2</td><td>4</td><td>8</td><td>16</td><td>32</td><td>1024</td></tr>
+    </table></div>
+    <p>Why is $2^0 = 1$? Walk <em>down</em> the ladder: each step down divides by 2. $8 \to 4 \to 2 \to 1$. Going from $2^1 = 2$ down one more step gives $2 \div 2 = 1$. So $2^0 = 1$: zero doublings leaves you where you started.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="64" data-tol="0">
+    <p>What is $2^6$?</p>
+    <div class="explain">$2^5 = 32$, and one more doubling gives $32 \times 2 = 64$.</div>
+  </div>
+
+  <section>
+    <h2>Below zero</h2>
+    <p>Keep walking down. Every step still divides by 2:</p>
+    <p>$$2^0 = 1,\quad 2^{-1} = \tfrac12,\quad 2^{-2} = \tfrac14,\quad 2^{-3} = \tfrac18$$</p>
+    <p>A negative exponent counts <strong>halvings</strong>. The rule: $2^{-n} = \dfrac{1}{2^n}$. It is never a negative <em>number</em>: $2^{-3}$ is $\tfrac18$, not $-8$.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>What is $2^{-4}$?</p>
+    <button>$-16$</button>
+    <button>$-8$</button>
+    <button data-correct>$\tfrac{1}{16}$</button>
+    <button>$\tfrac18$</button>
+    <div class="explain">Four halvings from 1: $1 \to \tfrac12 \to \tfrac14 \to \tfrac18 \to \tfrac1{16}$. Equivalently $2^{-4} = \dfrac{1}{2^4} = \dfrac{1}{16}$. The minus in the exponent means “divide,” not “negative.”</div>
+  </div>
+
+  <section>
+    <h2>Running it backwards</h2>
+    <p>Exponents answer: <em>start at 1, double $n$ times, where do you land?</em> A <strong>logarithm</strong> asks the reverse: <em>you landed on $x$. How many doublings did it take?</em></p>
+    <p>$$\log_2 x = y \quad\text{means exactly}\quad 2^y = x$$</p>
+    <p>These are the same fact, read in two directions. $\log_2 8 = 3$ because $2^3 = 8$. Slide through the ladder and watch both sentences change together:</p>
+    <div class="widget">
+      <label for="k">Steps from 1: <span class="readout" id="kread"></span>
+        <input id="k" type="range" min="-6" max="10" step="1" value="3"></label>
+      <div class="ladder-out">
+        <div class="pair">
+          <div><span class="lab">exponent form</span><span class="stmt" id="expf"></span></div>
+          <div><span class="lab">log form</span><span class="stmt" id="logf"></span></div>
+        </div>
+        <div class="chain" id="chain"></div>
+        <div class="sub" id="note"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="5" data-tol="0">
+    <p>What is $\log_2 32$?</p>
+    <div class="explain">Ask: 2 to what power is 32? $2^5 = 32$, so $\log_2 32 = 5$. Five doublings: $1 \to 2 \to 4 \to 8 \to 16 \to 32$.</div>
+  </div>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="0" data-tol="0">
+    <p>What is $\log_2 1$?</p>
+    <div class="explain">2 to what power is 1? $2^0 = 1$, so $\log_2 1 = 0$. You are already at 1, so it takes zero doublings.</div>
+  </div>
+
+  <section>
+    <h2>Logs of fractions are negative</h2>
+    <p>Now ask the backwards question about a fraction. 2 to what power is $\tfrac18$? From the ladder, $2^{-3} = \tfrac18$. So:</p>
+    <p>$$\log_2 \tfrac18 = -3$$</p>
+    <p>Three <em>halvings</em> from 1. The pattern for every positive $x$:</p>
+    <ul>
+      <li>$x > 1$: you double to get there, so $\log_2 x$ is positive.</li>
+      <li>$x = 1$: no steps, so $\log_2 x = 0$.</li>
+      <li>$0 < x < 1$: you halve to get there, so $\log_2 x$ is negative.</li>
+    </ul>
+    <p>And $\log_2 0$ has no answer. You can halve forever and get as close to 0 as you like, but you never land on it.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="-2" data-tol="0">
+    <p>What is $\log_2 0.25$?</p>
+    <div class="explain">$0.25 = \tfrac14 = 2^{-2}$. So $\log_2 0.25 = -2$: two halvings from 1, $1 \to \tfrac12 \to \tfrac14$.</div>
+  </div>
+
+  <section>
+    <h2>Where the minus sign comes from</h2>
+    <p>A probability $p$ is always between 0 and 1. So by the pattern above, $\log_2 p$ is always zero or negative. That would make a strange measure of surprise, so information theory flips the sign:</p>
+    <p>$$\text{surprise} = -\log_2 p \text{ bits}$$</p>
+    <p>Work it through for the question you flagged, $p = 0.25$, one step at a time:</p>
+    <ol>
+      <li>Write $p$ as a power of 2: $0.25 = \tfrac14 = 2^{-2}$.</li>
+      <li>Read off the log: $\log_2 0.25 = -2$.</li>
+      <li>Flip the sign: $-\log_2 0.25 = -(-2) = 2$ bits.</li>
+    </ol>
+    <div class="table-wrap"><table>
+      <tr><th>$p$</th><th>as a power of 2</th><th>$\log_2 p$</th><th>surprise $-\log_2 p$</th></tr>
+      <tr><td>1</td><td>$2^0$</td><td>0</td><td>0 bits</td></tr>
+      <tr><td>$\tfrac12$</td><td>$2^{-1}$</td><td>$-1$</td><td>1 bit</td></tr>
+      <tr><td>$\tfrac14$</td><td>$2^{-2}$</td><td>$-2$</td><td>2 bits</td></tr>
+      <tr><td>$\tfrac18$</td><td>$2^{-3}$</td><td>$-3$</td><td>3 bits</td></tr>
+      <tr><td>$\tfrac1{1024}$</td><td>$2^{-10}$</td><td>$-10$</td><td>10 bits</td></tr>
+    </table></div>
+    <p>Read the right-hand column as: <strong>the surprise is the number of halvings it takes to get from certainty down to $p$.</strong> A one-in-eight event is three halvings away from certain, so it’s worth 3 bits.</p>
+    <aside class="key"><p>$\log_2 x$ asks “2 to what power gives $x$?” For a probability the answer is zero or negative, so surprise is written $-\log_2 p$ to make it a positive count of halvings.</p></aside>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="num" data-answer="5" data-tol="0">
+    <p>How many bits of surprise is an event with probability $\tfrac1{32}$?</p>
+    <div class="explain">
+      <p>$\tfrac1{32} = \dfrac{1}{2^5} = 2^{-5}$.</p>
+      <p>So $\log_2 \tfrac1{32} = -5$, and $-\log_2 \tfrac1{32} = -(-5) = 5$ bits.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="10" data-tol="0">
+    <p>What is $\log_2 1024$?</p>
+    <div class="explain">$2^{10} = 1024$, so $\log_2 1024 = 10$. Worth memorising: 1024 is “about a thousand,” so a thousand-way choice is about 10 bits.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>An event’s probability is cut in half. What happens to its surprise?</p>
+    <button>It doubles</button>
+    <button data-correct>It goes up by exactly 1 bit</button>
+    <button>It halves</button>
+    <button>It goes down by 1 bit</button>
+    <div class="explain">Halving $p$ is one more step down the ladder: the exponent goes from, say, $-3$ to $-4$. So $-\log_2 p$ goes from 3 to 4. One halving, one extra bit, whatever $p$ was.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="mcq">
+    <p>What is $\log_2 0$?</p>
+    <button>0</button>
+    <button>$-1$</button>
+    <button data-correct>It doesn’t exist: no power of 2 equals 0</button>
+    <button>1</button>
+    <div class="explain">$2^y$ is always positive. Halving gets you ever closer to 0 but never there, so $\log_2 x$ heads toward $-\infty$ as $x$ shrinks to 0. In surprise terms: an event you said was impossible ($p = 0$) would be infinitely surprising.</div>
+  </div>
+
+  <div class="q" data-id="q10" data-type="self">
+    <p>In your own words: why is $-\log_2 \tfrac12 = 1$, and why does the formula need the minus sign?</p>
+    <div class="explain">$\tfrac12 = 2^{-1}$, so $\log_2 \tfrac12 = -1$: one halving from 1. Logs of numbers below 1 are negative, and probabilities are at most 1, so the minus sign turns the answer into a positive count: one halving from certainty is 1 bit of surprise.</div>
+  </div>
+</main>
+
+<script src="../../../../kit/public.js"></script>
+<script>
+(function () {
+  const k = document.getElementById('k');
+  const sgn = (n) => (n < 0 ? '−' + -n : String(n));
+  const val = (n) => (n >= 0 ? String(2 ** n) : '1/' + 2 ** -n);
+  function draw() {
+    const n = Number(k.value);
+    const x = val(n);
+    document.getElementById('kread').textContent = n > 1 ? n + ' doublings' : n === 1 ? '1 doubling' : n < -1 ? -n + ' halvings' : n === -1 ? '1 halving' : 'none';
+    document.getElementById('expf').innerHTML = '2<sup>' + sgn(n) + '</sup> = ' + x;
+    document.getElementById('logf').textContent = 'log₂ ' + x + ' = ' + sgn(n);
+    const steps = [];
+    const dir = n >= 0 ? 1 : -1;
+    for (let i = 0; i !== n + dir; i += dir) steps.push(val(i));
+    const chain = document.getElementById('chain');
+    chain.innerHTML = steps.map((s, i) => (i ? `<span class="arr">${dir > 0 ? '×2' : '÷2'}</span>` : '') + `<span class="step${i === steps.length - 1 ? ' end' : ''}">${s}</span>`).join('');
+    document.getElementById('note').textContent = n > 0
+      ? `Doubled ${n} time${n === 1 ? '' : 's'} from 1, so the log is +${n}.`
+      : n < 0 ? `Halved ${-n} time${n === -1 ? '' : 's'} from 1, so the log is −${-n}. As a probability, that’s ${-n} bit${n === -1 ? '' : 's'} of surprise.`
+      : 'No steps at all: log₂ 1 = 0.';
+  }
+  k.addEventListener('input', draw);
+  draw();
+})();
+</script>
+</body></html>

@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>One-sided limits and jumps</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .plot { width: 100%; height: 240px; display: block; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); touch-action: pan-y; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; font-family: var(--sans); }
+  .pair div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: .5rem .6rem; }
+  .pair > div > span { display: block; font-size: .8rem; color: var(--muted); }
+  .pair b { font: 600 1.15rem var(--mono); font-variant-numeric: tabular-nums; }
+  .msg { font-family: var(--sans); margin: 0; min-height: 1.5em; }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 1.6rem 1fr; gap: .5rem; align-items: start; }
+  .steps li::before { content: counter(s); font: 650 .85rem/1.6rem var(--sans); width: 1.6rem; height: 1.6rem; border-radius: .8rem; background: var(--accent-soft); color: var(--accent); text-align: center; }
+  .steps li > div { min-width: 0; overflow-x: auto; }
+  .steps li > div p { margin: 0; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Calculus · Functions and limits · Lesson 3</p>
+    <h1>One-sided limits and jumps</h1>
+    <p class="lede">Walk toward a point from the left, then from the right. If you arrive at the same height both ways, the limit exists. If not, you’ve found a jump.</p>
+  </header>
+
+  <section>
+    <h2>A function with a step in it</h2>
+    <p>Real rules often switch at a threshold: a tax band, a postage price, a thermostat. Here is a made-up one with a switch at $x = 2$:</p>
+    <p>$$f(x) = \begin{cases} x + 1 & x &lt; 2 \\ x^2 & x \ge 2 \end{cases}$$</p>
+    <p>Drag the slider to shrink the distance $d$ from 2. One dot walks in from the left, the other from the right.</p>
+    <div class="widget">
+      <canvas class="plot" id="jump" aria-label="Graph of f with a jump at x = 2"></canvas>
+      <label for="dslider">Distance from 2: <span class="readout" id="dread"></span>
+        <input id="dslider" type="range" min="0" max="100" value="0"></label>
+      <div class="pair">
+        <div><span>from the left, $f(2-d)$</span><b id="lv"></b></div>
+        <div><span>from the right, $f(2+d)$</span><b id="rv"></b></div>
+      </div>
+    </div>
+    <p>From the left, the values head to <strong>3</strong>. From the right, they head to <strong>4</strong>. They never agree.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="3" data-tol="0.001">
+    <p>What height does $f$ approach as $x$ comes toward 2 <em>from the left</em>?</p>
+    <div class="explain">For $x &lt; 2$ the rule is $x + 1$. As $x$ gets close to 2 that heads to $2 + 1 = 3$.</div>
+  </div>
+
+  <section>
+    <h2>The notation</h2>
+    <p>A small sign on the $a$ says which side you come from:</p>
+    <p>$$\lim_{x\to 2^-} f(x) = 3 \qquad \lim_{x\to 2^+} f(x) = 4$$</p>
+    <p>$2^-$ means “from below 2” (the left); $2^+$ means “from above 2” (the right). To compute each, use only the piece of the rule that applies on that side.</p>
+    <aside class="key"><p>The ordinary two-sided limit $\lim_{x\to a} f(x)$ exists <strong>only when both one-sided limits exist and are equal</strong>. Then it’s that shared number.</p></aside>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>Here $f(2) = 2^2 = 4$, the right-hand limit is 4, and the left-hand limit is 3. What is $\displaystyle\lim_{x\to 2} f(x)$?</p>
+    <button>4, because that’s $f(2)$</button>
+    <button>3.5, halfway between</button>
+    <button data-correct>It doesn’t exist</button>
+    <div class="explain">The two sides disagree (3 vs 4), so there is no single height the function settles toward. And $f(2) = 4$ doesn’t change that: as in lesson 1, the value <em>at</em> the point never decides the limit. It only tells you where the filled dot sits.</div>
+  </div>
+
+  <section>
+    <h2>Value at the point vs. limit</h2>
+    <p>Three separate questions, three separate answers for our $f$:</p>
+    <ul>
+      <li><strong>Left limit</strong> (walk in from below): 3</li>
+      <li><strong>Right limit</strong> (walk in from above): 4</li>
+      <li><strong>Value</strong> $f(2)$ (stand on the point): 4, the filled dot</li>
+    </ul>
+    <p>It’s tempting to read $f(2)$ and call that the limit. Lesson 1 showed a limit can exist where $f(a)$ doesn’t; here is the reverse: $f(a)$ exists but the limit doesn’t.</p>
+  </section>
+
+  <section>
+    <h2>A jump made of algebra: $\dfrac{|x|}{x}$</h2>
+    <p>Absolute value is secretly a two-piece function: $|x| = x$ when $x \ge 0$, and $|x| = -x$ when $x &lt; 0$ (making a negative number positive). Tap through:</p>
+    <div class="widget">
+      <p style="margin:0">$\displaystyle\lim_{x\to 0}\frac{|x|}{x}$</p>
+      <ol class="steps" data-steps>
+        <li><div><p>Plug in: $\frac{0}{0}$. But nothing factors, so split by side.</p></div></li>
+        <li><div><p>Right side, $x &gt; 0$: $|x| = x$, so $\frac{|x|}{x} = \frac{x}{x} = 1$. Every value is 1, so $\lim_{x\to0^+} = 1$.</p></div></li>
+        <li><div><p>Left side, $x &lt; 0$: $|x| = -x$, so $\frac{|x|}{x} = \frac{-x}{x} = -1$. So $\lim_{x\to0^-} = -1$.</p></div></li>
+        <li><div><p>$1 \ne -1$, so the two-sided limit does not exist. The graph is a flat line at $-1$ that jumps to a flat line at $1$.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="-1" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to 3^-}\frac{|x-3|}{x-3}$</p>
+    <div class="explain">From the left, $x &lt; 3$, so $x - 3$ is negative and $|x-3| = -(x-3)$. Then $\frac{-(x-3)}{x-3} = -1$ for every such $x$, so the left limit is $-1$.</div>
+  </div>
+
+  <section>
+    <h2>Closing the gap</h2>
+    <p>Often you get to choose a constant so the pieces meet. Slide $k$ until the left piece lands where the right piece starts.</p>
+    <p>$$g(x) = \begin{cases} kx + 1 & x &lt; 1 \\ x^2 + 3 & x \ge 1 \end{cases}$$</p>
+    <div class="widget">
+      <canvas class="plot" id="join" aria-label="Graph of g with adjustable left piece"></canvas>
+      <label for="kslider">$k$ = <span class="readout" id="kread"></span>
+        <input id="kslider" type="range" min="0" max="50" value="10"></label>
+      <div class="pair">
+        <div><span>left limit, $k\cdot1 + 1$</span><b id="kl"></b></div>
+        <div><span>right limit, $1^2 + 3$</span><b id="kr"></b></div>
+      </div>
+      <p class="msg" id="kmsg"></p>
+    </div>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="3" data-tol="0.001">
+    <p>Which $k$ makes $\displaystyle\lim_{x\to1} g(x)$ exist? (Set the two one-sided limits equal and solve.)</p>
+    <div class="explain">
+      <p>Left limit: $k(1) + 1 = k + 1$. Right limit: $1^2 + 3 = 4$.</p>
+      <p>Set equal: $k + 1 = 4$. Subtract 1 from both sides: $k = 3$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>One-sided blow-ups</h2>
+    <p>Sides matter for blow-ups too. Near 0, $\frac1x$ is huge and positive just to the right ($\frac{1}{0.001} = 1000$) and huge and negative just to the left ($\frac{1}{-0.001} = -1000$). We write $\lim_{x\to0^+}\frac1x = +\infty$ and $\lim_{x\to0^-}\frac1x = -\infty$. “$= \infty$” is shorthand for “grows without bound”, not a number. Lesson 4 is all about these.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="2" data-tol="0.001">
+    <p>$\lfloor x \rfloor$ (“floor of $x$”) rounds down to a whole number: $\lfloor 2.7 \rfloor = 2$, $\lfloor 3 \rfloor = 3$. What is $\displaystyle\lim_{x\to 3^-}\lfloor x \rfloor$?</p>
+    <div class="explain">Just left of 3, $x$ is something like 2.99, and $\lfloor 2.99 \rfloor = 2$. Every value on that side is 2, so the left limit is 2, even though $\lfloor 3 \rfloor = 3$. (The right limit is 3, so the two-sided limit at 3 doesn’t exist: a staircase has a jump at every whole number.)</div>
+  </div>
+
+  <div class="q" data-id="q6" data-type="num" data-answer="4" data-tol="0.001">
+    <p>$h(x) = \dfrac{x^2-4}{x-2}$ for $x &lt; 2$, and $h(x) = 3x - 2$ for $x &gt; 2$. Find $\displaystyle\lim_{x\to2} h(x)$.</p>
+    <div class="explain">
+      <p>Left: $\frac{x^2-4}{x-2} = \frac{(x-2)(x+2)}{x-2} = x + 2 \to 4$ (lesson 2’s factoring move).</p>
+      <p>Right: $3(2) - 2 = 6 - 2 = 4$.</p>
+      <p>Both sides give 4, so the limit is 4, even though $h(2)$ isn’t defined at all.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>$\displaystyle\lim_{x\to 0^-}\frac{1}{x}$ is…</p>
+    <button>$+\infty$</button>
+    <button data-correct>$-\infty$</button>
+    <button>0</button>
+    <div class="explain">Left of 0, $x$ is a tiny negative number, and 1 divided by a tiny negative is a huge negative: $\frac{1}{-0.01} = -100$. So it falls without bound.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="self">
+    <p>In one or two sentences: why can’t $\lim_{x\to a} f(x)$ exist if the left and right limits are different?</p>
+    <div class="explain">The limit has to be a single number $L$ that $f(x)$ gets close to for <em>every</em> $x$ near $a$, on both sides. If the left side crowds toward 3 and the right toward 4, no single $L$ is close to both, so there’s no limit.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(4));
+
+  // Draw pieces [{f, a, b}] and dots [{x, y, open, color}] in a box [x0,x1]×[y0,y1]
+  function plot(cv, box, pieces, dots) {
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr;
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const [x0, x1, y0, y1] = box, pad = 22;
+    const X = (x) => pad + (x - x0) / (x1 - x0) * (w - 2 * pad);
+    const Y = (y) => h - pad - (y - y0) / (y1 - y0) * (h - 2 * pad);
+    c.clearRect(0, 0, w, h);
+    c.strokeStyle = css('--line'); c.lineWidth = 1; c.fillStyle = css('--muted'); c.font = '11px ' + css('--sans');
+    for (let x = Math.ceil(x0); x <= x1; x++) { c.beginPath(); c.moveTo(X(x), pad / 2); c.lineTo(X(x), h - pad); c.stroke(); c.fillText(x, X(x) - 3, h - 6); }
+    for (let y = Math.ceil(y0); y <= y1; y += 2) { c.beginPath(); c.moveTo(pad, Y(y)); c.lineTo(w - pad / 2, Y(y)); c.stroke(); c.fillText(y, 4, Y(y) + 4); }
+    c.save(); c.beginPath(); c.rect(pad, pad / 2, w - 1.5 * pad, h - 1.5 * pad); c.clip();
+    c.strokeStyle = css('--ink'); c.lineWidth = 2.5;
+    pieces.forEach(({ f, a, b }) => {
+      c.beginPath();
+      for (let i = 0; i <= 120; i++) { const x = a + (b - a) * i / 120; i ? c.lineTo(X(x), Y(f(x))) : c.moveTo(X(x), Y(f(x))); }
+      c.stroke();
+    });
+    c.restore();
+    dots.forEach(({ x, y, open, color, r = 6 }) => {
+      c.beginPath(); c.arc(X(x), Y(y), r, 0, 2 * Math.PI);
+      c.fillStyle = open ? css('--paper') : (color || css('--ink'));
+      c.strokeStyle = color || css('--ink'); c.lineWidth = 2; c.fill(); c.stroke();
+    });
+  }
+
+  // ---- jump at 2 ----
+  const jump = document.getElementById('jump'), ds = document.getElementById('dslider');
+  const fl = (x) => x + 1, fr = (x) => x * x;
+  function drawJump() {
+    const d = Math.pow(10, -3 * Number(ds.value) / 100); // 1 down to 0.001
+    document.getElementById('dread').textContent = d < 0.01 ? d.toFixed(3) : d.toFixed(2);
+    document.getElementById('lv').textContent = fmt(fl(2 - d));
+    document.getElementById('rv').textContent = fmt(fr(2 + d));
+    plot(jump, [0, 3.2, 0, 8], [{ f: fl, a: 0, b: 2 }, { f: fr, a: 2, b: 3.2 }], [
+      { x: 2, y: 3, open: true }, { x: 2, y: 4 },
+      { x: 2 - d, y: fl(2 - d), color: css('--accent'), r: 7 },
+      { x: 2 + d, y: fr(2 + d), color: css('--good'), r: 7 },
+    ]);
+  }
+  ds.addEventListener('input', drawJump);
+
+  // ---- choose k ----
+  const join = document.getElementById('join'), ks = document.getElementById('kslider');
+  function drawJoin() {
+    const k = Number(ks.value) / 10, L = k + 1, ok = Math.abs(L - 4) < 1e-9;
+    document.getElementById('kread').textContent = k.toFixed(1);
+    document.getElementById('kl').textContent = L.toFixed(1);
+    document.getElementById('kr').textContent = '4';
+    document.getElementById('kmsg').textContent = ok ? 'Joined: both sides head to 4, so the limit exists.' : (L < 4 ? 'Left piece arrives too low.' : 'Left piece arrives too high.');
+    plot(join, [-1, 2.2, -2, 9], [{ f: (x) => k * x + 1, a: -1, b: 1 }, { f: (x) => x * x + 3, a: 1, b: 2.2 }],
+      ok ? [{ x: 1, y: 4, color: css('--good') }] : [{ x: 1, y: L, open: true, color: css('--accent') }, { x: 1, y: 4 }]);
+  }
+  ks.addEventListener('input', drawJoin);
+
+  const redraw = () => { drawJump(); drawJoin(); };
+  window.addEventListener('resize', redraw);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+  redraw();
+
+  // step-through worked examples: reveal one step per tap
+  document.querySelectorAll('[data-steps]').forEach((ol) => {
+    const items = [...ol.children];
+    items.forEach((li, i) => { li.hidden = i > 0; });
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'kit-btn'; btn.textContent = 'Next step';
+    ol.after(btn);
+    let shown = 1;
+    btn.addEventListener('click', () => {
+      if (shown < items.length) { items[shown].hidden = false; shown++; }
+      if (shown >= items.length) btn.remove();
+    });
+  });
+})();
+</script>
+</body></html>

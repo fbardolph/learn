@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The log rules</title>
+<link rel="stylesheet" href="../../../../kit/lesson.css">
+<style>
+  .rods { width: 100%; height: 120px; display: block; }
+  .rods .ax { stroke: var(--muted); stroke-width: 1; }
+  .rods .tk { stroke: var(--muted); stroke-width: 1; }
+  .rods .ra { fill: var(--accent); }
+  .rods .rb { fill: var(--good); }
+  .rods .mk { stroke: var(--ink); stroke-width: 2; }
+  .rods text { fill: var(--muted); font: 10px var(--sans); }
+  .rods text.hi { fill: var(--ink); font-weight: 650; }
+  .sums { display: grid; grid-template-columns: auto 1fr; gap: .25rem .75rem; font: .95rem var(--mono); font-variant-numeric: tabular-nums; }
+  .sums > .l { color: var(--muted); font-family: var(--sans); }
+  .sums > .tot { font-weight: 650; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Mathematics · Exponents and logarithms · Lesson 2</p>
+    <h1>The log rules</h1>
+    <p class="lede">Logs turn multiplying into adding. That one trick is why surprises add up, and every log rule falls out of counting twos.</p>
+  </header>
+
+  <section>
+    <h2>Counting twos</h2>
+    <p>Multiply two powers of 2 and count the twos:</p>
+    <p>$$2^3 \times 2^2 = (2 \times 2 \times 2) \times (2 \times 2) = 2^5$$</p>
+    <p>Three twos and two more make five twos. In general, <strong>multiplying powers adds the exponents</strong>: $2^a \times 2^b = 2^{a+b}$. It works for negative exponents too: $2^3 \times 2^{-1} = 8 \times \tfrac12 = 4 = 2^2$, and $3 + (-1) = 2$.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="7" data-tol="0">
+    <p>$2^4 \times 2^3 = 2^{?}$</p>
+    <div class="explain">Add the exponents: $4 + 3 = 7$. Check: $16 \times 8 = 128 = 2^7$.</div>
+  </div>
+
+  <section>
+    <h2>The product rule</h2>
+    <p>Now read the same fact as logs. Say $x = 2^a$ and $y = 2^b$, so $\log_2 x = a$ and $\log_2 y = b$. Then:</p>
+    <ol>
+      <li>$xy = 2^a \times 2^b = 2^{a+b}$</li>
+      <li>So $\log_2(xy) = a + b$</li>
+      <li>Substitute back: $\log_2(xy) = \log_2 x + \log_2 y$</li>
+    </ol>
+    <p>Example: $\log_2(8 \times 4) = \log_2 32 = 5$, and $\log_2 8 + \log_2 4 = 3 + 2 = 5$.</p>
+    <p>On a log scale, multiplying is laying rods end to end. Each rod’s length is a log. Pick two numbers (they needn’t be powers of 2) and see where the second rod ends:</p>
+    <div class="widget">
+      <label for="xs">$x$: <span class="readout" id="xr"></span>
+        <input id="xs" type="range" min="1" max="32" step="1" value="8"></label>
+      <label for="ys">$y$: <span class="readout" id="yr"></span>
+        <input id="ys" type="range" min="1" max="32" step="1" value="4"></label>
+      <svg class="rods" id="rods" viewBox="0 0 320 120" aria-label="Two rods on a log scale whose lengths add"></svg>
+      <div class="sums">
+        <span class="l">log₂ x</span><span id="lx"></span>
+        <span class="l">+ log₂ y</span><span id="ly"></span>
+        <span class="l">= log₂(xy)</span><span class="tot" id="lxy"></span>
+        <span class="l">so xy</span><span class="tot" id="pxy"></span>
+      </div>
+    </div>
+    <p>That is how a slide rule multiplies: two rulers marked on a log scale, slid along each other so their lengths add.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="6" data-tol="0">
+    <p>What is $\log_2 16 + \log_2 4$?</p>
+    <div class="explain">$\log_2 16 = 4$ and $\log_2 4 = 2$, so the sum is $6$. That’s also $\log_2(16 \times 4) = \log_2 64 = 6$.</div>
+  </div>
+
+  <section>
+    <h2>Why surprises add</h2>
+    <p>Two independent events: a coin lands heads ($p = \tfrac12$) and a four-sided die shows 1 ($p = \tfrac14$). The chance of both is the product, $\tfrac12 \times \tfrac14 = \tfrac18$. Now the surprise, step by step:</p>
+    <ol>
+      <li>Both together: $-\log_2 \tfrac18 = 3$ bits.</li>
+      <li>Separately: $-\log_2 \tfrac12 = 1$ bit and $-\log_2 \tfrac14 = 2$ bits.</li>
+      <li>$1 + 2 = 3$. The product rule guarantees this always works.</li>
+    </ol>
+    <p>That’s the reason information is measured with a log. Probabilities of independent events <em>multiply</em>, but we want amounts of information to <em>add</em>, the way lengths and weights do. The log converts one into the other. It’s also why a language model’s loss for a whole sentence is just the sum of the per-token surprises.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="5" data-tol="0">
+    <p>Two independent events have probabilities $\tfrac14$ and $\tfrac18$. How many bits of surprise is seeing both?</p>
+    <div class="explain">
+      <p>Separately: $-\log_2 \tfrac14 = 2$ and $-\log_2 \tfrac18 = 3$. Add: $2 + 3 = 5$ bits.</p>
+      <p>Check with the product: $\tfrac14 \times \tfrac18 = \tfrac1{32} = 2^{-5}$, and $-\log_2 \tfrac1{32} = 5$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>The quotient rule</h2>
+    <p>Dividing powers subtracts exponents: $2^a \div 2^b = 2^{a-b}$ (cancel $b$ twos from top and bottom). So, by the same three steps as before:</p>
+    <p>$$\log_2 \frac{x}{y} = \log_2 x - \log_2 y$$</p>
+    <p>Example: $\log_2 \tfrac{32}{4} = 5 - 2 = 3$, and indeed $\tfrac{32}{4} = 8$.</p>
+    <p>Set $x = 1$ and you get a useful special case. Since $\log_2 1 = 0$:</p>
+    <p>$$\log_2 \frac{1}{y} = 0 - \log_2 y = -\log_2 y$$</p>
+    <p>So surprise has a second, friendlier form: $-\log_2 p = \log_2 \dfrac1p$. A “1 in 8” event is $\log_2 8 = 3$ bits. No minus sign needed: just ask how many doublings it takes to reach the “1 in …” number.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Which is the same as $-\log_2 p$?</p>
+    <button>$\log_2(-p)$</button>
+    <button data-correct>$\log_2 \dfrac1p$</button>
+    <button>$\dfrac{1}{\log_2 p}$</button>
+    <div class="explain">Quotient rule with top 1: $\log_2 \tfrac1p = \log_2 1 - \log_2 p = 0 - \log_2 p$. The others are traps: $\log_2(-p)$ doesn’t exist (no power of 2 is negative), and $\tfrac{1}{\log_2 p}$ is a different number, e.g. for $p = \tfrac14$ it’s $-\tfrac12$, not 2.</div>
+  </div>
+
+  <section>
+    <h2>The power rule</h2>
+    <p>Raising a power to a power multiplies exponents: $(2^a)^k$ is $k$ copies of $2^a$ multiplied together, which is $2^{a + a + \dots + a} = 2^{ak}$. So:</p>
+    <p>$$\log_2(x^k) = k \log_2 x$$</p>
+    <p>Example: $\log_2(8^2) = 2 \times \log_2 8 = 2 \times 3 = 6$, and $8^2 = 64 = 2^6$.</p>
+    <p>This is how you count bits in a string. A random 10-character string over 27 symbols has $27^{10}$ possibilities. Its information is $\log_2(27^{10}) = 10 \log_2 27 \approx 10 \times 4.75 = 47.5$ bits: 4.75 bits per character, times 10 characters.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="10" data-tol="0">
+    <p>What is $\log_2(4^5)$?</p>
+    <div class="explain">Power rule: $5 \times \log_2 4 = 5 \times 2 = 10$. Check: $4^5 = 1024 = 2^{10}$.</div>
+  </div>
+
+  <aside class="note"><p><strong>The traps.</strong> There is no rule for $\log(x + y)$: $\log_2(8 + 8) = \log_2 16 = 4$, but $\log_2 8 + \log_2 8 = 6$. And $\log x \times \log y$ isn’t anything useful. Logs turn <em>products</em> into sums, nothing else.</p></aside>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>Which is true?</p>
+    <button>$\log_2(8 + 8) = \log_2 8 + \log_2 8$</button>
+    <button data-correct>$\log_2(8 \times 8) = \log_2 8 + \log_2 8$</button>
+    <button>$\log_2(8 \times 8) = \log_2 8 \times \log_2 8$</button>
+    <div class="explain">$8 \times 8 = 64 = 2^6$, and $3 + 3 = 6$. The first is wrong: $\log_2 16 = 4$, not 6. The third is wrong: $3 \times 3 = 9$, not 6.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="13.29" data-tol="0.05">
+    <p>A random 4-digit PIN has $10^4$ possibilities. Using $\log_2 10 \approx 3.32$, how many bits is it? (Two decimal places.)</p>
+    <div class="explain">
+      <p>Power rule: $\log_2(10^4) = 4 \times \log_2 10$.</p>
+      <p>$4 \times 3.32 = 13.28$, or $13.29$ with the more exact $\log_2 10 = 3.3219$. Either is fine. About 13 bits, the same as 13 coin flips.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="num" data-answer="3" data-tol="0">
+    <p>What is $\log_2 48 - \log_2 6$?</p>
+    <div class="explain">Quotient rule: $\log_2 \tfrac{48}{6} = \log_2 8 = 3$. You never had to work out $\log_2 48$ on its own.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In your own words: why does the surprise of two independent events equal the sum of their separate surprises?</p>
+    <div class="explain">Independent probabilities multiply: $P(\text{both}) = p \times q$. The log turns a product into a sum, $\log_2(pq) = \log_2 p + \log_2 q$, so $-\log_2(pq) = (-\log_2 p) + (-\log_2 q)$. That additivity is exactly why information is measured with a log.</div>
+  </div>
+</main>
+
+<script src="../../../../kit/public.js"></script>
+<script>
+(function () {
+  const xs = document.getElementById('xs'), ys = document.getElementById('ys'), svg = document.getElementById('rods');
+  const W = 320, P = 16, MAX = 10; // axis spans 1 .. 2^10
+  const X = (v) => P + (Math.log2(v) / MAX) * (W - 2 * P);
+  let base = `<line class="ax" x1="${X(1)}" y1="78" x2="${X(1024)}" y2="78"/>`;
+  for (let i = 0; i <= MAX; i++) {
+    const v = 2 ** i;
+    base += `<line class="tk" x1="${X(v)}" y1="74" x2="${X(v)}" y2="82"/>`;
+    if (i % 2 === 0) base += `<text x="${X(v)}" y="96" text-anchor="middle">${v}</text>`;
+  }
+  base += `<text x="${P}" y="114">log scale: equal steps = doublings</text>`;
+  const f = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(2));
+  function draw() {
+    const x = Number(xs.value), y = Number(ys.value), xy = x * y;
+    document.getElementById('xr').textContent = x;
+    document.getElementById('yr').textContent = y;
+    const a = X(1), b = X(x), c = X(xy);
+    svg.innerHTML = base
+      + `<rect class="ra" x="${a}" y="40" width="${Math.max(b - a, 0)}" height="14" rx="3"/>`
+      + `<rect class="rb" x="${b}" y="40" width="${Math.max(c - b, 0)}" height="14" rx="3"/>`
+      + `<line class="mk" x1="${c}" y1="34" x2="${c}" y2="84"/>`
+      + `<text class="hi" x="${Math.min(Math.max(c, 30), W - 30)}" y="28" text-anchor="middle">x·y = ${xy}</text>`;
+    document.getElementById('lx').textContent = f(Math.log2(x));
+    document.getElementById('ly').textContent = f(Math.log2(y));
+    document.getElementById('lxy').textContent = f(Math.log2(xy));
+    document.getElementById('pxy').textContent = `${x} × ${y} = ${xy}`;
+  }
+  xs.addEventListener('input', draw); ys.addEventListener('input', draw);
+  draw();
+})();
+</script>
+</body></html>

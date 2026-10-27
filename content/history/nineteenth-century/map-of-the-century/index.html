@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A map of the century · Learning paths</title>
+<meta name="description" content="The big picture from Waterloo to 1914: the forces and turning points the other topics zoom in on.">
+<link rel="stylesheet" href="../../../../kit/lesson.css">
+<link rel="stylesheet" href="../../../../kit/site.css">
+</head><body>
+<main class="page">
+  <header>
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="../../../../">Learning paths</a><span aria-hidden="true">›</span><span>History</span><span aria-hidden="true">›</span><span>The 19th century</span></nav>
+    <h1>A map of the century</h1>
+    <p class="lede">The big picture from Waterloo to 1914: the forces and turning points the other topics zoom in on.</p>
+  </header>
+  
+  <section class="group">
+    <h2>4 lessons · 3 written so far</h2>
+    <ol class="path">
+    <li><a class="lesson-row" href="lessons/01-waterloo-to-1914.html" data-lesson="history/nineteenth-century/map-of-the-century#1"><span class="n">1</span><span class="t">From Waterloo to 1914 in fifteen minutes</span><span class="chip quiet">Start</span><span class="g">The shape of the century and its four engines.</span></a></li>
+    <li><a class="lesson-row" href="lessons/02-britains-century.html" data-lesson="history/nineteenth-century/map-of-the-century#2"><span class="n">2</span><span class="t">Britain’s century</span><span class="chip quiet">Start</span><span class="g">Why a small island ran the world economy.</span></a></li>
+    <li><a class="lesson-row" href="lessons/03-revolutions-and-reaction.html" data-lesson="history/nineteenth-century/map-of-the-century#3"><span class="n">3</span><span class="t">Revolutions and reaction</span><span class="chip quiet">Start</span><span class="g">1830, 1848 and the new politics.</span></a></li>
+    <li><div class="lesson-row unwritten"><span class="n">4</span><span class="t">The world in 1873</span><span class="chip quiet">Not written yet</span><span class="g">Where things stood on the eve of the crash.</span></div></li>
+    </ol>
+  </section>
+  <footer class="foot">
+  <p>These are the topics and lessons from Frazier Bardolph’s own self-study, written with Claude. New lessons appear as he works through them. Each takes about 15 minutes on a phone.</p>
+  <p>Your progress is saved in this browser only. Nothing you answer is sent anywhere. Stuck on something? Tap the <strong>?</strong> next to any section or question to copy it, then paste it into whichever AI assistant you use and ask away.</p>
+  <details class="backup"><summary>Move your progress to another device</summary>
+    <p>Copy the code here, then paste it into this box on your other device and tap Load.</p>
+    <textarea id="backup-code" aria-label="Progress code" spellcheck="false"></textarea>
+    <div class="row"><button type="button" class="kit-btn" id="backup-copy">Copy my progress code</button><button type="button" class="kit-btn" id="backup-load">Load a code</button></div>
+    <p id="backup-status" role="status"></p>
+  </details>
+  <p><a href="../../../../">Learning paths</a> · <a href="https://frazierbardolph.com">frazierbardolph.com</a></p>
+</footer>
+</main>
+<script>
+// Local progress: kept in this browser only.
+(function () {
+  var KEY = 'learn.progress.v1';
+  function read() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
+  var p = read(), done = p.lessons || {};
+  document.querySelectorAll('[data-leaf]').forEach(function (el) {
+    var id = el.getAttribute('data-leaf'), written = Number(el.getAttribute('data-written') || 0);
+    var n = Object.keys(done).filter(function (k) { return k.indexOf(id + '#') === 0 && done[k].done; }).length;
+    var chip = el.querySelector('.chip');
+    if (chip && n) { chip.textContent = n + ' of ' + written + ' done'; chip.classList.add(n >= written ? 'done' : 'x'); }
+    if (n && n < written) el.setAttribute('data-started', '1');
+  });
+  var firstNext = null;
+  document.querySelectorAll('[data-lesson]').forEach(function (el) {
+    var r = done[el.getAttribute('data-lesson')], chip = el.querySelector('.chip');
+    if (r && r.done && chip) { chip.textContent = r.score != null ? 'Done · ' + Math.round(r.score * 100) + '%' : 'Done'; chip.className = 'chip done'; }
+    else if (!firstNext && el.tagName === 'A') firstNext = el;
+  });
+  if (firstNext) { firstNext.classList.add('next'); var c = firstNext.querySelector('.chip'); if (c) c.textContent = 'Up next'; }
+  var cont = document.querySelector('.continue');
+  if (cont) document.querySelectorAll('[data-started]').forEach(function (el) { cont.appendChild(el.cloneNode(true)); });
+  var box = document.getElementById('backup-code');
+  if (box) {
+    document.getElementById('backup-copy').addEventListener('click', function () {
+      box.value = btoa(unescape(encodeURIComponent(JSON.stringify(read()))));
+      box.select();
+      if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function () { status('Copied. Paste it on your other device.'); }, function () { status('Select the code and copy it.'); });
+    });
+    document.getElementById('backup-load').addEventListener('click', function () {
+      try {
+        var incoming = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+        var cur = read(); cur.lessons = Object.assign({}, cur.lessons || {}, incoming.lessons || {});
+        localStorage.setItem(KEY, JSON.stringify(cur)); status('Progress loaded.'); setTimeout(function () { location.reload(); }, 600);
+      } catch (e) { status('That code didn’t work. Copy the whole code from your other device and try again.'); }
+    });
+  }
+  function status(t) { var s = document.getElementById('backup-status'); if (s) s.textContent = t; }
+})();
+</script>
+</body></html>

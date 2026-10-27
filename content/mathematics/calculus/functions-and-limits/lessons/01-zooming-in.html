@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Zooming in: what a limit is</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .plot { width: 100%; aspect-ratio: 4 / 3; display: block; border-radius: 8px; background: var(--paper); touch-action: pan-y; }
+  .fnpick { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+  .fnpick button { font: 500 .9rem var(--sans); padding: .55rem .5rem; min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; }
+  .fnpick button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .vals { width: 100%; font: .95rem var(--mono); font-variant-numeric: tabular-nums; }
+  .vals td, .vals th { text-align: right; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Calculus · Functions and limits · Lesson 1</p>
+    <h1>Zooming in: what a limit is</h1>
+    <p class="lede">A limit asks where a function is <em>heading</em>, not where it is. That one shift is what makes all of calculus possible.</p>
+  </header>
+
+  <section>
+    <h2>A function with a hole in it</h2>
+    <p>Take $f(x) = \dfrac{x^2 - 1}{x - 1}$. Try to evaluate it at $x = 1$ and you get $\frac{0}{0}$, which is meaningless. The function simply isn’t defined there.</p>
+    <p>But at $x = 0.9$ or $x = 1.1$ it works fine. Drag the slider to walk $x$ toward 1 and watch what $f(x)$ does.</p>
+    <div class="widget" id="w1">
+      <canvas class="plot" id="p1" aria-label="Graph of f(x) = (x squared minus 1) over (x minus 1), a straight line with a hole at x = 1"></canvas>
+      <label for="s1">Distance from 1: <span class="readout" id="r1"></span>
+        <input id="s1" type="range" min="0" max="100" value="0"></label>
+      <div class="table-wrap"><table class="vals"><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody id="t1"></tbody></table></div>
+    </div>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>As $x$ gets closer and closer to 1 (from either side), what does $f(x)$ get close to?</p>
+    <button>1</button>
+    <button>0, because the top becomes 0</button>
+    <button data-correct>2</button>
+    <button>Nothing; it is undefined</button>
+    <div class="explain">It heads to 2. Factor the top: $x^2 - 1 = (x-1)(x+1)$, so for every $x \ne 1$, $f(x) = x + 1$. Near 1 that is near 2. The graph is the line $y = x+1$ with one point punched out.</div>
+  </div>
+
+  <section>
+    <h2>The definition, in plain words</h2>
+    <p>We write</p>
+    <p>$$\lim_{x \to 1} \frac{x^2-1}{x-1} = 2$$</p>
+    <p>and read it “the limit of $f(x)$ as $x$ approaches 1 is 2.”</p>
+    <aside class="key"><p>$\lim_{x\to a} f(x) = L$ means: you can make $f(x)$ as close to $L$ as you like by taking $x$ close enough to $a$, <strong>without ever setting $x = a$</strong>.</p></aside>
+    <p>The last clause is the whole trick. The limit only looks at the neighbourhood around $a$. What happens exactly at $a$ (a hole, a different value, nothing at all) is irrelevant.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="6" data-tol="0.001">
+    <p>Use the same factoring idea: what is $\displaystyle\lim_{x\to 3} \frac{x^2-9}{x-3}$?</p>
+    <div class="explain">$x^2 - 9 = (x-3)(x+3)$. Cancel the $(x-3)$ (allowed, because $x \ne 3$ in a limit) to get $x + 3$, which heads to $6$.</div>
+  </div>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>Define $g(x) = x + 1$ for every $x$ except $x = 1$, where we set $g(1) = 5$. What is $\lim_{x\to 1} g(x)$?</p>
+    <button>5, because that’s the value at 1</button>
+    <button data-correct>2</button>
+    <button>It doesn’t exist, because the graph is broken</button>
+    <div class="explain">Still 2. The limit ignores the value at the point itself; near $x = 1$, $g$ is just $x+1$. (When the limit <em>does</em> equal the value, the function is called continuous there. That’s lesson 5.)</div>
+  </div>
+
+  <section>
+    <h2>Zoom in until it’s boring</h2>
+    <p>Here is a good mental test. Zoom in on the graph around the point. If the curve settles toward a single height, the limit exists. If it keeps doing something dramatic, it doesn’t.</p>
+    <p>Pick a function and drag the zoom.</p>
+    <div class="widget" id="w2">
+      <div class="fnpick" role="group" aria-label="Function">
+        <button type="button" data-f="hole" aria-pressed="true">Hole: (x²−1)/(x−1)</button>
+        <button type="button" data-f="jump" aria-pressed="false">Jump</button>
+        <button type="button" data-f="blow" aria-pressed="false">Blow-up: 1/x²</button>
+        <button type="button" data-f="wild" aria-pressed="false">Wild: sin(1/x)</button>
+      </div>
+      <canvas class="plot" id="p2" aria-label="Zoomable graph of the chosen function"></canvas>
+      <label for="s2">Zoom: <span class="readout" id="r2"></span>
+        <input id="s2" type="range" min="0" max="100" value="0"></label>
+      <p id="verdict2" style="margin:0;font-size:.95rem"></p>
+    </div>
+    <p>Those are the three classic ways a limit fails:</p>
+    <ul>
+      <li><strong>Jump.</strong> Coming from the left you approach one height, from the right another. No single answer.</li>
+      <li><strong>Blow-up.</strong> The values grow without bound. (We will write $\lim = \infty$ as shorthand in lesson 4, but strictly no limit exists.)</li>
+      <li><strong>Oscillation.</strong> $\sin(1/x)$ swings between −1 and 1 infinitely often as $x \to 0$. Zooming never calms it down.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Why anyone cares</h2>
+    <p>Your speedometer shows speed <em>at an instant</em>. But speed is distance divided by time, and in an instant no time passes: $\frac{0}{0}$ again.</p>
+    <p>Limits rescue this. Measure average speed over a shrinking interval of time $h$, and ask where it’s heading as $h \to 0$:</p>
+    <p>$$\text{speed at } t = \lim_{h\to 0} \frac{\text{position}(t+h) - \text{position}(t)}{h}$$</p>
+    <aside class="note"><p>That expression is the <strong>derivative</strong>, the subject of the next topic. Every $\frac{0}{0}$ you learn to untangle here is practice for it.</p></aside>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+    <p>Five questions to finish. Tap <strong>?</strong> on any question to copy it, then paste it to Claude with your question.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="12" data-tol="0.001">
+    <p>Find $\displaystyle\lim_{x\to 2} \frac{x^3-8}{x-2}$.</p>
+    <div class="explain">
+      <p>Plugging in gives $\frac{0}{0}$, so simplify. A difference of cubes factors as $a^3 - b^3 = (a-b)(a^2+ab+b^2)$:</p>
+      <p>$$\frac{x^3-8}{x-2} = \frac{(x-2)(x^2+2x+4)}{x-2} = x^2+2x+4 \quad (x\ne 2)$$</p>
+      <p>As $x \to 2$: $4 + 4 + 4 = 12$.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Which statement about $\lim_{x\to a} f(x)$ is true?</p>
+    <button>It equals $f(a)$ whenever $f(a)$ is defined</button>
+    <button data-correct>It can exist even when $f(a)$ is undefined</button>
+    <button>It doesn’t exist if plugging in gives $\frac{0}{0}$</button>
+    <div class="explain">A limit describes the approach, not the arrival. $\frac{0}{0}$ just means “simplify first”; it says nothing about whether the limit exists. And the $g(x)$ example showed the limit can differ from $f(a)$.</div>
+  </div>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>As $x \to 0$, $\sin(1/x)$ has no limit. Why?</p>
+    <button>Because $1/0$ is undefined</button>
+    <button data-correct>Because it keeps oscillating between −1 and 1, no matter how close $x$ gets to 0</button>
+    <button>Because it grows without bound</button>
+    <div class="explain">Undefined-at-the-point is never the reason (remember the hole). Here the values never settle: in every tiny interval around 0 the function hits both −1 and 1.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="self">
+    <p>In one or two sentences, explain to a friend why $\lim_{x\to1}\frac{x^2-1}{x-1}$ exists even though the function is undefined at 1.</p>
+    <div class="explain">Something like: “The limit only cares about values <em>near</em> 1, never at 1. Near 1 the function equals $x + 1$, so its values crowd in on 2. The hole at exactly $x=1$ doesn’t matter.”</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="num" data-answer="-0.25" data-tol="0.001">
+    <p>Stretch: $\displaystyle\lim_{x\to 2} \frac{\frac1x - \frac12}{x-2}$. (Hint: combine the fractions on top.)</p>
+    <div class="explain">
+      <p><strong>1. Common denominator.</strong> $2x$ works for both fractions: $\frac1x = \frac{2}{2x}$ and $\frac12 = \frac{x}{2x}$, so $\frac1x - \frac12 = \frac{2-x}{2x}$.</p>
+      <p><strong>2. Flip the sign.</strong> $2 - x = -(x-2)$, so the top is $-\frac{x-2}{2x}$.</p>
+      <p><strong>3. Divide by $(x-2)$.</strong> Dividing is multiplying by $\frac{1}{x-2}$, and the $(x-2)$ cancels: $-\frac{x-2}{2x}\cdot\frac{1}{x-2} = -\frac{1}{2x}$ for $x \ne 2$.</p>
+      <p>As $x\to2$ that heads to $-\frac14 = -0.25$. (This exact computation is the slope of $1/x$ at $x=2$. You just did your first derivative.)</p>
+    </div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  function setup(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+  }
+  // draw f over [x0,x1]x[y0,y1]; opts.hole = [x,y]; opts.dot = [x,y]
+  function plot(canvas, f, x0, x1, y0, y1, opts = {}) {
+    const { ctx, w, h } = setup(canvas);
+    const X = (x) => ((x - x0) / (x1 - x0)) * w, Y = (y) => h - ((y - y0) / (y1 - y0)) * h;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css('--line'); ctx.lineWidth = 1;
+    if (x0 < 0 && x1 > 0) { ctx.beginPath(); ctx.moveTo(X(0), 0); ctx.lineTo(X(0), h); ctx.stroke(); }
+    if (y0 < 0 && y1 > 0) { ctx.beginPath(); ctx.moveTo(0, Y(0)); ctx.lineTo(w, Y(0)); ctx.stroke(); }
+    if (opts.guide != null) { ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(0, Y(opts.guide)); ctx.lineTo(w, Y(opts.guide)); ctx.stroke(); ctx.setLineDash([]); }
+    ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2.5; ctx.beginPath();
+    let pen = false, prev = null;
+    const N = 1600;
+    for (let i = 0; i <= N; i++) {
+      const x = x0 + (i / N) * (x1 - x0);
+      const y = f(x);
+      if (!Number.isFinite(y) || (prev != null && Math.abs(y - prev) > (y1 - y0) * 0.6)) { pen = false; prev = Number.isFinite(y) ? y : null; continue; }
+      const py = Math.max(-1e4, Math.min(1e4, Y(y)));
+      pen ? ctx.lineTo(X(x), py) : ctx.moveTo(X(x), py); pen = true; prev = y;
+    }
+    ctx.stroke();
+    if (opts.hole) { ctx.fillStyle = css('--panel'); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X(opts.hole[0]), Y(opts.hole[1]), 6, 0, 7); ctx.fill(); ctx.stroke(); }
+    for (const d of opts.dots || []) { ctx.fillStyle = css('--ink'); ctx.beginPath(); ctx.arc(X(d[0]), Y(d[1]), 5, 0, 7); ctx.fill(); }
+    ctx.fillStyle = css('--muted'); ctx.font = '12px ' + css('--mono');
+    ctx.fillText(`x: ${+x0.toPrecision(3)} … ${+x1.toPrecision(3)}`, 8, h - 8);
+  }
+
+  // widget 1
+  const f = (x) => (x * x - 1) / (x - 1);
+  const s1 = document.getElementById('s1'), r1 = document.getElementById('r1'), t1 = document.getElementById('t1'), p1 = document.getElementById('p1');
+  function draw1() {
+    const d = Math.pow(10, -3 * (Number(s1.value) / 100)) * 0.9; // 0.9 down to ~0.0009
+    r1.textContent = d.toFixed(4);
+    plot(p1, f, -0.5, 2.5, -0.5, 3.5, { hole: [1, 2], dots: [[1 - d, f(1 - d)], [1 + d, f(1 + d)]], guide: 2 });
+    t1.innerHTML = [1 - d, 1 + d].map((x) => `<tr><td>${x.toFixed(4)}</td><td>${f(x).toFixed(4)}</td></tr>`).join('');
+  }
+  s1.addEventListener('input', draw1);
+
+  // widget 2
+  const fns = {
+    hole: { f, a: 1, L: 2, say: 'Settles at height 2: the limit exists and equals 2, hole or no hole.' },
+    jump: { f: (x) => (x < 0 ? 1 : 2), a: 0, L: 1.5, say: 'Left side sits at 1, right side at 2, at every zoom. No single limit.' },
+    blow: { f: (x) => 1 / (x * x), a: 0, L: null, say: 'The curve shoots off the top of the window at every zoom. No (finite) limit.' },
+    wild: { f: (x) => Math.sin(1 / x), a: 0, L: 0, say: 'The wiggles get faster the closer you look and never settle. No limit.' },
+  };
+  let cur = 'hole';
+  const s2 = document.getElementById('s2'), r2 = document.getElementById('r2'), p2 = document.getElementById('p2'), v2 = document.getElementById('verdict2');
+  function draw2() {
+    const F = fns[cur];
+    const half = 1.5 * Math.pow(10, -2.5 * (Number(s2.value) / 100));
+    r2.textContent = `×${(1.5 / half).toFixed(0)}`;
+    let y0, y1;
+    if (cur === 'blow') { y0 = -0.5; y1 = 10; }
+    else if (cur === 'jump') { y0 = 0; y1 = 3; }
+    else if (cur === 'wild') { y0 = -1.5; y1 = 1.5; }
+    else { y0 = F.L - half * 1.5; y1 = F.L + half * 1.5; }
+    plot(p2, F.f, F.a - half, F.a + half, y0, y1, cur === 'hole' ? { hole: [1, 2] } : {});
+    v2.textContent = F.say;
+  }
+  document.querySelectorAll('#w2 [data-f]').forEach((b) => b.addEventListener('click', () => {
+    cur = b.dataset.f;
+    document.querySelectorAll('#w2 [data-f]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    draw2();
+  }));
+  s2.addEventListener('input', draw2);
+  const all = () => { draw1(); draw2(); };
+  window.addEventListener('resize', all);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', all);
+  all();
+})();
+</script>
+</body></html>

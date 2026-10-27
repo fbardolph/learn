@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Limit algebra</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 1.6rem 1fr; gap: .5rem; align-items: start; }
+  .steps li::before { content: counter(s); font: 650 .85rem/1.6rem var(--sans); width: 1.6rem; height: 1.6rem; border-radius: .8rem; background: var(--accent-soft); color: var(--accent); text-align: center; }
+  .steps li > div { min-width: 0; overflow-x: auto; }
+  .steps li > div p { margin: 0; }
+  .flow { display: grid; grid-template-columns: auto 1fr; gap: .4rem .75rem; font-family: var(--sans); font-size: 1rem; align-items: baseline; }
+  .flow b { font: 600 .95rem var(--mono); white-space: nowrap; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Calculus · Functions and limits · Lesson 2</p>
+    <h1>Limit algebra</h1>
+    <p class="lede">Most limits you’ll meet fall to one of four moves: plug in, factor, combine fractions, or multiply by the conjugate. This lesson drills all four, with extra time on the fraction move from last lesson’s stretch question.</p>
+  </header>
+
+  <section>
+    <h2>Move 0: just plug in</h2>
+    <p>Limits behave politely with arithmetic. The limit of a sum is the sum of the limits, and the same goes for differences, products, and quotients (as long as the bottom isn’t heading to 0). For polynomials and most everyday functions, that means you can simply substitute.</p>
+    <p>$$\lim_{x\to 2}(x^3 - 4x + 1) = 8 - 8 + 1 = 1$$</p>
+    <aside class="key"><p>Always try plugging in first. Only when it fails do you need algebra, and <em>how</em> it fails tells you what to do next.</p></aside>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="14" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to 3}(x^2 + 2x - 1)$</p>
+    <div class="explain">Plug in: $9 + 6 - 1 = 14$.</div>
+  </div>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="-3" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to 2}\frac{x+1}{x-3}$</p>
+    <div class="explain">The bottom heads to $-1$, not 0, so plug in: $\frac{3}{-1} = -3$.</div>
+  </div>
+
+  <section>
+    <h2>Reading the result of plugging in</h2>
+    <div class="flow">
+      <b>a number</b><span>That’s the limit. Done.</span>
+      <b>nonzero / 0</b><span>The function blows up near the point. No finite limit (lesson 4 handles these).</span>
+      <b>0 / 0</b><span>Indeterminate. Something on top and bottom is cancelling to zero together. Find it with algebra, cancel it, plug in again.</span>
+    </div>
+    <p>The three algebra moves below are three ways of making the hidden common factor $(x - a)$ show itself.</p>
+  </section>
+
+  <section>
+    <h2>Move 1: factor</h2>
+    <p>If top and bottom are polynomials that both vanish at $x = a$, both have a factor of $(x - a)$. Tap through:</p>
+    <div class="widget">
+      <p style="margin:0">$\displaystyle\lim_{x\to -2}\frac{x^2+5x+6}{x+2}$</p>
+      <ol class="steps" data-steps>
+        <li><div><p>Plug in: $\frac{4 - 10 + 6}{0} = \frac00$. So simplify.</p></div></li>
+        <li><div><p>Factor the top: two numbers that multiply to 6 and add to 5 are 2 and 3, so $x^2+5x+6 = (x+2)(x+3)$.</p></div></li>
+        <li><div><p>Cancel: $\frac{(x+2)(x+3)}{x+2} = x+3$, valid because $x \ne -2$ inside a limit.</p></div></li>
+        <li><div><p>Plug in again: $-2 + 3 = 1$.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="5" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to 3}\frac{x^2-x-6}{x-3}$</p>
+    <div class="explain">$x^2 - x - 6 = (x-3)(x+2)$ (numbers multiplying to −6 and adding to −1: −3 and 2). Cancel to get $x + 2 \to 5$.</div>
+  </div>
+
+  <section>
+    <h2>Move 2: combine fractions</h2>
+    <p>This is the move from last lesson’s stretch question. When the top is a difference of fractions, the factor you need is hidden inside them. Merge them into one fraction and it appears.</p>
+    <div class="widget">
+      <p style="margin:0">$\displaystyle\lim_{x\to 3}\frac{\frac1x - \frac13}{x-3}$</p>
+      <ol class="steps" data-steps>
+        <li><div><p>Plug in: $\frac{1/3 - 1/3}{0} = \frac00$. Simplify.</p></div></li>
+        <li><div><p>Common denominator $3x$: $\frac1x = \frac{3}{3x}$ and $\frac13 = \frac{x}{3x}$, so the top is $\frac{3-x}{3x}$.</p></div></li>
+        <li><div><p>Flip the sign to expose the factor: $3 - x = -(x-3)$, so the top is $-\frac{x-3}{3x}$.</p></div></li>
+        <li><div><p>Divide by $(x-3)$, which means multiply by $\frac{1}{x-3}$: $\;-\frac{x-3}{3x}\cdot\frac{1}{x-3} = -\frac{1}{3x}$.</p></div></li>
+        <li><div><p>Plug in: $-\frac{1}{9}$.</p></div></li>
+      </ol>
+    </div>
+    <aside class="note"><p>Pattern worth noticing: $\lim_{x\to a}\frac{\frac1x - \frac1a}{x-a} = -\frac{1}{a^2}$. That is the slope of the curve $y = 1/x$ at $x = a$. You are computing derivatives already.</p></aside>
+  </section>
+
+  <div class="q" data-id="q4" data-type="text" data-answer="(4-x)/(4x)|(4 - x)/(4x)|(4-x)/4x|-(x-4)/(4x)">
+    <p>Step 2 only: combine $\frac1x - \frac14$ into a single fraction. Type it like <code>(a-b)/(cx)</code>.</p>
+    <div class="explain">Common denominator $4x$: $\frac{4}{4x} - \frac{x}{4x} = \frac{4-x}{4x}$.</div>
+  </div>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="-0.0625" data-tol="0.0005">
+    <p>Now the whole thing: $\displaystyle\lim_{x\to 4}\frac{\frac1x - \frac14}{x-4}$. (Decimal is fine.)</p>
+    <div class="explain">$\frac{4-x}{4x} = -\frac{x-4}{4x}$. Dividing by $(x-4)$ leaves $-\frac{1}{4x} \to -\frac{1}{16} = -0.0625$. It matches the pattern $-\frac{1}{a^2}$.</div>
+  </div>
+
+  <section>
+    <h2>Move 3: the conjugate</h2>
+    <p>Square roots hide the factor differently. The trick is the identity $(a-b)(a+b) = a^2 - b^2$: multiplying a root expression by its <strong>conjugate</strong> (same terms, opposite sign) squares the root away.</p>
+    <div class="widget">
+      <p style="margin:0">$\displaystyle\lim_{x\to 0}\frac{\sqrt{x+4}-2}{x}$</p>
+      <ol class="steps" data-steps>
+        <li><div><p>Plug in: $\frac{2-2}{0} = \frac00$.</p></div></li>
+        <li><div><p>Multiply top and bottom by the conjugate $\sqrt{x+4}+2$. That is multiplying by 1, so nothing changes:</p><p>$$\frac{\sqrt{x+4}-2}{x}\cdot\frac{\sqrt{x+4}+2}{\sqrt{x+4}+2}$$</p></div></li>
+        <li><div><p>Top: $(\sqrt{x+4})^2 - 2^2 = x + 4 - 4 = x$. The root is gone.</p></div></li>
+        <li><div><p>Now it’s $\frac{x}{x(\sqrt{x+4}+2)} = \frac{1}{\sqrt{x+4}+2}$. Cancel the $x$.</p></div></li>
+        <li><div><p>Plug in: $\frac{1}{2+2} = \frac14$.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="q" data-id="q6" data-type="num" data-answer="0.16667" data-tol="0.002">
+    <p>$\displaystyle\lim_{x\to 9}\frac{\sqrt{x}-3}{x-9}$ (decimal is fine)</p>
+    <div class="explain">
+      <p>Multiply by $\frac{\sqrt x + 3}{\sqrt x + 3}$. Top: $x - 9$. So the expression is $\frac{x-9}{(x-9)(\sqrt x+3)} = \frac{1}{\sqrt x + 3} \to \frac16 \approx 0.1667$.</p>
+      <p>Shortcut: $x - 9 = (\sqrt x - 3)(\sqrt x + 3)$, so you could also factor the bottom directly.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Check: pick the move</h2>
+  </section>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>$\displaystyle\lim_{x\to 2}\frac{x^2+1}{x-2}$. What happens when you plug in, and what’s the limit?</p>
+    <button>0/0, so factor</button>
+    <button data-correct>5/0: it blows up, so there’s no finite limit</button>
+    <button>It equals 5</button>
+    <div class="explain">Top heads to 5, bottom to 0. A nonzero number over something tiny is huge, so the function blows up. No algebra will rescue it, because there is no common factor to cancel.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>Which move fits $\displaystyle\lim_{x\to 0}\frac{\frac{1}{x+2}-\frac12}{x}$?</p>
+    <button>Factor a polynomial</button>
+    <button data-correct>Combine fractions</button>
+    <button>Conjugate</button>
+    <div class="explain">A difference of fractions on top means combine them. Common denominator $2(x+2)$: the top is $\frac{2 - (x+2)}{2(x+2)} = \frac{-x}{2(x+2)}$. Divide by $x$: $-\frac{1}{2(x+2)} \to -\frac14$.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="num" data-answer="-0.25" data-tol="0.001">
+    <p>Finish that one: $\displaystyle\lim_{x\to 0}\frac{\frac{1}{x+2}-\frac12}{x}$</p>
+    <div class="explain">$-\frac{1}{2(x+2)}$ at $x = 0$ is $-\frac14 = -0.25$. (That is the slope of $\frac{1}{x+2}$ at $x=0$, again the $-\frac{1}{a^2}$ pattern with $a = 2$.)</div>
+  </div>
+
+  <div class="q" data-id="q10" data-type="num" data-answer="-2" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to -1}\frac{x^2-1}{x+1}$</p>
+    <div class="explain">Difference of squares: $(x-1)(x+1)$. Cancel to get $x - 1 \to -2$.</div>
+  </div>
+
+  <div class="q" data-id="q11" data-type="self">
+    <p>In one sentence: why are we allowed to cancel $(x-a)$ from top and bottom when it would be dividing by zero at $x = a$?</p>
+    <div class="explain">Because a limit never evaluates at $x = a$ itself. For every $x$ near $a$ (but not equal to it), $(x-a) \ne 0$, so cancelling is ordinary algebra.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+  // step-through worked examples: reveal one step per tap
+  document.querySelectorAll('[data-steps]').forEach((ol) => {
+    const items = [...ol.children];
+    items.forEach((li, i) => { li.hidden = i > 0; });
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'kit-btn'; btn.textContent = 'Next step';
+    ol.after(btn);
+    let shown = 1;
+    btn.addEventListener('click', () => {
+      if (shown < items.length) { items[shown].hidden = false; shown++; }
+      if (shown >= items.length) btn.remove();
+    });
+  });
+</script>
+</body></html>

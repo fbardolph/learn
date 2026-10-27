@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bits and surprise</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats span { font-size: .8rem; color: var(--muted); }
+  .curve { width: 100%; height: 150px; display: block; }
+  .curve .ax { stroke: var(--line); stroke-width: 1; }
+  .curve .ln { fill: none; stroke: var(--accent); stroke-width: 2; }
+  .curve .dot { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+  .curve text { fill: var(--muted); font: 11px var(--sans); }
+  .dist { display: grid; grid-template-columns: 4.5rem 1fr 3.2rem 3.6rem; gap: .5rem .6rem; align-items: center; font: .95rem var(--sans); }
+  .dist input[type=range] { width: 100%; min-height: 44px; margin: 0; }
+  .dist .n { font: .9rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .dist .h { color: var(--muted); font-size: .75rem; }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  textarea.src { width: 100%; box-sizing: border-box; min-height: 6.5rem; font: 1rem/1.4 var(--serif); padding: .6rem; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+  .freq { display: grid; grid-template-columns: 1.6rem 1fr 3rem; gap: .25rem .5rem; align-items: center; font: .85rem var(--mono); font-variant-numeric: tabular-nums; }
+  .freq .bar { height: 12px; border-radius: 0 4px 4px 0; background: var(--accent); min-width: 2px; }
+</style>
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Prediction, compression and intelligence · Lesson 2</p>
+    <h1>Bits and surprise</h1>
+    <p class="lede">Last time you measured surprise one guess at a time. Now the averaged version, entropy: the single number that says how unpredictable a source is, and the floor no compressor can beat.</p>
+  </header>
+
+  <section>
+    <h2>Surprise, recapped</h2>
+    <p>An outcome you gave probability $p$ carries $-\log_2 p$ bits of surprise. Probability $\tfrac12$ is 1 bit, $\tfrac14$ is 2 bits, $\tfrac18$ is 3 bits: every halving adds one bit. Something certain ($p = 1$) carries $-\log_2 1 = 0$ bits. You learn nothing from it.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="3" data-tol="0.001">
+    <p>How many bits of surprise is an outcome with probability $\tfrac18$?</p>
+    <div class="explain">$\tfrac18 = 2^{-3}$, so $-\log_2 \tfrac18 = -(-3) = 3$ bits.</div>
+  </div>
+
+  <section>
+    <h2>Entropy: surprise on average</h2>
+    <p>Before you see the outcome, you can ask: how surprised should I <em>expect</em> to be? Weight each outcome’s surprise by how often it happens and add up:</p>
+    <p>$$H = \sum_{\text{outcomes}} p \cdot (-\log_2 p)$$</p>
+    <p>That is the <strong>entropy</strong>, in bits. Try it on a coin. Slide the chance of heads:</p>
+    <div class="widget">
+      <label for="coin">Chance of heads: <span class="readout" id="cread"></span>
+        <input id="coin" type="range" min="0" max="100" value="50"></label>
+      <div class="stats">
+        <div><b id="sh"></b><span>bits if heads</span></div>
+        <div><b id="st"></b><span>bits if tails</span></div>
+        <div><b id="ch"></b><span>entropy, bits per flip</span></div>
+      </div>
+      <svg class="curve" id="curve" viewBox="0 0 320 150" preserveAspectRatio="none" aria-label="Entropy of a coin against chance of heads"></svg>
+    </div>
+    <p>A fair coin has the most entropy: exactly 1 bit. A coin that lands heads 99% of the time is mostly boring. Its rare tails is very surprising (6.6 bits), but it’s so rare that the average is only about 0.08 bits.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>A coin lands heads 90% of the time. Its entropy is…</p>
+    <button>More than 1 bit, because tails is so surprising</button>
+    <button data-correct>Less than 1 bit</button>
+    <button>Exactly 1 bit, like any coin</button>
+    <div class="explain">Tails costs $-\log_2 0.1 \approx 3.32$ bits but happens only 10% of the time. Heads costs $-\log_2 0.9 \approx 0.15$ bits. Average: $0.1(3.32) + 0.9(0.15) \approx 0.47$ bits. Lopsided means predictable means less entropy.</div>
+  </div>
+
+  <section>
+    <h2>A worked example</h2>
+    <p>Tomorrow’s weather, as your forecast sees it: sun $\tfrac12$, cloud $\tfrac14$, rain $\tfrac14$.</p>
+    <ul>
+      <li>Sun: $\tfrac12 \times (-\log_2\tfrac12) = \tfrac12 \times 1 = 0.5$</li>
+      <li>Cloud: $\tfrac14 \times (-\log_2\tfrac14) = \tfrac14 \times 2 = 0.5$</li>
+      <li>Rain: $\tfrac14 \times 2 = 0.5$</li>
+    </ul>
+    <p>Add them: $H = 0.5 + 0.5 + 0.5 = 1.5$ bits. And here’s what that means concretely: give sun the code <code>0</code>, cloud <code>10</code>, rain <code>11</code>. On average a day costs $\tfrac12(1) + \tfrac14(2) + \tfrac14(2) = 1.5$ bits. The entropy is the length of the best possible code.</p>
+    <aside class="key"><p><strong>Entropy is the compression floor.</strong> No lossless code can average fewer than $H$ bits per symbol, and good codes get within a hair of it.</p></aside>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="1.75" data-tol="0.001">
+    <p>Four outcomes with probabilities $\tfrac12, \tfrac14, \tfrac18, \tfrac18$. What is the entropy in bits?</p>
+    <div class="explain">
+      <p>Surprises: 1, 2, 3, 3 bits.</p>
+      <p>Weighted: $\tfrac12(1) + \tfrac14(2) + \tfrac18(3) + \tfrac18(3) = 0.5 + 0.5 + 0.375 + 0.375 = 1.75$ bits.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Shape a distribution</h2>
+    <p>Four kinds of weather. Drag the weights (they’re rescaled to add to 1) and watch the entropy. Can you get it to 2 bits? To 0?</p>
+    <div class="widget">
+      <div class="dist" id="dist"></div>
+      <div class="row">
+        <button type="button" class="kit-btn" id="d-even">Even</button>
+        <button type="button" class="kit-btn" id="d-sure">Certain sun</button>
+        <button type="button" class="kit-btn" id="d-half">½ ¼ ⅛ ⅛</button>
+      </div>
+      <div class="stats"><div><b id="dh"></b><span>entropy, bits</span></div><div><b>2.00</b><span>maximum for 4 outcomes</span></div></div>
+    </div>
+    <p>Entropy is highest when every outcome is equally likely ($\log_2 4 = 2$ bits for four), and zero when one outcome is certain. Everything in between measures how much you <em>don’t</em> know.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Which distribution over 8 outcomes has the highest entropy, and how much?</p>
+    <button>One outcome at 0.93, the rest tiny: about 7 bits</button>
+    <button data-correct>All equal at ⅛: 3 bits</button>
+    <button>All equal at ⅛: 8 bits</button>
+    <div class="explain">Uniform is maximal, and for $n$ equal outcomes $H = \log_2 n$. $\log_2 8 = 3$ because $2^3 = 8$.</div>
+  </div>
+
+  <section>
+    <h2>Bits per character, for real text</h2>
+    <p>Treat text as a source that emits one character at a time. If you ignore context and only know how common each letter is, the entropy is the bits per character you’d need. Type or paste anything:</p>
+    <div class="widget">
+      <textarea class="src" id="txt" aria-label="Text to measure">It was a bright cold day in spring, and the trains were running late again. She bought a coffee, found a seat by the window, and opened the book she had been meaning to read for years.</textarea>
+      <div class="stats">
+        <div><b id="tn"></b><span>characters (a–z and space)</span></div>
+        <div><b id="th"></b><span>bits/char, letter counts only</span></div>
+        <div><b>4.75</b><span>if all 27 were equal</span></div>
+      </div>
+      <div class="freq" id="freq"></div>
+    </div>
+    <p>Letter counts alone get English to about <strong>4.1 bits per character</strong>, since <em>e</em> and space are common and <em>q</em> and <em>z</em> rare. Shannon’s guessers reached about <strong>1 bit</strong>. The gap, roughly 3 bits per character, is what context buys: knowing the previous letters, words and meaning. Capturing that context is the entire job of a language model.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Why do human guessers beat the letter-frequency estimate by so much?</p>
+    <button>They memorised the frequency table more accurately</button>
+    <button data-correct>They use context: spelling, grammar and meaning narrow down the next character</button>
+    <button>Letter-frequency estimates ignore the space character</button>
+    <div class="explain">After “th” the next letter is very likely <em>e</em>; after “the capital of France is ” it’s almost surely <em>P</em>. The probabilities that matter are <em>conditional</em> on what came before, and those are far more lopsided, so the average surprise is far lower.</div>
+  </div>
+
+  <section>
+    <h2>Bits or nats</h2>
+    <p>Machine-learning code uses the natural log, $\ln$, instead of $\log_2$. The unit is then the <strong>nat</strong>. It’s the same quantity in a different unit, like miles and kilometres: 1 nat $= \frac{1}{\ln 2} \approx 1.44$ bits. When a training run reports a loss of 2.0, that’s 2.0 nats of average surprise per token, about 2.9 bits.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="num" data-answer="150" data-tol="0.5">
+    <p>A 1,000-character text is compressed to 1.2 bits per character. How many <em>bytes</em> is that? (8 bits = 1 byte.)</p>
+    <div class="explain">$1000 \times 1.2 = 1200$ bits. $1200 \div 8 = 150$ bytes. Stored plainly, at one byte per character, it would be 1,000 bytes.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="0" data-tol="0.001">
+    <p>A source always emits the letter <em>a</em>. What is its entropy in bits?</p>
+    <div class="explain">One outcome with $p = 1$: $1 \times (-\log_2 1) = 1 \times 0 = 0$. A perfectly predictable source carries no information, and you could “send” it in zero bits.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>A model’s training loss falls from 3.0 to 2.5 nats per token. What happened?</p>
+    <button>It now uses fewer tokens</button>
+    <button data-correct>On average it is less surprised by the real next token: it predicts better, so it would compress better</button>
+    <button>Its vocabulary got smaller</button>
+    <div class="explain">The loss is the average of $-\ln p$ for the token that actually came next. Lower loss means higher probability on the right answers. In bits it went from about 4.3 to 3.6 per token.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In your own words: what does entropy measure, and when is it largest?</p>
+    <div class="explain">It is the average surprise, $\sum p(-\log_2 p)$: how many bits per symbol you need on average, or equivalently how unpredictable the source is. It is largest when all outcomes are equally likely ($\log_2 n$ bits) and zero when one outcome is certain.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const lg = (p) => (p > 0 ? -Math.log2(p) : Infinity);
+  const H = (ps) => ps.reduce((s, p) => s + (p > 0 ? p * -Math.log2(p) : 0), 0);
+  const f2 = (x) => (Number.isFinite(x) ? x.toFixed(2) : '∞');
+
+  // ---- coin ----
+  const coin = document.getElementById('coin'), svg = document.getElementById('curve');
+  const W = 320, Ht = 150, P = 18, X = (p) => P + p * (W - 2 * P), Y = (h) => Ht - P - h * (Ht - 2 * P);
+  let path = '';
+  for (let i = 0; i <= 100; i++) { const p = i / 100; path += (i ? 'L' : 'M') + X(p).toFixed(1) + ' ' + Y(H([p, 1 - p])).toFixed(1); }
+  svg.innerHTML = `<line class="ax" x1="${P}" y1="${Y(0)}" x2="${W - P}" y2="${Y(0)}"/><line class="ax" x1="${P}" y1="${Y(1)}" x2="${W - P}" y2="${Y(1)}"/>`
+    + `<text x="${P}" y="${Ht - 3}">0</text><text x="${W / 2 - 8}" y="${Ht - 3}">0.5</text><text x="${W - P - 6}" y="${Ht - 3}">1</text><text x="2" y="${Y(1) + 4}">1</text>`
+    + `<path class="ln" d="${path}"/><circle class="dot" id="cdot" r="6"/>`;
+  function drawCoin() {
+    const p = Number(coin.value) / 100;
+    document.getElementById('cread').textContent = p.toFixed(2);
+    document.getElementById('sh').textContent = f2(lg(p));
+    document.getElementById('st').textContent = f2(lg(1 - p));
+    const h = H([p, 1 - p]);
+    document.getElementById('ch').textContent = h.toFixed(2);
+    const d = document.getElementById('cdot'); d.setAttribute('cx', X(p)); d.setAttribute('cy', Y(h));
+  }
+  coin.addEventListener('input', drawCoin); drawCoin();
+
+  // ---- four-outcome distribution ----
+  const NAMES = ['Sun', 'Cloud', 'Rain', 'Snow'];
+  const dist = document.getElementById('dist');
+  dist.innerHTML = '<span class="h"></span><span class="h">weight</span><span class="h n">prob.</span><span class="h n">bits</span>'
+    + NAMES.map((n, i) => `<span>${n}</span><input type="range" min="0" max="100" value="25" data-i="${i}" aria-label="${n} weight"><span class="n" id="dp${i}"></span><span class="n" id="db${i}"></span>`).join('');
+  const sliders = [...dist.querySelectorAll('input')];
+  function drawDist() {
+    const w = sliders.map((s) => Number(s.value)), tot = w.reduce((a, b) => a + b, 0) || 1;
+    const ps = w.map((x) => x / tot);
+    ps.forEach((p, i) => { document.getElementById('dp' + i).textContent = p.toFixed(2); document.getElementById('db' + i).textContent = p > 0 ? f2(lg(p)) : '–'; });
+    document.getElementById('dh').textContent = H(ps).toFixed(2);
+  }
+  const setDist = (w) => { sliders.forEach((s, i) => { s.value = w[i]; }); drawDist(); };
+  sliders.forEach((s) => s.addEventListener('input', drawDist));
+  document.getElementById('d-even').addEventListener('click', () => setDist([25, 25, 25, 25]));
+  document.getElementById('d-sure').addEventListener('click', () => setDist([100, 0, 0, 0]));
+  document.getElementById('d-half').addEventListener('click', () => setDist([80, 40, 20, 20]));
+  drawDist();
+
+  // ---- letter-frequency entropy of typed text ----
+  const txt = document.getElementById('txt');
+  let logged = false;
+  function drawTxt() {
+    const s = txt.value.toLowerCase().replace(/[^a-z ]+/g, ' ').replace(/ +/g, ' ');
+    const counts = {}; for (const ch of s) counts[ch] = (counts[ch] || 0) + 1;
+    const n = s.length, ps = Object.values(counts).map((c) => c / n), h = n ? H(ps) : 0;
+    document.getElementById('tn').textContent = n;
+    document.getElementById('th').textContent = n ? h.toFixed(2) : '–';
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8), max = top.length ? top[0][1] : 1;
+    document.getElementById('freq').innerHTML = top.map(([c, k]) => `<span>${c === ' ' ? '␣' : c}</span><div class="bar" style="width:${k / max * 100}%"></div><span>${(100 * k / n).toFixed(1)}%</span>`).join('');
+    return { n, h };
+  }
+  txt.addEventListener('input', drawTxt);
+  txt.addEventListener('change', () => {
+    const { n, h } = drawTxt();
+    if (!logged && n >= 40) { logged = true; Study.event({ type: 'entropy-text', chars: n, bits: Number(h.toFixed(2)) }); }
+  });
+  drawTxt();
+})();
+</script>
+</body></html>
