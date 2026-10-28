@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Flashcards · Learning paths</title>
+<link rel="stylesheet" href="kit/lesson.css">
+<link rel="stylesheet" href="kit/site.css">
+<link rel="icon" href="kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="kit/site-icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="page">
+  <header>
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Learning paths</a><span aria-hidden="true">›</span><span>Flashcards</span></nav>
+    <h1>Flashcards</h1>
+    <p class="lede">Cards from the lessons you’ve finished, timed to come back just before you’d forget them. A few minutes a day is plenty.</p>
+  </header>
+  <section class="rv" aria-live="polite">
+    <p class="rv-left" id="rv-left"></p>
+    <div class="rv-card" id="rv-card" hidden>
+      <p class="rv-leaf" id="rv-leaf"></p>
+      <div class="rv-q" id="rv-q"></div>
+      <div class="rv-a" id="rv-a" hidden></div>
+    </div>
+    <button type="button" class="kit-btn primary rv-show" id="rv-show" hidden>Show answer</button>
+    <div class="rv-grades" id="rv-grades" hidden>
+      <button type="button" class="kit-btn" data-g="1">Again<span></span></button>
+      <button type="button" class="kit-btn" data-g="2">Hard<span></span></button>
+      <button type="button" class="kit-btn" data-g="3">Good<span></span></button>
+      <button type="button" class="kit-btn" data-g="4">Easy<span></span></button>
+    </div>
+    <div class="rv-done" id="rv-done" hidden></div>
+    <p class="kit-fine">Answer in your head, then tap Show answer and be honest: <strong>Again</strong> if you didn’t know it, <strong>Good</strong> if you did. The small times show when you’ll see the card next.</p>
+  </section>
+  <footer class="foot">
+  <p>These are the topics and lessons from Frazier Bardolph’s own self-study, written with Claude. New lessons appear as he works through them. Each takes about 15 minutes on a phone.</p>
+  <p>Your progress is saved in this browser only. Nothing you answer is sent anywhere. Stuck on something? Tap the <strong>?</strong> next to any section or question to copy it, then paste it into whichever AI assistant you use and ask away.</p>
+  <details class="backup"><summary>Move your progress to another device</summary>
+    <p>Copy the code here, then paste it into this box on your other device and tap Load.</p>
+    <textarea id="backup-code" aria-label="Progress code" spellcheck="false"></textarea>
+    <div class="row"><button type="button" class="kit-btn" id="backup-copy">Copy my progress code</button><button type="button" class="kit-btn" id="backup-load">Load a code</button></div>
+    <p id="backup-status" role="status"></p>
+  </details>
+  <p><a href="./">Learning paths</a> · <a href="https://frazierbardolph.com">frazierbardolph.com</a></p>
+</footer>
+</main>
+<script type="module" src="kit/review.js"></script>
+<script>
+// Local progress: kept in this browser only.
+(function () {
+  var KEY = 'learn.progress.v1';
+  function read() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
+  var p = read(), done = p.lessons || {};
+  document.querySelectorAll('[data-leaf]').forEach(function (el) {
+    var id = el.getAttribute('data-leaf'), written = Number(el.getAttribute('data-written') || 0);
+    var n = Object.keys(done).filter(function (k) { return k.indexOf(id + '#') === 0 && done[k].done; }).length;
+    var chip = el.querySelector('.chip');
+    if (chip && n) { chip.textContent = n + ' of ' + written + ' done'; chip.classList.add(n >= written ? 'done' : 'x'); }
+    if (n && n < written) el.setAttribute('data-started', '1');
+  });
+  var firstNext = null;
+  document.querySelectorAll('[data-lesson]').forEach(function (el) {
+    var r = done[el.getAttribute('data-lesson')], chip = el.querySelector('.chip');
+    if (r && r.done && chip) { chip.textContent = r.score != null ? 'Done · ' + Math.round(r.score * 100) + '%' : 'Done'; chip.className = 'chip done'; }
+    else if (!firstNext && el.tagName === 'A') firstNext = el;
+  });
+  if (firstNext) { firstNext.classList.add('next'); var c = firstNext.querySelector('.chip'); if (c) c.textContent = 'Up next'; }
+  var cont = document.querySelector('.continue');
+  if (cont) document.querySelectorAll('[data-started]').forEach(function (el) { cont.appendChild(el.cloneNode(true)); });
+  var box = document.getElementById('backup-code');
+  if (box) {
+    document.getElementById('backup-copy').addEventListener('click', function () {
+      box.value = btoa(unescape(encodeURIComponent(JSON.stringify(read()))));
+      box.select();
+      if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function () { status('Copied. Paste it on your other device.'); }, function () { status('Select the code and copy it.'); });
+    });
+    document.getElementById('backup-load').addEventListener('click', function () {
+      try {
+        var incoming = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+        var cur = read(); cur.lessons = Object.assign({}, cur.lessons || {}, incoming.lessons || {}); cur.reviews = cur.reviews || {}; var rin = incoming.reviews || {}; Object.keys(rin).forEach(function (k) { if (!cur.reviews[k] || (rin[k].last || 0) > (cur.reviews[k].last || 0)) cur.reviews[k] = rin[k]; });
+        localStorage.setItem(KEY, JSON.stringify(cur)); status('Progress loaded.'); setTimeout(function () { location.reload(); }, 600);
+      } catch (e) { status('That code didn’t work. Copy the whole code from your other device and try again.'); }
+    });
+  }
+  function status(t) { var s = document.getElementById('backup-status'); if (s) s.textContent = t; }
+})();
+</script>
+</body></html>

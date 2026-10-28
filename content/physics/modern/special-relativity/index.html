@@ -73,7 +73,7 @@
     document.getElementById('backup-load').addEventListener('click', function () {
       try {
         var incoming = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
-        var cur = read(); cur.lessons = Object.assign({}, cur.lessons || {}, incoming.lessons || {});
+        var cur = read(); cur.lessons = Object.assign({}, cur.lessons || {}, incoming.lessons || {}); cur.reviews = cur.reviews || {}; var rin = incoming.reviews || {}; Object.keys(rin).forEach(function (k) { if (!cur.reviews[k] || (rin[k].last || 0) > (cur.reviews[k].last || 0)) cur.reviews[k] = rin[k]; });
         localStorage.setItem(KEY, JSON.stringify(cur)); status('Progress loaded.'); setTimeout(function () { location.reload(); }, 600);
       } catch (e) { status('That code didn’t work. Copy the whole code from your other device and try again.'); }
     });

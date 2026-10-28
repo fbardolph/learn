@@ -195,7 +195,7 @@
     p.lessons = p.lessons || {};
     p.lessons[lessonKey] = { done: true, score: n ? Math.round((right / n) * 100) / 100 : null, answered: n, total: qs.length, ts: Date.now() };
     const ok = write(p);
-    fin.innerHTML = `<h2>${ok ? 'Saved' : 'Finished'}</h2><p style="margin:0">${ok ? 'Your progress is saved in this browser.' : 'This browser isn’t letting the page save, so your progress won’t be remembered here.'}</p><a class="kit-btn primary" href="${root}content/${leaf}/" style="text-decoration:none">Back to the lesson list</a>`;
+    fin.innerHTML = `<h2>${ok ? 'Saved' : 'Finished'}</h2><p style="margin:0">${ok ? 'Your progress is saved in this browser, and this lesson’s flashcards are now in <a href="' + root + 'review.html">Flashcards</a>.' : 'This browser isn’t letting the page save, so your progress won’t be remembered here.'}</p><a class="kit-btn primary" href="${root}content/${leaf}/" style="text-decoration:none">Back to the lesson list</a>`;
   });
 
   progress();

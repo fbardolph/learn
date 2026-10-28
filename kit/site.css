@@ -1,4 +1,18 @@
 
+.rv { display: flex; flex-direction: column; gap: .75rem; }
+.rv-left { margin: 0; font: 600 .8rem var(--sans); color: var(--muted); letter-spacing: .04em; min-height: 1em; }
+.rv-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem; display: flex; flex-direction: column; gap: .75rem; min-height: 9rem; }
+.rv-leaf { margin: 0; font: 600 .75rem var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.rv-q { font: 650 1.3rem/1.35 var(--serif); }
+.rv-a { font: 1.05rem/1.5 var(--sans); border-top: 1px dashed var(--line); padding-top: .75rem; }
+.rv-show { text-align: center; }
+.rv-grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; }
+.rv-grades button { display: flex; flex-direction: column; align-items: center; gap: .1rem; text-align: center; padding: .55rem .2rem; font-weight: 600; }
+.rv-grades button span { font: 500 .75rem var(--sans); color: var(--muted); }
+.rv-grades button[data-g="1"] { border-color: var(--bad); }
+.rv-grades button[data-g="3"] { border-color: var(--good); }
+.rv-done { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem; font: 1rem/1.55 var(--sans); }
+
 /* Home and topic pages. Builds on lesson.css tokens. */
 .page { max-width: 40rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 1.75rem; }
 .page > header { padding-top: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
