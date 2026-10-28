@@ -126,7 +126,13 @@
       if (type === 'num') inp.inputMode = 'decimal';
       inp.setAttribute('aria-label', 'Your answer');
       const go = document.createElement('button'); go.type = 'button'; go.className = 'kit-btn primary'; go.textContent = 'Check';
-      row.append(inp, go);
+      if (type === 'num') {
+        // iPhone's number keypad has no minus key: a ± button flips the sign.
+        const neg = document.createElement('button'); neg.type = 'button'; neg.className = 'kit-btn kit-neg'; neg.textContent = '±';
+        neg.setAttribute('aria-label', 'Make the answer negative or positive');
+        neg.addEventListener('click', () => { const v = inp.value.trim(); inp.value = /^[-−]/.test(v) ? v.replace(/^[-−]\s*/, '') : '-' + v; inp.focus(); });
+        row.append(inp, neg, go);
+      } else row.append(inp, go);
       q.insertBefore(row, q.querySelector('.explain') || null);
       const check = () => {
         const val = inp.value.trim();
@@ -134,7 +140,7 @@
         let ok = false, extra = '';
         if (type === 'num') {
           const want = Number(q.dataset.answer), tol = Number(q.dataset.tol || 1e-6);
-          const digits = val.replace(',', '.').replace(/[^0-9eE+\-.]/g, '');
+          const digits = val.replace(',', '.').replace(/[−–]/g, '-').replace(/[^0-9eE+\-.]/g, '');
           const got = digits ? Number(digits) : NaN;
           ok = Number.isFinite(got) && Math.abs(got - want) <= tol;
           if (!ok) extra = `answer: ${q.dataset.answer}`;

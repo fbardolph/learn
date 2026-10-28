@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Logs of anything</title>
+<link rel="stylesheet" href="../../../../kit/lesson.css">
+<style>
+  .curve { width: 100%; height: auto; display: block; }
+  .curve .ax { stroke: var(--muted); stroke-width: 1; }
+  .curve .grid { stroke: var(--line); stroke-width: 1; }
+  .curve .ln { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+  .curve .pt { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
+  .curve .old { fill: var(--muted); }
+  .curve .step { stroke: var(--good); stroke-width: 2; stroke-dasharray: 4 3; }
+  .curve .guide { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; }
+  .curve text { fill: var(--muted); font: 10px var(--sans); }
+  .curve text.hi { fill: var(--good); font-weight: 700; font-size: 12px; }
+  .btnrow { display: flex; gap: .5rem; }
+  .btnrow > button {
+    flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink); font: 600 1rem var(--sans); cursor: pointer;
+  }
+  .out { font: 1rem var(--mono); font-variant-numeric: tabular-nums; margin: 0; }
+  .out > .ok { color: var(--good); font-weight: 650; }
+  .out > .bad { color: var(--bad); font-weight: 650; }
+  .anchors { width: 100%; }
+  .anchors td:last-child { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+</style>
+<link rel="icon" href="../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Mathematics · Exponents and logarithms · Lesson 3</p>
+    <h1>Logs of anything</h1>
+    <p class="lede">Most numbers aren’t neat powers of 2, but every positive number still has a log. You’ll learn to pin it down to a decimal or two in your head.</p>
+  </header>
+
+  <section>
+    <h2>Between the rungs</h2>
+    <p>The ladder from Lesson 1 only had rungs at the powers of 2: 1, 2, 4, 8, 16, 32, … So what is $\log_2 27$? No whole number of doublings lands on 27.</p>
+    <p>But you can say where it falls straight away:</p>
+    <p>$$16 < 27 < 32 \quad\Longrightarrow\quad 4 < \log_2 27 < 5$$</p>
+    <p>Bigger numbers have bigger logs. So if 27 sits between the 4th and 5th rungs, its log sits between 4 and 5. The answer is a decimal, and that’s fine: the question “2 to what power makes 27?” still has an answer.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>Between which two whole numbers is $\log_2 100$?</p>
+    <button>5 and 6</button>
+    <button data-correct>6 and 7</button>
+    <button>10 and 11</button>
+    <button>50 and 51</button>
+    <div class="explain">List the rungs: $2^6 = 64$ and $2^7 = 128$. Since $64 < 100 < 128$, the log is between 6 and 7. (It’s about 6.64.) “10 and 11” mixes it up with $\log_{10}$, and “50 and 51” halves 100, which is a different question altogether.</div>
+  </div>
+
+  <section>
+    <h2>Half a doubling</h2>
+    <p>What does a decimal exponent like $2^{0.5}$ mean? Use the rule from Lesson 2: multiplying powers adds exponents. So</p>
+    <p>$$2^{0.5} \times 2^{0.5} = 2^{0.5 + 0.5} = 2^1 = 2$$</p>
+    <p>$2^{0.5}$ is the number that, times itself, gives 2. That’s $\sqrt2 \approx 1.414$. Half a doubling multiplies by about 1.41, and two half-doublings make one full doubling.</p>
+    <p>Now you can narrow down $\log_2 27$:</p>
+    <ol>
+      <li>$2^{4.5} = 2^4 \times 2^{0.5} = 16 \times 1.414 \approx 22.6$.</li>
+      <li>27 is bigger than 22.6, so $\log_2 27$ is bigger than 4.5.</li>
+      <li>It’s between 4.5 and 5, so the first digit after the point is 5 or more.</li>
+    </ol>
+    <p>You could keep halving the gap like this forever. Try it with the slider: find the power of 2 that makes 27.</p>
+    <div class="widget">
+      <label for="gs">Your guess for $\log_2 27$: <span class="readout" id="gr"></span>
+        <input id="gs" type="range" min="4" max="5" step="0.01" value="4.5"></label>
+      <p class="out" id="gout"></p>
+    </div>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="4.75" data-tol="0.02">
+    <p>To two decimal places, what is $\log_2 27$?</p>
+    <div class="explain">
+      <p>About $4.75$: $2^{4.75} \approx 26.9$ and $2^{4.76} \approx 27.1$. More exactly, $\log_2 27 = 4.7549$.</p>
+      <p>Lesson 2 used this number: 4.75 bits per character for a 27-symbol alphabet.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Building from a few anchors</h2>
+    <p>You don’t need the slider every time. Remember two logs and the rules from Lesson 2 will build most of the rest:</p>
+    <table class="anchors">
+      <tr><td>$\log_2 3$</td><td>≈ 1.585</td></tr>
+      <tr><td>$\log_2 10$</td><td>≈ 3.32</td></tr>
+    </table>
+    <p>The second has a lovely shortcut. $2^{10} = 1024$, which is almost exactly $1000 = 10^3$. So ten doublings is about three tenfolds, and one tenfold is about $\tfrac{10}{3} \approx 3.33$ doublings.</p>
+    <p>Now combine. For $\log_2 27$, write $27 = 3^3$ and use the power rule:</p>
+    <p>$$\log_2 27 = \log_2(3^3) = 3 \times \log_2 3 \approx 3 \times 1.585 = 4.755$$</p>
+    <p>That matches the slider. For $\log_2 6$, write $6 = 2 \times 3$ and use the product rule:</p>
+    <p>$$\log_2 6 = \log_2 2 + \log_2 3 \approx 1 + 1.585 = 2.585$$</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="3.17" data-tol="0.02">
+    <p>Using $\log_2 3 \approx 1.585$, what is $\log_2 9$? (Two decimal places.)</p>
+    <div class="explain">
+      <p>$9 = 3^2$, so by the power rule $\log_2 9 = 2 \times \log_2 3$.</p>
+      <p>$2 \times 1.585 = 3.17$. Sanity check: $8 < 9 < 16$, so the answer should be a bit over 3. It is.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="20" data-tol="0.5">
+    <p>About how many bits is $\log_2 1{,}000{,}000$? Use $2^{10} \approx 1000$. (Whole number.)</p>
+    <div class="explain">
+      <p>$1{,}000{,}000 = 1000 \times 1000 \approx 2^{10} \times 2^{10}$.</p>
+      <p>Add the exponents: $2^{10} \times 2^{10} = 2^{20}$. So $\log_2 1{,}000{,}000 \approx 20$ (exactly, 19.93).</p>
+      <p>So one choice out of a million is worth about 20 yes/no questions.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>The shape of the curve</h2>
+    <p>Plot $y = \log_2 x$ and you get the curve below. Drag the slider, then tap <strong>×2</strong> a few times and watch how far the dot rises each time.</p>
+    <div class="widget">
+      <svg class="curve" id="curve" viewBox="0 0 320 210" aria-label="Graph of y equals log base 2 of x, with a movable point"></svg>
+      <label for="cx">$x$: <span class="readout" id="cxr"></span>
+        <input id="cx" type="range" min="0.25" max="32" step="any" value="3"></label>
+      <div class="btnrow">
+        <button type="button" id="half">÷2</button>
+        <button type="button" id="dbl">×2</button>
+      </div>
+      <p class="out" id="cout"></p>
+    </div>
+    <p>Three things to notice:</p>
+    <ol>
+      <li><strong>Every ×2 is a +1.</strong> From 3 to 6, from 6 to 12, from 12 to 24: the dot rises by exactly 1 each time, though the jumps in $x$ keep getting bigger. Doubling $x$ adds one to the log. It never doubles the log.</li>
+      <li><strong>It grows very slowly.</strong> To climb from 5 to 6 you need $x$ to go from 32 to 64. To reach 20 you need a million.</li>
+      <li><strong>It plunges near 0.</strong> Each halving toward 0 subtracts 1, forever. $\log_2 x$ heads to $-\infty$ as $x$ shrinks to 0, and there’s no log at 0 or below.</li>
+    </ol>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>$x$ goes from 10 to 20. What happens to $\log_2 x$?</p>
+    <button>It doubles</button>
+    <button data-correct>It goes up by exactly 1</button>
+    <button>It goes up by 10</button>
+    <button>It goes up by about 3.32</button>
+    <div class="explain">
+      <p>$\log_2 20 = \log_2(2 \times 10) = \log_2 2 + \log_2 10 = 1 + \log_2 10$. One doubling, one more. Numerically: 3.32 becomes 4.32.</p>
+      <p>“It doubles” is the trap. The log would only double if $x$ were <em>squared</em> ($10 \to 100$), by the power rule.</p>
+    </div>
+  </div>
+
+  <aside class="key"><p>On a log scale, <strong>multiplying by 2 means adding 1</strong>, wherever you start. Doubling the input never doubles the log. Squaring the input does.</p></aside>
+
+  <section>
+    <h2>Surprise for any probability</h2>
+    <p>Real models don’t hand out neat probabilities like $\tfrac14$. Suppose a language model gives the correct next word $p = \tfrac13$. Using the friendly form from Lesson 2:</p>
+    <p>$$-\log_2 \tfrac13 = \log_2 3 \approx 1.585 \text{ bits}$$</p>
+    <p>Or it gives the right word $p = 0.75$, which is $\tfrac34$. Flip it to $\tfrac43$, then use the quotient rule:</p>
+    <ol>
+      <li>$-\log_2 \tfrac34 = \log_2 \tfrac43$</li>
+      <li>$= \log_2 4 - \log_2 3$</li>
+      <li>$\approx 2 - 1.585 = 0.415$ bits</li>
+    </ol>
+    <p>A confident correct guess costs less than half a bit. Now let $p$ shrink: at $p = 0.1$ the surprise is $\log_2 10 \approx 3.32$ bits, and at $p = 0.001$ it’s about 10. That’s the curve’s plunge near 0, flipped by the minus sign. A model that is confidently wrong pays a cost with no ceiling.</p>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>A model gives the correct next token probability $p$. As $p$ gets closer and closer to 0, what happens to the surprise $-\log_2 p$?</p>
+    <button>It gets closer to 0</button>
+    <button>It levels off at 1 bit</button>
+    <button data-correct>It grows without limit</button>
+    <div class="explain">Each halving of $p$ adds one bit, and you can halve forever: $\tfrac1{1024}$ is 10 bits, $\tfrac1{2^{20}}$ is 20 bits, and so on. This is why training punishes confident wrong answers so hard.</div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>Which is closest to $\log_2 50$?</p>
+    <button>4.6</button>
+    <button data-correct>5.6</button>
+    <button>6.6</button>
+    <button>25</button>
+    <div class="explain">$32 < 50 < 64$, so it’s between 5 and 6, which leaves only 5.6. (Check: $\log_2 50 = \log_2 100 - \log_2 2 \approx 6.64 - 1 = 5.64$.)</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="num" data-answer="2.585" data-tol="0.01">
+    <p>Using $\log_2 3 \approx 1.585$: how many bits of surprise is an event with probability $\tfrac16$?</p>
+    <div class="explain">
+      <p>Flip it: $-\log_2 \tfrac16 = \log_2 6$.</p>
+      <p>$6 = 2 \times 3$, so $\log_2 6 = \log_2 2 + \log_2 3 = 1 + 1.585 = 2.585$ bits. That’s one roll of a fair die.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="num" data-answer="3.585" data-tol="0.01">
+    <p>And for an event with probability $\tfrac1{12}$?</p>
+    <div class="explain">
+      <p>$-\log_2 \tfrac1{12} = \log_2 12$. Since $12 = 2 \times 6$, that’s one doubling more than $\log_2 6$.</p>
+      <p>$1 + 2.585 = 3.585$ bits. Halving the probability added exactly one bit.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q10" data-type="self">
+    <p>In your own words: why is $\log_2 1000$ almost exactly 10?</p>
+    <div class="explain">Because $2^{10} = 1024$, which is very close to 1000. The log asks “2 to what power makes 1000?”, and ten doublings land just past it, so the answer is just under 10 (it’s 9.97). The same fact gives $\log_2 10 \approx \tfrac{10}{3}$.</div>
+  </div>
+</main>
+
+<script src="../../../../kit/public.js"></script>
+<script>
+(function () {
+  // Guess-the-exponent slider
+  const gs = document.getElementById('gs'), gr = document.getElementById('gr'), gout = document.getElementById('gout');
+  function guess() {
+    const y = Number(gs.value), v = 2 ** y;
+    gr.textContent = y.toFixed(2);
+    const near = Math.abs(v - 27) < 0.2;
+    const verdict = near ? '<span class="ok">≈ 27, got it</span>'
+      : v < 27 ? '<span class="bad">too small, go higher</span>' : '<span class="bad">too big, go lower</span>';
+    gout.innerHTML = `2<sup>${y.toFixed(2)}</sup> = ${v.toFixed(1)} · ${verdict}`;
+  }
+  gs.addEventListener('input', guess); guess();
+
+  // Log curve with ×2 / ÷2 steps
+  const svg = document.getElementById('curve'), cx = document.getElementById('cx');
+  const W = 320, H = 210, L = 28, R = 10, T = 12, B = 26;
+  const XMAX = 32, YMIN = -2, YMAX = 5;
+  const sx = (x) => L + (x / XMAX) * (W - L - R);
+  const sy = (y) => T + ((YMAX - y) / (YMAX - YMIN)) * (H - T - B);
+  let base = '';
+  for (let y = YMIN; y <= YMAX; y++) {
+    base += `<line class="grid" x1="${L}" y1="${sy(y)}" x2="${W - R}" y2="${sy(y)}"/>`
+      + `<text x="${L - 6}" y="${sy(y) + 3}" text-anchor="end">${y}</text>`;
+  }
+  for (const x of [0, 4, 8, 16, 24, 32]) base += `<text x="${sx(x)}" y="${H - 10}" text-anchor="middle">${x}</text>`;
+  base += `<line class="ax" x1="${L}" y1="${sy(0)}" x2="${W - R}" y2="${sy(0)}"/>`
+    + `<line class="ax" x1="${sx(0)}" y1="${T}" x2="${sx(0)}" y2="${H - B}"/>`;
+  let d = '';
+  for (let i = 0; i <= 200; i++) {
+    const x = 0.25 * Math.pow(XMAX / 0.25, i / 200);
+    d += (i ? 'L' : 'M') + sx(x).toFixed(1) + ' ' + sy(Math.log2(x)).toFixed(1);
+  }
+  base += `<path class="ln" d="${d}"/>`;
+  const f = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(2));
+  let prev = null;
+  function draw() {
+    const x = Number(cx.value), y = Math.log2(x);
+    document.getElementById('cxr').textContent = f(x);
+    let s = base + `<line class="guide" x1="${sx(x)}" y1="${sy(y)}" x2="${sx(x)}" y2="${sy(0)}"/>`;
+    let msg = `log₂ ${f(x)} = ${f(y)}`;
+    if (prev !== null && prev !== x) {
+      const py = Math.log2(prev), dy = y - py;
+      s += `<circle class="old" cx="${sx(prev)}" cy="${sy(py)}" r="4"/>`
+        + `<line class="step" x1="${sx(x)}" y1="${sy(py)}" x2="${sx(x)}" y2="${sy(y)}"/>`
+        + `<line class="guide" x1="${sx(prev)}" y1="${sy(py)}" x2="${sx(x)}" y2="${sy(py)}"/>`;
+      const lx = Math.min(sx(x) + 6, W - R - 22);
+      s += `<text class="hi" x="${lx}" y="${(sy(py) + sy(y)) / 2 + 4}">${dy > 0 ? '+' : '−'}${f(Math.abs(dy))}</text>`;
+      msg += ` (${dy > 0 ? 'up' : 'down'} ${f(Math.abs(dy))} from log₂ ${f(prev)})`;
+    }
+    s += `<circle class="pt" cx="${sx(x)}" cy="${sy(y)}" r="6"/>`;
+    svg.innerHTML = s;
+    document.getElementById('cout').textContent = msg;
+  }
+  function jump(k) {
+    const x = Number(cx.value), nx = Math.min(32, Math.max(0.25, x * k));
+    if (nx === x) return;
+    prev = x; cx.value = nx; draw();
+  }
+  // The slider snaps to quarters; ×2 and ÷2 may land between them (e.g. 0.375).
+  cx.addEventListener('input', () => { prev = null; cx.value = Math.max(0.25, Math.round(cx.value * 4) / 4); draw(); });
+  document.getElementById('dbl').addEventListener('click', () => jump(2));
+  document.getElementById('half').addEventListener('click', () => jump(0.5));
+  draw();
+})();
+</script>
+</body></html>

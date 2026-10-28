@@ -99,6 +99,7 @@ aside > :last-child { margin-bottom: 0; }
   flex: 1; min-width: 8rem; font: 500 1.05rem var(--mono); padding: .65rem .75rem; min-height: 44px;
   border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink);
 }
+.q .kit-row .kit-neg { min-width: 44px; padding-inline: .6rem; text-align: center; font-weight: 700; }
 .kit-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; text-align: center; }
 .kit-ask {
   position: absolute; top: .55rem; right: .55rem; width: 40px; height: 40px; border-radius: 20px;
