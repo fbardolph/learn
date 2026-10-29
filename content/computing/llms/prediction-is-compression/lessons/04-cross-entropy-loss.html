@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cross-entropy loss</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats > div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats > div > span { font-size: .8rem; color: var(--muted); }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .row .kit-btn { min-height: 44px; }
+  .toks { display: grid; grid-template-columns: 4.2rem 1fr 3.2rem; gap: .35rem .5rem; align-items: center; font: .9rem var(--sans); }
+  .toks .tok { min-height: 44px; padding: 0 .3rem; font: 600 .9rem var(--sans); }
+  .toks .tok[aria-pressed="true"] { background: var(--good); color: var(--paper); border-color: var(--good); }
+  .toks .cell { display: flex; flex-direction: column; gap: .15rem; }
+  .toks .cell input[type=range] { width: 100%; min-height: 28px; accent-color: var(--accent); margin: 0; }
+  .toks .bar { height: 10px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .toks .fill { height: 100%; background: var(--accent); }
+  .toks .fill.truth { background: var(--good); }
+  .toks .n { font: .8rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .toks .h { color: var(--muted); font-size: .75rem; }
+  .curve { width: 100%; height: auto; display: block; }
+  .curve .ax { stroke: var(--line); stroke-width: 1; }
+  .curve .ln { fill: none; stroke: var(--accent); stroke-width: 2; }
+  .curve .floor { stroke: var(--good); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .curve .dot { fill: var(--accent); }
+  .curve text { fill: var(--muted); font: 11px var(--sans); }
+  table.t { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
+  table.t th, table.t td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Prediction, compression and intelligence · Lesson 4</p>
+    <h1>Cross-entropy loss</h1>
+    <p class="lede">You’ll compute the one number every language model is trained to push down, see where it comes from, and see why it’s the same thing as file size.</p>
+  </header>
+
+  <section>
+    <h2>One prediction, one bill</h2>
+    <p>Show a model “The cat sat on the” and it doesn’t answer with a word. It answers with a probability for every token it knows. Then the real text reveals what came next, and the model gets a bill:</p>
+    <p>$$\text{loss} = -\ln p(\text{the token that actually came next})$$</p>
+    <p>That’s the surprise from Lesson 2, in nats (natural log) because that’s what training code uses. Put 0.9 on the right token and you pay $0.105$ nats. Put 0.1 on it and you pay $2.30$.</p>
+    <p>Notice what the bill ignores. It doesn’t matter how the model split the <em>rest</em> of its probability among the wrong tokens. Only the probability on the truth counts.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>The model has given its probabilities and the real next token is revealed. Which numbers does the loss for this step use?</p>
+    <button>All the probabilities, weighted by how wrong each one was</button>
+    <button data-correct>Only the probability given to the token that actually came next</button>
+    <button>Only the probability of the model’s top guess</button>
+    <div class="explain">The loss is $-\ln p$ of the actual token, nothing else. The other probabilities matter only indirectly: they all add up to 1, so any probability spent on wrong tokens is probability not spent on the right one.</div>
+  </div>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="1.386" data-tol="0.01">
+    <p>The model gave the actual next token probability $0.25$. What’s the loss in nats? (Use $\ln 4 \approx 1.386$.)</p>
+    <div class="explain">
+      <p>$-\ln 0.25 = -\ln \tfrac14$.</p>
+      <p>The log of a reciprocal is minus the log: $\ln \tfrac14 = -\ln 4$.</p>
+      <p>So $-\ln \tfrac14 = \ln 4 \approx 1.386$ nats. In bits it’s $-\log_2 \tfrac14 = 2$, and $1.386 \times 1.443 \approx 2$ checks out.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Where the probabilities come from: softmax</h2>
+    <p>Inside, the model first produces one raw score per token, called a <strong>logit</strong>. Logits can be any number, negative or positive. To turn them into probabilities:</p>
+    <ol>
+      <li>Raise $e$ to each logit: $e^{z}$. Now everything is positive, and a bigger logit gives a much bigger number.</li>
+      <li>Divide each by the total, so they add up to 1.</li>
+    </ol>
+    <p>That’s <strong>softmax</strong>. Worked example with five candidate tokens:</p>
+    <table class="t">
+      <tr><th>Token</th><th>Logit $z$</th><th>$e^{z}$</th><th>Probability</th></tr>
+      <tr><td>mat</td><td>2.0</td><td>7.389</td><td>$7.389 \div 13.124 = 0.563$</td></tr>
+      <tr><td>floor</td><td>1.0</td><td>2.718</td><td>$0.207$</td></tr>
+      <tr><td>sofa</td><td>0.5</td><td>1.649</td><td>$0.126$</td></tr>
+      <tr><td>roof</td><td>0.0</td><td>1.000</td><td>$0.076$</td></tr>
+      <tr><td>moon</td><td>−1.0</td><td>0.368</td><td>$0.028$</td></tr>
+      <tr><td></td><td></td><td>total $13.124$</td><td>total $1.000$</td></tr>
+    </table>
+    <p>If the real next word is “mat”, the loss is $-\ln 0.563 = 0.574$ nats. If it’s “floor”, $-\ln 0.207 = 1.574$ nats.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="0.576" data-tol="0.005">
+    <p>Three tokens have logits $1$, $0$ and $0$. What probability does softmax give the first one? (Use $e \approx 2.718$.)</p>
+    <div class="explain">
+      <p>Exponentiate: $e^1 = 2.718$, $e^0 = 1$, $e^0 = 1$.</p>
+      <p>Total: $2.718 + 1 + 1 = 4.718$.</p>
+      <p>First token: $2.718 \div 4.718 = 0.576$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Poke it, then train it</h2>
+    <p>Here’s that five-token model. Drag the logits to change the probabilities. Tap a token’s name to make it the one that actually came next (green). Then press <strong>Train step</strong>: it nudges the logits the way real training does, and the loss drops.</p>
+    <div class="widget">
+      <p style="margin:0">The cat sat on the …</p>
+      <div class="toks" id="toks"></div>
+      <div class="row">
+        <button type="button" class="kit-btn primary" id="train">Train step</button>
+        <button type="button" class="kit-btn" id="reset">Reset</button>
+      </div>
+      <div class="stats">
+        <div><b id="lp"></b><span>p(actual)</span></div>
+        <div><b id="ln"></b><span>loss, nats</span></div>
+        <div><b id="lb"></b><span>loss, bits</span></div>
+        <div><b id="ls"></b><span>train steps</span></div>
+      </div>
+    </div>
+    <p>The nudge is simple. For the true token, the logit goes up by $(1 - p)$: a lot if the model gave it little probability, hardly at all if it was already confident. Every other token’s logit goes down by its own probability, so the tokens that stole the most get pushed down the most. (Where that rule comes from is calculus, which the Calculus leaf will reach.)</p>
+    <p>Try one more thing: drag every logit up by the same amount. The probabilities don’t change, because softmax only cares about the <em>gaps</em> between logits.</p>
+  </section>
+
+  <section>
+    <h2>Averaged over real text: cross-entropy</h2>
+    <p>Training doesn’t look at one prediction. It averages the loss over every position in a huge pile of text. If the text really comes from some true distribution $p$ and the model predicts $q$, that average settles at</p>
+    <p>$$H(p, q) = \sum p \,(-\log q),$$</p>
+    <p>the <strong>cross-entropy</strong>: how often each outcome really happens, times what the model pays when it does.</p>
+    <p>Back to the weather from Lesson 2. The truth is sun $\tfrac12$, cloud $\tfrac14$, rain $\tfrac14$, so the entropy is $1.5$ bits. In bits:</p>
+    <table class="t">
+      <tr><th>Model predicts</th><th>Cross-entropy</th><th>Wasted</th></tr>
+      <tr><td>$\tfrac12, \tfrac14, \tfrac14$ (the truth)</td><td>$\tfrac12(1) + \tfrac14(2) + \tfrac14(2) = 1.5$</td><td>0</td></tr>
+      <tr><td>$\tfrac13, \tfrac13, \tfrac13$</td><td>$\log_2 3 = 1.585$</td><td>0.085</td></tr>
+      <tr><td>$\tfrac14, \tfrac14, \tfrac12$</td><td>$\tfrac12(2) + \tfrac14(2) + \tfrac14(1) = 1.75$</td><td>0.25</td></tr>
+    </table>
+    <p>Cross-entropy is never below the entropy. The best a model can do is predict the true probabilities, and then it pays exactly the entropy. Any gap is bits wasted by a wrong model. (That gap has a name you’ll meet in papers: the <strong>KL divergence</strong>.)</p>
+    <div class="widget">
+      <label><span>True chance of heads, p: <span class="readout" id="pv"></span></span>
+        <input type="range" id="ps" min="0.05" max="0.95" step="0.01" value="0.5"></label>
+      <label><span>Model’s chance of heads, q: <span class="readout" id="qv"></span></span>
+        <input type="range" id="qs" min="0.02" max="0.98" step="0.01" value="0.8"></label>
+      <svg class="curve" id="curve" viewBox="0 0 320 170" role="img" aria-label="Cross-entropy as the model's guess q varies"></svg>
+      <div class="stats">
+        <div><b id="ce"></b><span>cross-entropy, bits</span></div>
+        <div><b id="en"></b><span>entropy (floor)</span></div>
+        <div><b id="kl"></b><span>wasted</span></div>
+      </div>
+    </div>
+    <p>Wherever you set the truth, the curve’s lowest point sits right at $q = p$, touching the dashed entropy floor.</p>
+    <aside class="key"><p><strong>Training loss = average surprise on real text = cross-entropy.</strong> It can’t go below the text’s entropy, and it reaches it only when the model’s probabilities match reality.</p></aside>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="1.21" data-tol="0.01">
+    <p>A coin is fair, but the model predicts heads $\tfrac34$, tails $\tfrac14$. What’s the cross-entropy in bits? (Use $-\log_2 \tfrac34 \approx 0.415$.)</p>
+    <div class="explain">
+      <p>Heads happens half the time and costs $-\log_2 \tfrac34 \approx 0.415$ bits.</p>
+      <p>Tails happens half the time and costs $-\log_2 \tfrac14 = 2$ bits.</p>
+      <p>$H(p,q) = \tfrac12(0.415) + \tfrac12(2) = 0.2075 + 1 = 1.2075 \approx 1.21$ bits. The entropy of a fair coin is 1 bit, so the overconfident model wastes about 0.21 bits per toss.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Confidently wrong is ruinous</h2>
+    <table class="t">
+      <tr><th>Probability on the truth</th><th>0.9</th><th>0.5</th><th>0.1</th><th>0.01</th><th>0.0001</th></tr>
+      <tr><td>Loss (nats)</td><td>0.105</td><td>0.693</td><td>2.30</td><td>4.61</td><td>9.21</td></tr>
+    </table>
+    <p>As the probability on the truth heads to 0, the loss heads to infinity. One confident mistake (0.0001 on the truth) costs as much as about 900 confident hits at 0.99. So a model trained on this loss learns to hedge: when it genuinely doesn’t know, it spreads probability rather than betting everything on one answer.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Model A always gives the right token probability 0.6. Model B gives it 0.99 nine times out of ten, but 0.0001 the tenth time. Which has the lower average loss?</p>
+    <button data-correct>A</button>
+    <button>B</button>
+    <button>They’re about equal</button>
+    <div class="explain">
+      <p>A: $-\ln 0.6 = 0.511$ nats every time.</p>
+      <p>B: $0.9 \times (-\ln 0.99) + 0.1 \times (-\ln 0.0001) = 0.9 \times 0.010 + 0.1 \times 9.21 = 0.009 + 0.921 = 0.930$ nats.</p>
+      <p>B’s rare confident blunder costs more than all its confident hits save.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>From loss to file size</h2>
+    <p>Lesson 3 showed that an arithmetic coder spends the model’s surprise in bits. So the training loss <em>is</em> a compression rate: bits (or nats) per token. To get the size of a whole document, do it in two steps:</p>
+    <ol>
+      <li><strong>Rate × length.</strong> Average loss per token × number of tokens = total.</li>
+      <li><strong>Convert units.</strong> Nats × 1.443 = bits. Bits ÷ 8 = bytes.</li>
+    </ol>
+    <p>Example: 1,000 tokens at 2.0 nats per token is $1000 \times 2.0 = 2000$ nats. Then $2000 \times 1.443 = 2886$ bits, and $2886 \div 8 \approx 361$ bytes for the whole document.</p>
+    <p>A common slip is to skip step 1: $2.0 \times 1.443 \div 8 = 0.36$ is bytes <em>per token</em>, not the size of the document.</p>
+  </section>
+
+  <div class="q" data-id="q6" data-type="num" data-answer="200" data-tol="0.5">
+    <p>A document is 2,000 tokens long. The model’s average loss on it is 0.8 bits per token. How many bytes does the whole document compress to?</p>
+    <div class="explain">
+      <p>Step 1, rate × length: $2000 \times 0.8 = 1600$ bits in total.</p>
+      <p>Step 2, convert: $1600 \div 8 = 200$ bytes.</p>
+      <p>(If you got 0.1, that’s $0.8 \div 8$: the bytes for one token.)</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Perplexity: loss as a number of choices</h2>
+    <p>Papers often report <strong>perplexity</strong> instead of loss. It undoes the log: $e^{\text{loss}}$ for nats, or $2^{\text{loss}}$ for bits.</p>
+    <p>Why bother? Because it reads as “how many equally likely options the model is choosing among”. A loss of $\ln 4 = 1.386$ nats gives perplexity $e^{1.386} = 4$: on average the model is as unsure as if it were picking uniformly from 4 tokens. Lowering perplexity from 20 to 10 means the model has halved its effective uncertainty.</p>
+  </section>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="8" data-tol="0.01">
+    <p>A model’s loss is 3 bits per token. What’s its perplexity?</p>
+    <div class="explain">For bits, perplexity is $2^{\text{loss}} = 2^3 = 8$. The model is as unsure as a uniform pick among 8 tokens.</div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>You add 5 to every one of a model’s logits. What happens to its probabilities?</p>
+    <button>They all go up</button>
+    <button>The biggest one goes up, the rest go down</button>
+    <button data-correct>Nothing: softmax depends only on the gaps between logits</button>
+    <div class="explain">Each $e^{z}$ gets multiplied by the same $e^5$, and so does the total. The factor cancels when you divide: $\dfrac{e^{z_i + 5}}{\sum e^{z_j + 5}} = \dfrac{e^5 e^{z_i}}{e^5 \sum e^{z_j}} = \dfrac{e^{z_i}}{\sum e^{z_j}}$.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="mcq">
+    <p>Why can’t a language model’s loss on real text ever reach 0?</p>
+    <button>Because softmax never outputs exactly 1, and that’s the only reason</button>
+    <button data-correct>Text has real uncertainty (names, numbers, choices a writer could make either way), and cross-entropy can’t go below the text’s entropy</button>
+    <button>Because the loss is measured in nats</button>
+    <div class="explain">A loss of 0 means probability 1 on every actual token: total certainty about what comes next. Real text contains genuinely unpredictable things, so its entropy is above 0, and cross-entropy is never below entropy.</div>
+  </div>
+
+  <div class="q" data-id="q10" data-type="num" data-answer="3.17" data-tol="0.02">
+    <p>A training run reports a loss of 2.2 nats per token. What is that in bits per token? (1 nat ≈ 1.443 bits.)</p>
+    <div class="explain">$2.2 \times 1.443 = 3.17$ bits per token. Same quantity, different unit: like converting miles to kilometres.</div>
+  </div>
+
+  <div class="q" data-id="q11" data-type="self">
+    <p>In your own words: why is training a model to lower its cross-entropy loss the same as training it to be a better compressor?</p>
+    <div class="explain">The loss is the model’s average surprise, $-\log p$, on the token that actually came next. Plugged into an arithmetic coder, the model spends exactly that surprise per token (Lesson 3). So average loss is the compressed size per token, and pushing the loss down shrinks the file. The floor for both is the entropy of the text.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  // Softmax toy
+  const NAMES = ['mat', 'floor', 'sofa', 'roof', 'moon'];
+  const START = [2, 1, 0.5, 0, -1];
+  let z = START.slice(), truth = 1, steps = 0, logged = false;
+  const softmax = (v) => { const m = Math.max(...v); const e = v.map((x) => Math.exp(x - m)); const s = e.reduce((a, b) => a + b, 0); return e.map((x) => x / s); };
+
+  const toks = $('toks');
+  toks.innerHTML = '<span class="h">token</span><span class="h">logit (slider) and probability (bar)</span><span class="h n">p</span>'
+    + NAMES.map((n, i) => `<button type="button" class="kit-btn tok" data-i="${i}">${n}</button>`
+      + `<div class="cell"><input type="range" min="-4" max="6" step="0.1" data-i="${i}" aria-label="logit for ${n}"><div class="bar"><div class="fill" data-i="${i}"></div></div></div>`
+      + `<span class="n" data-i="${i}"></span>`).join('');
+  const sliders = [...toks.querySelectorAll('input')], fills = [...toks.querySelectorAll('.fill')];
+  const nums = [...toks.querySelectorAll('span.n[data-i]')], tokBtns = [...toks.querySelectorAll('.tok')];
+
+  function drawToy() {
+    const p = softmax(z);
+    p.forEach((pi, i) => {
+      sliders[i].value = z[i];
+      fills[i].style.width = (pi * 100) + '%';
+      fills[i].classList.toggle('truth', i === truth);
+      nums[i].textContent = pi.toFixed(3);
+      tokBtns[i].setAttribute('aria-pressed', String(i === truth));
+    });
+    const loss = -Math.log(p[truth]);
+    $('lp').textContent = p[truth].toFixed(3);
+    $('ln').textContent = loss.toFixed(3);
+    $('lb').textContent = (loss / Math.LN2).toFixed(3);
+    $('ls').textContent = steps;
+    if (!logged && steps >= 3 && loss < 0.1) { logged = true; Study.event({ type: 'softmax-train', steps, token: NAMES[truth] }); }
+  }
+  sliders.forEach((s) => s.addEventListener('input', () => { z[+s.dataset.i] = Number(s.value); drawToy(); }));
+  tokBtns.forEach((b) => b.addEventListener('click', () => { truth = +b.dataset.i; steps = 0; drawToy(); }));
+  $('train').addEventListener('click', () => {
+    const p = softmax(z);
+    z = z.map((zi, i) => Math.max(-4, Math.min(6, zi + ((i === truth ? 1 : 0) - p[i]))));
+    steps++; drawToy();
+  });
+  $('reset').addEventListener('click', () => { z = START.slice(); truth = 1; steps = 0; drawToy(); });
+  drawToy();
+
+  // Coin cross-entropy curve
+  const W = 320, H = 170, L = 30, R = 310, T = 10, B = 145, YMAX = 3;
+  const xe = (q) => L + (R - L) * q, ye = (b) => B - (B - T) * Math.min(b, YMAX) / YMAX;
+  const ceOf = (p, q) => -p * Math.log2(q) - (1 - p) * Math.log2(1 - q);
+  function drawCurve() {
+    const p = Number($('ps').value), q = Number($('qs').value);
+    const ent = ceOf(p, p), ce = ceOf(p, q);
+    let d = '';
+    for (let i = 1; i < 100; i++) { const qq = i / 100; d += (i === 1 ? 'M' : 'L') + xe(qq).toFixed(1) + ' ' + ye(ceOf(p, qq)).toFixed(1); }
+    $('curve').innerHTML = `<line class="ax" x1="${L}" y1="${B}" x2="${R}" y2="${B}"/><line class="ax" x1="${L}" y1="${T}" x2="${L}" y2="${B}"/>`
+      + `<line class="floor" x1="${L}" y1="${ye(ent)}" x2="${R}" y2="${ye(ent)}"/>`
+      + `<path class="ln" d="${d}"/><circle class="dot" cx="${xe(q)}" cy="${ye(ce)}" r="6"/>`
+      + `<text x="${L}" y="${H - 8}">q = 0</text><text x="${R}" y="${H - 8}" text-anchor="end">q = 1</text>`
+      + `<text x="${L - 4}" y="${ye(0) - 2}" text-anchor="end">0</text><text x="${L - 4}" y="${ye(3) + 9}" text-anchor="end">3</text>`;
+    $('pv').textContent = p.toFixed(2); $('qv').textContent = q.toFixed(2);
+    $('ce').textContent = ce.toFixed(3); $('en').textContent = ent.toFixed(3); $('kl').textContent = (ce - ent).toFixed(3);
+  }
+  $('ps').addEventListener('input', drawCurve); $('qs').addEventListener('input', drawCurve);
+  drawCurve();
+})();
+</script>
+</body></html>
