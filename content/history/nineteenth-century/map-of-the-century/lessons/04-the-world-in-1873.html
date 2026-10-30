@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The world in 1873</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .trip .bar { display: flex; height: 18px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); margin: .6rem 0; }
+  .trip .bar > i { display: block; height: 100%; border-right: 1px solid var(--paper); background: var(--line); }
+  .trip .bar > i.past { background: var(--accent-soft); }
+  .trip .bar > i.now { background: var(--accent); }
+  .trip .leg { font: 650 1.05rem var(--sans); margin: .2rem 0; }
+  .trip .meta { font: .85rem var(--mono); color: var(--muted); margin: 0 0 .4rem; }
+  .trip .new { font: .95rem/1.4 var(--sans); margin: 0; }
+  .trip .nav { display: flex; gap: .5rem; margin-top: .7rem; }
+  .trip .nav > button { flex: 1; min-height: 44px; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">History · The 19th century · A map of the century · Lesson 4</p>
+    <h1>The world in 1873</h1>
+    <p class="lede">The year the boom broke, seen from just before it broke: new nations, a world connected by rail and cable, gold replacing silver, and a lot of borrowed money.</p>
+  </header>
+
+  <section>
+    <h2>Warm-up: a palace in someone else’s country</h2>
+    <p>Two dates have been slippery in your cards: when the German Empire began, and how it fits between Suez and the Berlin Conference. This lesson is set two years after the first of those, so start there.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>The German Empire was proclaimed in January 1871. Where?</p>
+    <button>In Berlin, in front of the new Reichstag</button>
+    <button data-correct>In the Hall of Mirrors at Versailles, outside a besieged Paris</button>
+    <button>In Frankfurt, where the 1848 parliament had met</button>
+    <div class="explain">Prussia’s armies had beaten France and were besieging Paris, so the German princes proclaimed King Wilhelm of Prussia German Emperor in Louis XIV’s palace on 18 January 1871. It was a deliberate humiliation, and France never forgot it. A hook for the order: the canal opens in <strong>1869</strong>, the Germans crown their emperor in France two years later in <strong>1871</strong>, and the carving-up of Africa in Berlin comes more than a decade after that, in <strong>1884–85</strong>.</div>
+  </div>
+
+  <section>
+    <h2>A new map of Europe</h2>
+    <p>Compare 1873 with 1815 and the middle of Europe has been redrawn. In 1815 there were nearly forty German states and a patchwork of Italian ones. By 1873 there was one <strong>German Empire</strong>, run from Berlin by Bismarck, and one <strong>Kingdom of Italy</strong>, which took Rome as its capital in 1871 once the French garrison guarding the Pope left to fight Prussia.</p>
+    <p><strong>France</strong> had lost the war, the emperor and two provinces. Napoleon III was captured at Sedan in September 1870 and his empire collapsed; a republic, the Third Republic, took its place. In spring 1871 Paris rose against the new government and ran itself as the Paris Commune for about two months until the army retook the city, killing thousands. At the Treaty of Frankfurt (May 1871) France gave up Alsace and most of Lorraine and agreed to pay Germany <strong>5 billion francs</strong>, with German troops occupying the north-east until it was paid.</p>
+    <p>France paid it fast, by raising loans that its own citizens rushed to buy. The last instalment went in September 1873 and the last German soldiers left that month, well ahead of schedule.</p>
+  </section>
+
+  <section>
+    <h2>Where the money went</h2>
+    <p>Follow the 5 billion francs. A huge sum arrived in Germany in about two years. The government paid off war debts and spent on railways and fortresses, and money that had been locked up in government bonds was now looking for somewhere to go. Bankers and promoters obliged. Germans call the years around 1871–73 the <em>Gründerzeit</em>, the “founders’ time”: hundreds of new joint-stock companies (railways, banks, builders, land companies) were floated, often on thin plans, and their shares soared. Vienna had its own version, with share prices and building plots inflated by easy bank credit.</p>
+    <p>Vienna planned to show this new prosperity to the world with a <strong>World Exhibition</strong>, which opened on 1 May 1873. Eight days later the Vienna stock exchange crashed. That story belongs to the next topic, <em>1873: the first Great Depression</em>. The rest of this lesson is about why a crash in Vienna in May could become a panic in New York by September.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>How did France’s defeat help cause a boom in Germany?</p>
+    <button>Germany took over France’s colonies and their trade</button>
+    <button data-correct>France’s 5-billion-franc indemnity poured money into Germany, fuelling a rush of new companies and rising share prices</button>
+    <button>French workers emigrated to German factories and wages fell</button>
+    <div class="explain">The indemnity arrived quickly (France finished paying in September 1873), and much of it ended up chasing investments. That is the <em>Gründerzeit</em> boom: lots of new companies, rising shares, easy credit. The money also helped Germany switch to gold, which comes up below.</p>
+  </div>
+
+  <section>
+    <h2>Around the world in eighty days</h2>
+    <p>In January 1873 Jules Verne published <em>Around the World in Eighty Days</em> as a book, after a serial run in a Paris newspaper. Its hero, Phileas Fogg, bets his London club that he can go round the globe in 80 days, using a schedule printed in a newspaper. The joke was that by 1872 the schedule was almost realistic. Step through his eight legs and see which pieces of new infrastructure made each one possible.</p>
+    <div class="widget trip" id="trip">
+      <div class="bar" aria-hidden="true"></div>
+      <p class="leg"></p>
+      <p class="meta"></p>
+      <p class="new"></p>
+      <div class="nav"><button type="button" class="kit-btn" data-d="-1">‹ Back</button><button type="button" class="kit-btn" data-d="1">Next leg ›</button></div>
+    </div>
+    <p>Only a generation earlier, the trip round the Cape of Good Hope to India alone took months by sail. Now goods, people and, above all, news moved on one connected network. Telegraph cables had linked Britain and America since 1866 and Britain and India since 1870, so a price in London could be known in New York or Bombay the same day.</p>
+    <aside class="key"><p>By 1873 rail, steamships, the Suez Canal and the telegraph had tied the world’s markets together. That made the boom global, and it would make the crash global too.</p></aside>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>Which 1869 opening let a steamer sail from the Mediterranean straight to India?</p>
+    <button>The Mont Cenis tunnel</button>
+    <button data-correct>The Suez Canal</button>
+    <button>The Panama Canal</button>
+    <div class="explain">The Suez Canal opened in November 1869. Before that, travellers between Europe and India changed ships and crossed Egypt overland. (Panama didn’t open until 1914; the Mont Cenis rail tunnel through the Alps opened in 1871 and sped up the leg from Paris to Italy.)</div>
+  </div>
+
+  <section>
+    <h2>America: railways on borrowed money</h2>
+    <p>The United States had come out of the Civil War (1861–65) united, indebted and growing fast. The first transcontinental railroad was finished at Promontory Summit, Utah, in May 1869, and building went on furiously: US railroad mileage roughly doubled between 1865 and 1873. Much of it was paid for with bonds sold to investors in New York, London, Amsterdam and Frankfurt, on the promise that the lines would one day carry enough traffic to repay them.</p>
+    <p>The biggest name in the business was <strong>Jay Cooke</strong>, the Philadelphia banker who had sold Union war bonds to ordinary Americans. By 1873 his firm was staking its reputation on the Northern Pacific, a line across the empty north-west, and struggling to sell its bonds. When European investors took fright after Vienna, money for American railways dried up.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Why did American railroad finance depend on Europe’s mood in 1873?</p>
+    <button>European governments owned most US railroads</button>
+    <button data-correct>Many railroad bonds were sold to European investors, so when they got nervous the money stopped</button>
+    <button>US railroads ran on European coal</button>
+    <div class="explain">The lines were built with borrowed money, much of it from abroad. A scare in Vienna made investors everywhere pull back, and firms like Jay Cooke &amp; Co., which needed to keep selling bonds, were left exposed.</div>
+  </div>
+
+  <section>
+    <h2>Gold wins</h2>
+    <p>In lesson 2 you met Britain’s gold standard. In the early 1870s the rest of the world began to follow. The new German Empire used its indemnity to build up gold and moved to a gold mark (1871–73), selling off the silver that had backed its old currencies. The United States passed the Coinage Act of 1873, which quietly stopped coining the standard silver dollar. Denmark and Sweden formed a gold-based currency union the same year, and France and its partners in the Latin Monetary Union began limiting silver coinage.</p>
+    <p>With silver pouring onto the market and fewer countries using it as money, its value against gold slid. Linking the world’s money to a fixed supply of gold mattered for what came next: over the following two decades prices fell almost everywhere, the deflation of the Long Depression. Later, angry American farmers would call the 1873 act “the Crime of ’73”.</p>
+  </section>
+
+  <section>
+    <h2>Empire, before the scramble</h2>
+    <p>On a map of 1873 the British Empire is already huge: India (ruled by the Crown directly since the rebellion of 1857), Canada, Australia, the Cape, and a string of ports from Gibraltar to Hong Kong. But most of Africa is still not under European rule. Around 1870 Europeans controlled only about a tenth of the continent, mostly coasts plus French Algeria and the British Cape. By 1914 it would be about nine-tenths.</p>
+    <p>In East Asia, Japan was changing faster than anywhere. After the Meiji Restoration of 1868, a government of young reformers abolished the old feudal domains (1871), sent the Iwakura Mission to study the United States and Europe (1871–73), and switched to the Western calendar on 1 January 1873. Their plan was to modernise fast enough to avoid being colonised.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>Put these in order: (A) German Empire proclaimed, (B) Meiji Restoration, (C) Vienna crash, (D) Suez Canal opens.</p>
+    <button>D, B, A, C</button>
+    <button data-correct>B, D, A, C</button>
+    <button>B, A, D, C</button>
+    <div class="explain">Meiji Restoration 1868, Suez November 1869, German Empire January 1871, Vienna crash May 1873. Four events in five years.</div>
+  </div>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>What did Germany and the United States both do with their money in 1871–73?</p>
+    <button>Both moved from gold to silver</button>
+    <button data-correct>Both moved toward gold and away from silver</button>
+    <button>Both left the gold standard to print paper money</button>
+    <div class="explain">Germany adopted the gold mark and sold silver; the US Coinage Act of 1873 dropped the silver dollar. As more countries followed, silver fell in value and the world’s money became tied to the limited supply of gold, which set up the long fall in prices after 1873.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>Roughly how much of Africa was under European control around 1870?</p>
+    <button data-correct>About a tenth</button>
+    <button>About half</button>
+    <button>About nine-tenths</button>
+    <div class="explain">About a tenth, mostly coasts plus Algeria and the Cape. The Scramble for Africa, formalised at the Berlin Conference of 1884–85, took it to about nine-tenths by 1914.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="self">
+    <p>In two or three sentences: why could a stock-market crash in Vienna in May 1873 turn into a panic in New York by September?</p>
+    <div class="explain">By 1873 the world’s markets were linked: the telegraph carried news across oceans the same day, and money flowed across borders, with European investors holding many American railroad bonds. Booms in Germany and Austria (fed partly by the French indemnity) and in US railways all ran on credit. When Vienna crashed, investors everywhere pulled back, and firms like Jay Cooke &amp; Co. that needed to keep borrowing could no longer do it.</div>
+  </div>
+
+  <aside class="note"><p>That completes the map. The other topics in <em>The 19th century</em> zoom in on each piece: gold and the Rothschilds, industry and rail, nations made by war, empire, and the crash of 1873 itself.</p></aside>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  // Phileas Fogg's schedule from the novel: [leg, days, mode, what was new]
+  const LEGS = [
+    ['London → Suez', 7, 'rail and steamer, via the Alps and Brindisi',
+      'The Mont Cenis rail tunnel through the Alps opened in 1871, putting Italy’s ports within easy reach of Paris and London.'],
+    ['Suez → Bombay', 13, 'steamer',
+      'The Suez Canal (1869). Before it, travellers changed ships and crossed Egypt overland; now a ship sails straight from the Mediterranean to the Red Sea.'],
+    ['Bombay → Calcutta', 3, 'rail',
+      'A rail route right across India was completed in 1870. (Verne jokes that one stretch isn’t built yet, so Fogg buys an elephant.)'],
+    ['Calcutta → Hong Kong', 13, 'steamer',
+      'Hong Kong had been British since 1842, one of the ports Britain ran from Gibraltar to China.'],
+    ['Hong Kong → Yokohama', 6, 'steamer',
+      'Yokohama opened to Western trade in 1859. Japan’s Meiji government, in power since 1868, was modernising at speed.'],
+    ['Yokohama → San Francisco', 22, 'steamer',
+      'A regular steamship service across the Pacific began in 1867.'],
+    ['San Francisco → New York', 7, 'rail',
+      'The first transcontinental railroad, finished at Promontory Summit, Utah, in May 1869. Before it, crossing the US took weeks by stagecoach or months by sea.'],
+    ['New York → London', 9, 'steamer and rail',
+      'Fast transatlantic steamers were routine. And news crossed far faster than Fogg: the Atlantic telegraph cable had worked since 1866.'],
+  ];
+  const TOTAL = LEGS.reduce((s, l) => s + l[1], 0);
+  const box = document.getElementById('trip');
+  const bar = box.querySelector('.bar');
+  bar.innerHTML = LEGS.map((l) => `<i style="width:${(100 * l[1] / TOTAL).toFixed(2)}%"></i>`).join('');
+  const segs = [...bar.children];
+  const [back, next] = box.querySelectorAll('.nav > button');
+  let k = 0;
+  function show() {
+    const [leg, days, mode, isNew] = LEGS[k];
+    const sofar = LEGS.slice(0, k + 1).reduce((s, l) => s + l[1], 0);
+    segs.forEach((s, i) => { s.className = i < k ? 'past' : i === k ? 'now' : ''; });
+    box.querySelector('.leg').textContent = (k + 1) + '. ' + leg;
+    box.querySelector('.meta').textContent = days + ' days by ' + mode + ' · day ' + sofar + ' of ' + TOTAL;
+    box.querySelector('.new').textContent = isNew;
+    back.disabled = k === 0;
+    next.disabled = k === LEGS.length - 1;
+  }
+  back.addEventListener('click', () => { if (k > 0) { k--; show(); } });
+  next.addEventListener('click', () => { if (k < LEGS.length - 1) { k++; show(); } });
+  show();
+})();
+</script>
+</body></html>
