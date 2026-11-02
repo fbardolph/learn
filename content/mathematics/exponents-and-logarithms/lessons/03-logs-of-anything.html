@@ -23,6 +23,8 @@
   .out > .ok { color: var(--good); font-weight: 650; }
   .out > .bad { color: var(--bad); font-weight: 650; }
   .anchors { width: 100%; }
+  .ops { width: 100%; }
+  .ops td:last-child { font-weight: 650; }
   .anchors td:last-child { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 </style>
 <link rel="icon" href="../../../../kit/site-icon.svg" type="image/svg+xml">
@@ -38,6 +40,44 @@
     <h1>Logs of anything</h1>
     <p class="lede">Most numbers aren’t neat powers of 2, but every positive number still has a log. You’ll learn to pin it down to a decimal or two in your head.</p>
   </header>
+
+  <section>
+    <h2>Warm-up: logs change the operation</h2>
+    <p>Before anything new, the rules from Lesson 2. They have one thing in common: a log never keeps an operation as it is. It swaps each one for a simpler one:</p>
+    <table class="ops">
+      <tr><td>Multiply the numbers, $x \times y$</td><td>add the logs</td></tr>
+      <tr><td>Divide the numbers, $x \div y$</td><td>subtract the logs</td></tr>
+      <tr><td>Raise to a power, $x^k$</td><td>multiply the log by $k$</td></tr>
+      <tr><td>Add the numbers, $x + y$</td><td>no rule</td></tr>
+    </table>
+    <p>So read it backwards too. If you see two logs being <em>subtracted</em>, the numbers inside were <em>divided</em>:</p>
+    <ol>
+      <li>$\log_2 40 - \log_2 5 = \log_2 \tfrac{40}{5}$</li>
+      <li>$= \log_2 8$</li>
+      <li>$= 3$</li>
+    </ol>
+    <p>Two tempting wrong turns: $\log_2(40 - 5)$, which keeps the minus, and $\log_2 40 \div \log_2 5$, which divides the logs. Neither is the rule.</p>
+  </section>
+
+  <div class="q" data-id="q11" data-type="num" data-answer="7" data-tol="0">
+    <p>What is $\log_2(4 \times 32)$?</p>
+    <div class="explain">
+      <p>A product inside becomes a sum outside: $\log_2 4 + \log_2 32 = 2 + 5 = 7$.</p>
+      <p>Check: $4 \times 32 = 128 = 2^7$. If you got 10, you multiplied the logs ($2 \times 5$). That keeps the operation, and logs never do.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q12" data-type="mcq">
+    <p>What is $\log_2 96 - \log_2 3$?</p>
+    <button>$\log_2 93$</button>
+    <button>$\log_2 96 \div \log_2 3$</button>
+    <button data-correct>$5$</button>
+    <button>$32$</button>
+    <div class="explain">
+      <p>Subtracting logs means the numbers were divided: $\log_2 \tfrac{96}{3} = \log_2 32 = 5$.</p>
+      <p>$\log_2 93$ keeps the minus. $\log_2 96 \div \log_2 3$ divides the logs. And 32 is $\tfrac{96}{3}$ itself, one step short: you still have to take its log.</p>
+    </div>
+  </div>
 
   <section>
     <h2>Between the rungs</h2>

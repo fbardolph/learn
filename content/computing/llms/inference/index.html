@@ -18,14 +18,19 @@
     <h1>Sampling and inference</h1>
     <p class="lede">What happens when you send a prompt: sampling, temperature, KV caches, context windows and serving costs.</p>
   </header>
-  
+  <section class="prose"><p>Terms you’ll meet: sampling, temperature, top-p, logits, prefill, decode, time to first token (TTFT), tokens per second, KV cache, multi-query and grouped-query attention (MQA, GQA), paged attention (vLLM), continuous batching, memory-bound, quantization (FP8, INT4), distillation, speculative decoding, FlashAttention, context window, RoPE scaling, prompt caching.</p></section>
   <section class="group">
-    <h2>4 lessons planned · none written yet</h2>
+    <h2>9 lessons planned · none written yet</h2>
     <ol class="path">
-    <li><div class="lesson-row unwritten"><span class="n">1</span><span class="t">Sampling</span><span class="chip quiet">Not written yet</span><span class="g">Temperature, top-p and why outputs vary.</span></div></li>
-    <li><div class="lesson-row unwritten"><span class="n">2</span><span class="t">The KV cache</span><span class="chip quiet">Not written yet</span><span class="g">Why long contexts cost memory.</span></div></li>
-    <li><div class="lesson-row unwritten"><span class="n">3</span><span class="t">Context windows</span><span class="chip quiet">Not written yet</span><span class="g">How models handle a million tokens.</span></div></li>
-    <li><div class="lesson-row unwritten"><span class="n">4</span><span class="t">Serving economics</span><span class="chip quiet">Not written yet</span><span class="g">Tokens per second and dollars per million.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">1</span><span class="t">Sampling</span><span class="chip quiet">Not written yet</span><span class="g">Temperature, top-k, top-p and why the same prompt gives different answers.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">2</span><span class="t">Prefill and decode</span><span class="chip quiet">Not written yet</span><span class="g">Why the first token is slow and the rest stream; what time-to-first-token and tokens per second measure.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">3</span><span class="t">The KV cache</span><span class="chip quiet">Not written yet</span><span class="g">What gets cached at each layer, why it grows with every token, and how many gigabytes it takes (worked memory math).</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">4</span><span class="t">Shrinking the KV cache</span><span class="chip quiet">Not written yet</span><span class="g">Multi-query and grouped-query attention, paged attention, and offloading the cache.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">5</span><span class="t">Batching and serving</span><span class="chip quiet">Not written yet</span><span class="g">Continuous batching, throughput versus latency, and why decoding is memory-bound.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">6</span><span class="t">Quantization and distillation</span><span class="chip quiet">Not written yet</span><span class="g">FP16, FP8 and INT4 weights; small models taught by big ones.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">7</span><span class="t">Speculative decoding</span><span class="chip quiet">Not written yet</span><span class="g">A small model drafts, the big one checks several tokens at once.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">8</span><span class="t">Long context</span><span class="chip quiet">Not written yet</span><span class="g">Context windows, FlashAttention, stretching positions (RoPE scaling) and “lost in the middle”.</span></div></li>
+    <li><div class="lesson-row unwritten"><span class="n">9</span><span class="t">Serving economics</span><span class="chip quiet">Not written yet</span><span class="g">Tokens per second, dollars per million tokens, and prompt caching.</span></div></li>
     </ol>
   </section>
   <footer class="foot">
