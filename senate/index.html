@@ -46,7 +46,7 @@ svg{display:block;width:100%;height:auto;touch-action:pan-y;user-select:none;-we
 .tip .r.hl{font-weight:650}
 .tip .cand{margin-top:2px}
 .tip .cand b{font-weight:650}
-.zoombar{position:absolute;top:10px;right:10px;display:none;gap:6px}
+.zoombar{position:absolute;top:10px;left:50px;display:none;gap:6px}
 .zoombar .btn{background:var(--bg);font-size:12px;padding:4px 10px}
 .hint{color:var(--ink3);font-size:12px;margin:6px 2px 0}
 .notes{color:var(--ink2);font-size:12px;margin-top:10px}
@@ -82,7 +82,7 @@ a{color:var(--dem)}
 </div>
 
 <div class="chart" id="chartBox"><svg id="svg" role="img" aria-label="Line chart of win probability by Senate race"></svg><div class="tip" id="tip"></div><div class="zoombar" id="zoombar"><button class="btn" id="resetZoom">Reset zoom</button></div></div>
-<p class="hint" id="hint">Pinch (or ctrl/⌘ + scroll) to zoom · two fingers to pan · double-tap to reset · tap a line to isolate it · tap the tooltip to close</p>
+<p class="hint" id="hint">Pinch (or ⌘/ctrl + scroll) to zoom the timeline — the % scale fits itself · drag, swipe sideways or two-finger slide to pan · double-tap to reset · tap a line to isolate it · tap the tooltip to close</p>
 <div id="tableBox" class="hidden"></div>
 
 <p class="notes">Daily closing prices, 3-day median to strip single-print spikes in thin markets, sampled every 2 days. D and R lines come from separate “Yes” contracts, so in two-way races they’re near mirror images (they can sum to 99–102% because of spread); they diverge where an independent is in play. In Nebraska, Montana, Idaho and South Dakota the “Dem odds” line uses whichever non-Republican contract (Democratic or independent) was priced higher that day; the Nebraska and Montana independent contracts opened in late March. Before primaries, some markets traded as a generic party contract and were later renamed for the nominee. Source: Polymarket Gamma + CLOB price-history APIs, history through Nov 2 is saved in the page; everything after that loads live from Polymarket each time you open it.</p>
@@ -202,7 +202,7 @@ try{const s=JSON.parse(localStorage.getItem('senSel')||'null');if(Array.isArray(
 const save=()=>{try{localStorage.setItem('senSel',JSON.stringify([...sel]));localStorage.setItem('senSide',side)}catch(e){}};
 const V=r=>side==='D'?r.D:r.R;
 const vEnd=r=>V(r)[V(r).length-1];
-const zoomed=()=>Z.d0>0.5||Z.d1<LASTDAY-.5||Z.p0>0.5||Z.p1<99.5;
+const zoomed=()=>Z.d0>0.5||Z.d1<LASTDAY-.5;
 
 const svg=document.getElementById('svg'), tip=document.getElementById('tip'), box=document.getElementById('chartBox');
 const NS='http://www.w3.org/2000/svg';
@@ -229,6 +229,7 @@ function draw(){
   const m={l:38,r:labelSet.length?(narrow?50:150):16,t:12,b:28};
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   const pw=W-m.l-m.r, ph=H-m.t-m.b;
+  fitY();
   const x=d=>m.l+(d-Z.d0)/(Z.d1-Z.d0)*pw, y=p=>m.t+(Z.p1-p)/(Z.p1-Z.p0)*ph;
   geo={x,y,m,W,H,pw,ph,shown,narrow};
   const defs=el('defs',{});const cp=el('clipPath',{id:'plot'},defs);el('rect',{x:m.l,y:m.t-4,width:pw+5,height:ph+8},cp);
@@ -323,40 +324,49 @@ svg.addEventListener('click',e=>{
   draw();showTip(e.clientX,e.clientY);
 });
 
-// ---- zoom helpers
+// ---- zoom: timeline (x) only; y fits the visible lines automatically
 function clampZ(n){
-  let w=Math.max(10,Math.min(LASTDAY,n.d1-n.d0)), h=Math.max(8,Math.min(100,n.p1-n.p0));
-  let c=(n.d0+n.d1)/2, cy=(n.p0+n.p1)/2;
-  c=Math.max(w/2,Math.min(LASTDAY-w/2,c)); cy=Math.max(h/2,Math.min(100-h/2,cy));
-  return {d0:c-w/2,d1:c+w/2,p0:cy-h/2,p1:cy+h/2};
+  let w=Math.max(10,Math.min(LASTDAY,n.d1-n.d0)), c=(n.d0+n.d1)/2;
+  c=Math.max(w/2,Math.min(LASTDAY-w/2,c));
+  return {d0:c-w/2,d1:c+w/2,p0:Z.p0,p1:Z.p1};
+}
+function fitY(){
+  if(!zoomed()){Z.p0=0;Z.p1=100;return}
+  const set=focus&&sel.has(focus)?[races[focus]]:ALL.filter(r=>sel.has(r.state));
+  let lo=101,hi=-1;
+  set.forEach(r=>{const v=V(r);for(let i=0;i<v.length;i++){const d=r.days[i];if(d>=Z.d0-2.5&&d<=Z.d1+2.5){if(v[i]<lo)lo=v[i];if(v[i]>hi)hi=v[i]}}});
+  if(hi<lo){Z.p0=0;Z.p1=100;return}
+  const pad=Math.max(2,(hi-lo)*0.08);lo=Math.max(0,lo-pad);hi=Math.min(100,hi+pad);
+  if(hi-lo<10){const c=(hi+lo)/2;lo=Math.max(0,Math.min(90,c-5));hi=lo+10}
+  Z.p0=lo;Z.p1=hi;
 }
 let raf=0;function redraw(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;draw()})}
-function zoomAt(px,py,kx,ky){ // k<1 zooms in
-  const dv=dayAt(px), pv=Z.p1-(py-geo.m.t)/geo.ph*(Z.p1-Z.p0);
-  Z=clampZ({d0:dv-(dv-Z.d0)*kx,d1:dv+(Z.d1-dv)*kx,p0:pv-(pv-Z.p0)*ky,p1:pv+(Z.p1-pv)*ky});redraw();
+function zoomAt(px,k){ // k<1 zooms in, around the time under px
+  const dv=dayAt(px);Z=clampZ({d0:dv-(dv-Z.d0)*k,d1:dv+(Z.d1-dv)*k});redraw();
 }
-svg.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();hideTip();const [px,py]=toSvg(e.clientX,e.clientY);const k=Math.exp(e.deltaY*0.003);zoomAt(px,py,k,k)},{passive:false});
+function panBy(dxSvg){const dd=dxSvg/geo.pw*(Z.d1-Z.d0);Z=clampZ({d0:Z.d0-dd,d1:Z.d1-dd});redraw()}
+svg.addEventListener('wheel',e=>{
+  if(e.ctrlKey||e.metaKey){e.preventDefault();hideTip();const [px]=toSvg(e.clientX,e.clientY);zoomAt(px,Math.exp(e.deltaY*0.003));return}
+  // sideways trackpad swipe or shift+scroll pans the timeline once zoomed
+  const dx=e.shiftKey&&!e.deltaX?e.deltaY:e.deltaX;
+  if(zoomed()&&Math.abs(dx)>Math.abs(e.shiftKey?0:e.deltaY)){e.preventDefault();hideTip();panBy(-dx*geo.W/svg.getBoundingClientRect().width)}
+},{passive:false});
 // mouse drag-pan when zoomed
 let drag=null;
-svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&zoomed()){drag={x:e.clientX,y:e.clientY,Z:{...Z},moved:false}}});
+svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&zoomed()){drag={x:e.clientX,Z:{...Z},moved:false}}});
 window.addEventListener('pointerup',()=>{if(drag&&drag.moved)suppress=Date.now()+200;drag=null});
-function panMouse(e){const b=svg.getBoundingClientRect(),s=geo.W/b.width;const dx=(e.clientX-drag.x)*s,dy=(e.clientY-drag.y)*s;if(Math.abs(dx)+Math.abs(dy)>3)drag.moved=true;
-  const dd=dx/geo.pw*(drag.Z.d1-drag.Z.d0), dp=dy/geo.ph*(drag.Z.p1-drag.Z.p0);
-  Z=clampZ({d0:drag.Z.d0-dd,d1:drag.Z.d1-dd,p0:drag.Z.p0+dp,p1:drag.Z.p1+dp});hideTip();redraw()}
-// touch pinch + two-finger pan
+function panMouse(e){const b=svg.getBoundingClientRect(),s=geo.W/b.width;const dx=(e.clientX-drag.x)*s;if(Math.abs(dx)>3)drag.moved=true;
+  const dd=dx/geo.pw*(drag.Z.d1-drag.Z.d0);Z=clampZ({d0:drag.Z.d0-dd,d1:drag.Z.d1-dd});hideTip();redraw()}
+// touch: pinch zooms the timeline, two-finger slide pans it
 let pz=null;
 svg.addEventListener('touchstart',e=>{if(e.touches.length===2){e.preventDefault();pinching=true;hideTip();
-  const [a,b]=e.touches;const [ax,ay]=toSvg(a.clientX,a.clientY),[bx,by]=toSvg(b.clientX,b.clientY);
-  const mx=(ax+bx)/2,my=(ay+by)/2;
-  pz={Z:{...Z},sx:Math.max(40,Math.abs(ax-bx)),sy:Math.max(40,Math.abs(ay-by)),dv:dayAt(mx),pv:Z.p1-(my-geo.m.t)/geo.ph*(Z.p1-Z.p0)}}},{passive:false});
+  const [a,b]=e.touches;const [ax]=toSvg(a.clientX,a.clientY),[bx]=toSvg(b.clientX,b.clientY);
+  pz={Z:{...Z},sx:Math.max(30,Math.abs(ax-bx)),dv:dayAt((ax+bx)/2)}}},{passive:false});
 svg.addEventListener('touchmove',e=>{if(e.touches.length===2&&pz){e.preventDefault();
-  const [a,b]=e.touches;const [ax,ay]=toSvg(a.clientX,a.clientY),[bx,by]=toSvg(b.clientX,b.clientY);
-  const mx=(ax+bx)/2,my=(ay+by)/2;
-  const kx=pz.sx/Math.max(40,Math.abs(ax-bx)), ky=pz.sy/Math.max(40,Math.abs(ay-by));
-  const w=(pz.Z.d1-pz.Z.d0)*kx, h=(pz.Z.p1-pz.Z.p0)*ky;
-  const fx=(mx-geo.m.l)/geo.pw, fy=(my-geo.m.t)/geo.ph;
-  const d0=pz.dv-fx*w, p1=pz.pv+fy*h;
-  Z=clampZ({d0,d1:d0+w,p0:p1-h,p1});redraw()}},{passive:false});
+  const [a,b]=e.touches;const [ax]=toSvg(a.clientX,a.clientY),[bx]=toSvg(b.clientX,b.clientY);
+  const w=(pz.Z.d1-pz.Z.d0)*pz.sx/Math.max(30,Math.abs(ax-bx));
+  const d0=pz.dv-((ax+bx)/2-geo.m.l)/geo.pw*w;
+  Z=clampZ({d0,d1:d0+w});redraw()}},{passive:false});
 svg.addEventListener('touchend',e=>{if(e.touches.length<2&&pz){pz=null;suppress=Date.now()+400;setTimeout(()=>pinching=false,350)}});
 document.addEventListener('gesturestart',e=>{if(box.contains(e.target))e.preventDefault()});
 document.getElementById('resetZoom').onclick=e=>{e.stopPropagation();Z={d0:0,d1:LASTDAY,p0:0,p1:100};hideTip();draw()};
