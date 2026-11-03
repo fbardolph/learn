@@ -12,7 +12,7 @@
   .row .kit-btn { min-height: 44px; }
   .row .kit-btn[aria-pressed="true"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
   .msg { font: 1rem var(--mono); min-height: 1.5rem; letter-spacing: .1em; word-break: break-all; }
-  .zoom { display: grid; grid-template-columns: 1.4rem 1fr 3.4rem; gap: .3rem .5rem; align-items: center; font: .8rem var(--sans); }
+  .zoom { display: grid; grid-template-columns: 1.4rem 1fr 3.6rem 3rem; gap: .3rem .5rem; align-items: center; font: .8rem var(--sans); }
   .zoom .bar { display: flex; height: 22px; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
   .zoom .seg { height: 100%; border-right: 1px solid var(--paper); opacity: .25; display: flex; align-items: center; justify-content: center; font-size: .7rem; color: var(--ink); overflow: hidden; }
   .zoom .seg.on { opacity: 1; color: var(--paper); font-weight: 650; }
@@ -21,6 +21,11 @@
   .zoom .s-R { background: var(--good); }
   .zoom .n { font: .8rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
   .zoom .h { color: var(--muted); font-size: .7rem; }
+  .true { display: flex; flex-direction: column; gap: .3rem; font: .8rem var(--sans); }
+  .true .track { position: relative; height: 22px; border-radius: 4px; background: var(--line); }
+  .true .live { position: absolute; top: 0; bottom: 0; background: var(--accent); border-radius: 3px; min-width: 2px; transition: left .35s, width .35s; }
+  .true .ends { display: flex; justify-content: space-between; color: var(--muted); font: .75rem var(--mono); }
+  .true .cap { color: var(--muted); }
   table.steps { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
   table.steps th, table.steps td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
 </style>
@@ -55,18 +60,19 @@
   <section>
     <h2>The trick: a message is a slice of [0, 1)</h2>
     <p>Arithmetic coding doesn’t give each symbol its own bits. It encodes the <em>whole message</em> as one number between 0 and 1.</p>
+    <p>Keep the other end in mind throughout: a <strong>receiver</strong> has an identical copy of the model. It gets only that number, and replays the same steps to work out which slice the number fell into each time. So the number’s <em>position</em> carries the message, and the interval’s <em>width</em> decides how many digits the number needs.</p>
     <ol>
       <li>Start with the interval from 0 to 1.</li>
       <li>Ask the model for its probabilities for the next symbol. Cut the current interval into slices whose widths are proportional to those probabilities.</li>
       <li>Keep the slice for the symbol that actually happened. That slice becomes the new interval.</li>
       <li>Repeat for every symbol. At the end, send any short binary number that lies inside the final interval.</li>
     </ol>
-    <p>Each step multiplies the width by the probability of what happened. A likely symbol barely shrinks the interval. A surprising one shrinks it a lot.</p>
+    <p>The <strong>width</strong> is just the length of the current interval: how much of the line from 0 to 1 is still in play. $[0.2,\ 0.5)$ has width $0.5 - 0.2 = 0.3$. Each step keeps a fraction of the interval equal to the probability of what happened, so it multiplies the width by that probability. A likely symbol barely shrinks the interval. A surprising one shrinks it a lot.</p>
   </section>
 
   <section>
     <h2>Watch it shrink</h2>
-    <p>Tap the weather day by day. Each row is the interval so far, stretched to full width, with the model’s slices inside it. Then switch models and see what happens to the bill for the same message.</p>
+    <p>Tap the weather day by day. The top bar is the real line from 0 to 1: watch the blue interval shrink with every day. Each row below is that interval <em>blown up to full width</em> so you can see the model’s slices inside it, which is why the rows themselves don’t get smaller. The width column shows the true size. Then switch models and see what happens to the bill for the same message.</p>
     <div class="widget">
       <div class="row" role="group" aria-label="Model">
         <button type="button" class="kit-btn" data-model="uniform">Know-nothing</button>
@@ -82,6 +88,11 @@
         <button type="button" class="kit-btn" id="preset">Example week</button>
       </div>
       <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="true" aria-live="polite">
+        <span class="cap">At true scale: the interval inside [0, 1)</span>
+        <div class="track"><div class="live" id="live"></div></div>
+        <div class="ends"><span>0</span><span id="range"></span><span>1</span></div>
+      </div>
       <div class="zoom" id="zoom"></div>
       <div class="stats">
         <div><b id="zw"></b><span>final width</span></div>
@@ -94,12 +105,12 @@
 
   <div class="q" data-id="q2" data-type="num" data-answer="0.06" data-tol="0.0005">
     <p>A model gives the actual symbols probabilities $0.5$, then $0.6$, then $0.2$. How wide is the final interval?</p>
-    <div class="explain">Each step multiplies the width by the probability of what happened: $1 \times 0.5 = 0.5$, then $0.5 \times 0.6 = 0.3$, then $0.3 \times 0.2 = 0.06$.</div>
+    <div class="explain">Width is the length of the interval that’s left, starting at 1 for the whole line $[0, 1)$. Each step keeps only the slice for what happened, so it multiplies the width by that probability: $1 \times 0.5 = 0.5$, then $0.5 \times 0.6 = 0.3$, then $0.3 \times 0.2 = 0.06$. Only 6% of the line is left, and that’s $-\log_2 0.06 \approx 4.06$ bits.</div>
   </div>
 
   <section>
     <h2>Why width means bits</h2>
-    <p>A binary fraction with $k$ digits after the point, like $0.0111_2$, pins down a slot of width $2^{-k}$. To land a slot inside an interval of width $w$, you need about $k = -\log_2 w$ digits (plus one or two to be safe).</p>
+    <p>A binary fraction with $k$ digits after the point, like $0.0111_2$ (the small 2 means “written in base 2”: the places after the point are halves, quarters, eighths, sixteenths, so $0.0111_2 = \tfrac14 + \tfrac18 + \tfrac1{16} = 0.4375$), pins down a slot of width $2^{-k}$. To land a slot inside an interval of width $w$, you need about $k = -\log_2 w$ digits (plus one or two to be safe).</p>
     <p>Now the final width is the product of the probabilities:</p>
     <p>$$w = p_1 \times p_2 \times \cdots \times p_n$$</p>
     <p>and the log of a product is the sum of the logs, so</p>
@@ -205,6 +216,7 @@
   let model = 'persist', msg = [], tried = new Set();
 
   const $ = (id) => document.getElementById(id);
+  const fmt = (w) => (w >= 0.001 ? w.toPrecision(2) : w.toExponential(1).replace('e', '×10^'));
   const modelBtns = [...document.querySelectorAll('[data-model]')];
 
   function draw() {
@@ -213,18 +225,24 @@
     $('mdesc').textContent = m.desc;
     $('msg').textContent = msg.length ? msg.join(' ') : 'Tap a day to start.';
     let bits = 0;
-    let html = '<span class="h">day</span><span class="h">interval so far (zoomed), slices = model’s odds</span><span class="h n">bits</span>';
+    let html = '<span class="h">day</span><span class="h">interval before this day, zoomed to full width</span><span class="h n">width after</span><span class="h n">bits</span>';
+    let lo = 0, w = 1;
     msg.forEach((s, i) => {
       const ps = m.p(msg[i - 1]);
       const b = -Math.log2(ps[s]);
       bits += b;
       const segs = SYMS.map((k) => `<div class="seg s-${k}${k === s ? ' on' : ''}" style="width:${ps[k] * 100}%">${k}</div>`).join('');
-      html += `<span>${i + 1}</span><div class="bar" aria-label="${NAME[s]}, probability ${ps[s].toFixed(2)}">${segs}</div><span class="n">+${b.toFixed(2)}</span>`;
+      // keep the slice for the symbol that happened (slices in S, C, R order)
+      for (const k of SYMS) { if (k === s) break; lo += w * ps[k]; }
+      w *= ps[s];
+      html += `<span>${i + 1}</span><div class="bar" aria-label="${NAME[s]}, probability ${ps[s].toFixed(2)}">${segs}</div><span class="n">${fmt(w)}</span><span class="n">+${b.toFixed(2)}</span>`;
     });
     $('zoom').innerHTML = html;
     $('zb').textContent = bits.toFixed(2);
     $('zp').textContent = msg.length ? (bits / msg.length).toFixed(2) : '–';
-    $('zw').textContent = msg.length ? '2^−' + bits.toFixed(1) : '1';
+    $('zw').textContent = fmt(w);
+    const live = $('live'); live.style.left = (lo * 100) + '%'; live.style.width = (w * 100) + '%';
+    $('range').textContent = msg.length ? `[${lo.toPrecision(4)}, ${(lo + w).toPrecision(4)})` : '[0, 1)';
     if (msg.length >= 7) {
       tried.add(model);
       if (tried.size === 3) { tried.add('logged'); Study.event({ type: 'arith-coder', days: msg.length, model, bits: Number(bits.toFixed(2)) }); }
