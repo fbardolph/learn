@@ -138,12 +138,12 @@
     <button>Factor a polynomial</button>
     <button data-correct>Combine fractions</button>
     <button>Conjugate</button>
-    <div class="explain">A difference of fractions on top means combine them. Common denominator $2(x+2)$: the top is $\frac{2 - (x+2)}{2(x+2)} = \frac{-x}{2(x+2)}$. Divide by $x$: $-\frac{1}{2(x+2)} \to -\frac14$.</div>
+    <div class="explain"><p>A difference of fractions on top means combine them. Common denominator $2(x+2)$: the top is $\frac{2 - (x+2)}{2(x+2)} = \frac{-x}{2(x+2)}$.</p><p>Notice the top is <em>not</em> $-\frac14$ yet: it still has an $x$ in it, and that $x$ is what cancels the $x$ underneath. Dividing by $x$ means multiplying by $\frac1x$:</p><p>$$\frac{-x}{2(x+2)} \cdot \frac{1}{x} = \frac{-1}{2(x+2)}$$</p><p>Only now plug in $x = 0$: $-\frac{1}{2 \cdot 2} = -\frac14$.</p></div>
   </div>
 
   <div class="q" data-id="q9" data-type="num" data-answer="-0.25" data-tol="0.001">
     <p>Finish that one: $\displaystyle\lim_{x\to 0}\frac{\frac{1}{x+2}-\frac12}{x}$</p>
-    <div class="explain">$-\frac{1}{2(x+2)}$ at $x = 0$ is $-\frac14 = -0.25$. (That is the slope of $\frac{1}{x+2}$ at $x=0$, again the $-\frac{1}{a^2}$ pattern with $a = 2$.)</div>
+    <div class="explain">After combining, the top is $\frac{-x}{2(x+2)}$. Its $x$ cancels the $x$ in the denominator, leaving $-\frac{1}{2(x+2)}$, and at $x = 0$ that is $-\frac14 = -0.25$. (That is the slope of $\frac{1}{x+2}$ at $x=0$, again the $-\frac{1}{a^2}$ pattern with $a = 2$.)</div>
   </div>
 
   <div class="q" data-id="q10" data-type="num" data-answer="-2" data-tol="0.001">

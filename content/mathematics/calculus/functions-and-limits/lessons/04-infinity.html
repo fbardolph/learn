@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Infinity</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .plot { width: 100%; height: 240px; display: block; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); touch-action: pan-y; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; font-family: var(--sans); }
+  .pair > div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: .5rem .6rem; min-width: 0; }
+  .pair > div > span { display: block; font-size: .8rem; color: var(--muted); }
+  .pair b { font: 600 1.05rem var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .terms { display: flex; flex-direction: column; gap: .45rem; font-family: var(--sans); font-size: .9rem; }
+  .terms > .row { display: grid; grid-template-columns: 4.2rem 1fr; gap: .5rem; align-items: center; }
+  .terms > .row > .lab { color: var(--muted); }
+  .terms > .row > .track { height: 22px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); display: flex; overflow: hidden; }
+  .terms .big { background: var(--accent); }
+  .terms .small { background: var(--bad); }
+  .legend { font: .8rem var(--sans); color: var(--muted); margin: 0; }
+  .sw { display: inline-block; width: .8em; height: .8em; border-radius: 2px; vertical-align: -.05em; }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 1.6rem 1fr; gap: .5rem; align-items: start; }
+  .steps li::before { content: counter(s); font: 650 .85rem/1.6rem var(--sans); width: 1.6rem; height: 1.6rem; border-radius: .8rem; background: var(--accent-soft); color: var(--accent); text-align: center; }
+  .steps li > div { min-width: 0; overflow-x: auto; }
+  .steps li > div p { margin: 0; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Calculus · Functions and limits · Lesson 4</p>
+    <h1>Infinity</h1>
+    <p class="lede">Two new questions: what happens when $x$ runs off forever, and what happens when the bottom of a fraction shrinks to zero. Both come down to one habit: ask which part is biggest.</p>
+  </header>
+
+  <section>
+    <h2>Running off to the right</h2>
+    <p>Take $\frac{1}{x}$ and feed it bigger and bigger $x$: $\frac{1}{10} = 0.1$, $\frac{1}{1000} = 0.001$, $\frac{1}{1\,000\,000} = 0.000001$. The values crowd toward 0 and stay there. We write</p>
+    <p>$$\lim_{x\to\infty}\frac{1}{x} = 0.$$</p>
+    <p>Read “$x \to \infty$” as “as $x$ grows without bound”. $\infty$ isn’t a number you plug in; it’s a direction you walk. Same idea as before: the limit is the height the function settles toward.</p>
+    <aside class="key"><p>A fixed number divided by something huge is nearly 0: $\displaystyle\lim_{x\to\infty}\frac{c}{x} = 0$, and the same for $\frac{c}{x^2}$, $\frac{c}{x^3}$, …</p></aside>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="2" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to\infty}\left(2 + \frac{5}{x}\right)$</p>
+    <div class="explain">$\frac{5}{x} \to 0$ as $x$ grows, so the whole thing heads to $2 + 0 = 2$. On a graph, the curve hugs the horizontal line $y = 2$: a <strong>horizontal asymptote</strong>.</div>
+  </div>
+
+  <section>
+    <h2>Shrinking the bottom: blow-ups</h2>
+    <p>Lesson 2’s rule said <em>nonzero over 0</em> means the function blows up. Lesson 3 said sides matter. Put them together with</p>
+    <p>$$f(x) = \frac{x+1}{x-2}.$$</p>
+    <p>At $x = 2$ the top is $3$ and the bottom is $0$. Drag $x$ closer to 2 and watch each side.</p>
+    <div class="widget">
+      <canvas class="plot" id="va" aria-label="Graph of (x+1)/(x-2) with a vertical asymptote at x = 2"></canvas>
+      <label for="vslider">Distance from 2: <span class="readout" id="vread"></span>
+        <input id="vslider" type="range" min="0" max="100" value="0"></label>
+      <div class="pair">
+        <div><span>from the left, $f(2-d)$</span><b id="vl"></b></div>
+        <div><span>from the right, $f(2+d)$</span><b id="vr"></b></div>
+      </div>
+    </div>
+    <p>Why the opposite signs? Near 2 the top is about $3$ (positive). The bottom $x - 2$ is a tiny number whose <strong>sign depends on the side</strong>:</p>
+    <ul>
+      <li>Right of 2, e.g. $x = 2.001$: bottom $= +0.001$, so $\frac{3}{0.001} = 3000$. Heads to $+\infty$.</li>
+      <li>Left of 2, e.g. $x = 1.999$: bottom $= -0.001$, so $\frac{3}{-0.001} = -3000$. Heads to $-\infty$.</li>
+    </ul>
+    <p>The vertical line $x = 2$ that the graph shoots up and down beside is a <strong>vertical asymptote</strong>.</p>
+    <aside class="note"><p>Sign recipe for a blow-up: find the sign of the top near $a$, find the sign of the tiny bottom on the side you care about, multiply the signs.</p></aside>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>$\displaystyle\lim_{x\to 2^-}\frac{x+1}{x-2}$ is…</p>
+    <button>$+\infty$</button>
+    <button data-correct>$-\infty$</button>
+    <button>3</button>
+    <div class="explain">Top near 3: positive. Bottom just left of 2: tiny and negative. Positive over tiny negative is a huge negative, so $-\infty$.</div>
+  </div>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="0.25" data-tol="0.001">
+    <p>Careful, this one is not a blow-up: $\displaystyle\lim_{x\to 3}\frac{x-3}{(x-3)(x+1)}$. (Decimal is fine.)</p>
+    <div class="explain">
+      <p>Plugging in gives $\frac{0}{0}$, not nonzero over 0, so simplify first.</p>
+      <p>Cancel $(x - 3)$ (fine, since $x \ne 3$ inside a limit): $\frac{1}{x+1}$.</p>
+      <p>Plug in: $\frac{1}{3+1} = \frac14 = 0.25$. Only a <em>nonzero</em> top over a zero bottom gives an asymptote; $\frac00$ often hides a plain hole.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Dominant terms</h2>
+    <p>Now a fraction running off to infinity:</p>
+    <p>$$\lim_{x\to\infty}\frac{3x^2 + 5x}{x^2 + 1}$$</p>
+    <p>Top and bottom both grow without bound, so “$\frac{\infty}{\infty}$” tells you nothing yet (like $\frac00$). The question is which terms matter. Slide $x$ up and watch how much of each line is made of the biggest term.</p>
+    <div class="widget">
+      <label for="xslider">$x$ = <span class="readout" id="xread"></span>
+        <input id="xslider" type="range" min="0" max="60" value="0"></label>
+      <div class="terms">
+        <div class="row"><span class="lab">top</span><div class="track"><div class="big" id="tb"></div><div class="small" id="ts"></div></div></div>
+        <div class="row"><span class="lab">bottom</span><div class="track"><div class="big" id="bb"></div><div class="small" id="bs"></div></div></div>
+      </div>
+      <p class="legend"><span class="sw" style="background:var(--accent)"></span> $x^2$ term &nbsp; <span class="sw" style="background:var(--bad)"></span> the rest</p>
+      <div class="pair">
+        <div><span>$3x^2$ share of top</span><b id="tp"></b></div>
+        <div><span>value of the fraction</span><b id="fv"></b></div>
+      </div>
+    </div>
+    <p>At $x = 1$ the $5x$ is most of the top. By $x = 1000$ it’s a rounding error: the top is basically $3x^2$, the bottom basically $x^2$, and the fraction is basically $\frac{3x^2}{x^2} = 3$.</p>
+  </section>
+
+  <section>
+    <h2>Making it exact: divide by the top power</h2>
+    <p>“Basically” becomes algebra with one move: divide every term, top and bottom, by the highest power of $x$ in the bottom (here $x^2$). Dividing top and bottom by the same thing doesn’t change the fraction. Tap through:</p>
+    <div class="widget">
+      <ol class="steps" data-steps>
+        <li><div><p>Divide every term by $x^2$: $$\frac{3x^2 + 5x}{x^2 + 1} = \frac{\frac{3x^2}{x^2} + \frac{5x}{x^2}}{\frac{x^2}{x^2} + \frac{1}{x^2}}$$</p></div></li>
+        <li><div><p>Simplify each piece: $\frac{3x^2}{x^2} = 3$, $\frac{5x}{x^2} = \frac{5}{x}$, $\frac{x^2}{x^2} = 1$. So $$\frac{3 + \frac5x}{1 + \frac{1}{x^2}}$$</p></div></li>
+        <li><div><p>As $x \to \infty$: $\frac5x \to 0$ and $\frac{1}{x^2} \to 0$ (the key fact from the start).</p></div></li>
+        <li><div><p>What’s left: $\frac{3 + 0}{1 + 0} = 3$.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="2" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to\infty}\frac{4x^3 - x}{2x^3 + 7}$</p>
+    <div class="explain">
+      <p>Divide every term by $x^3$: $\frac{4 - \frac{1}{x^2}}{2 + \frac{7}{x^3}}$.</p>
+      <p>The small pieces go to 0: $\frac{4 - 0}{2 + 0} = \frac42 = 2$. Shortcut: same top power on both sides, so the answer is the ratio of the leading numbers, $\frac42$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>The three cases</h2>
+    <p>Compare the highest power on top with the highest power on the bottom:</p>
+    <ul>
+      <li><strong>Bottom wins</strong> (e.g. $\frac{5x + 2}{x^2 - 1}$): divide by $x^2$ to get $\frac{\frac5x + \frac{2}{x^2}}{1 - \frac{1}{x^2}} \to \frac{0}{1} = 0$.</li>
+      <li><strong>Tie</strong> (e.g. $\frac{3x^2 + 5x}{x^2+1}$): the limit is the ratio of the leading numbers, $\frac31 = 3$.</li>
+      <li><strong>Top wins</strong> (e.g. $\frac{x^2 + 1}{x + 3}$): divide by $x$ to get $\frac{x + \frac1x}{1 + \frac3x}$. The top still has a bare $x$ that keeps growing, so the fraction grows without bound: no finite limit.</li>
+    </ul>
+    <aside class="key"><p>As $x \to \infty$, only the highest power on top and the highest power on the bottom matter. Everything else fades to nothing next to them.</p></aside>
+  </section>
+
+  <div class="q" data-id="q5" data-type="self">
+    <p>In your own words: why is it safe to ignore the $+5x$ in $3x^2 + 5x$ when $x$ is huge, but not when $x$ is near 0?</p>
+    <div class="explain">Their ratio is $\frac{5x}{3x^2} = \frac{5}{3x}$. For huge $x$ that’s tiny, so $5x$ is a vanishing fraction of $3x^2$. Near 0 it’s the reverse: $\frac{5}{3x}$ is huge, so $5x$ is the bigger term. “Dominant” depends on where you’re looking.</div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>$\displaystyle\lim_{x\to\infty}\frac{5x+2}{x^2-1}$ is…</p>
+    <button>5</button>
+    <button data-correct>0</button>
+    <button>It grows without bound</button>
+    <div class="explain">The bottom’s power ($x^2$) beats the top’s ($x$). Divide by $x^2$: $\frac{\frac5x + \frac{2}{x^2}}{1 - \frac{1}{x^2}} \to \frac{0 + 0}{1 - 0} = 0$.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="-2" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to\infty}\frac{1 - 6x}{3x + 4}$ (mind the sign)</p>
+    <div class="explain">
+      <p>Highest power is $x$ on both sides. Divide every term by $x$: $\frac{\frac1x - 6}{3 + \frac4x}$.</p>
+      <p>As $x \to \infty$: $\frac{0 - 6}{3 + 0} = \frac{-6}{3} = -2$. The leading term on top is $-6x$, and its minus sign comes along.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>$\displaystyle\lim_{x\to -1^+}\frac{2}{x+1}$ is…</p>
+    <button data-correct>$+\infty$</button>
+    <button>$-\infty$</button>
+    <button>2</button>
+    <div class="explain">Top: 2, positive. Just right of $-1$, e.g. $x = -0.999$, the bottom is $-0.999 + 1 = 0.001$: tiny and positive. Positive over tiny positive is huge and positive, so $+\infty$.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="mcq">
+    <p>Which has a finite limit as $x \to \infty$?</p>
+    <button>$\dfrac{x^2+1}{x+3}$</button>
+    <button data-correct>$\dfrac{7x^2}{2x^2 - x}$</button>
+    <button>$\dfrac{x^3}{x^2+100}$</button>
+    <div class="explain">Only the middle one ties on power ($x^2$ over $x^2$), giving $\frac72$. The other two have a bigger power on top, so they grow without bound.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt = (v) => {
+    const a = Math.abs(v);
+    if (a >= 1e5) return Math.round(v).toLocaleString('en-US');
+    return a >= 100 ? v.toFixed(1) : v.toFixed(4);
+  };
+
+  // ---- vertical asymptote of (x+1)/(x-2) ----
+  const cv = document.getElementById('va'), vs = document.getElementById('vslider');
+  const f = (x) => (x + 1) / (x - 2);
+  function drawVA() {
+    const d = Math.pow(10, -3 * Number(vs.value) / 100); // 1 down to 0.001
+    document.getElementById('vread').textContent = d < 0.01 ? d.toFixed(3) : d.toFixed(2);
+    document.getElementById('vl').textContent = fmt(f(2 - d));
+    document.getElementById('vr').textContent = fmt(f(2 + d));
+
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr;
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const x0 = -1, x1 = 5, y0 = -12, y1 = 12, pad = 22;
+    const X = (x) => pad + (x - x0) / (x1 - x0) * (w - 2 * pad);
+    const Y = (y) => h - pad - (y - y0) / (y1 - y0) * (h - 2 * pad);
+    c.clearRect(0, 0, w, h);
+    c.strokeStyle = css('--line'); c.lineWidth = 1; c.fillStyle = css('--muted'); c.font = '11px ' + css('--sans');
+    for (let x = x0; x <= x1; x++) { c.beginPath(); c.moveTo(X(x), pad / 2); c.lineTo(X(x), h - pad); c.stroke(); c.fillText(x, X(x) - 3, h - 6); }
+    for (let y = -10; y <= 10; y += 5) { c.beginPath(); c.moveTo(pad, Y(y)); c.lineTo(w - pad / 2, Y(y)); c.stroke(); c.fillText(y, 2, Y(y) + 4); }
+    // asymptote
+    c.setLineDash([5, 5]); c.strokeStyle = css('--muted'); c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(X(2), pad / 2); c.lineTo(X(2), h - pad); c.stroke(); c.setLineDash([]);
+    // curve, two branches
+    c.save(); c.beginPath(); c.rect(pad, pad / 2, w - 1.5 * pad, h - 1.5 * pad); c.clip();
+    c.strokeStyle = css('--ink'); c.lineWidth = 2.5;
+    [[x0, 2 - 1e-3], [2 + 1e-3, x1]].forEach(([a, b]) => {
+      c.beginPath();
+      for (let i = 0; i <= 300; i++) {
+        // sample densely next to the asymptote
+        const t = i / 300, x = a < 2 ? b - (b - a) * (1 - t) * (1 - t) : a + (b - a) * t * t;
+        const y = Math.max(-1e3, Math.min(1e3, f(x)));
+        i ? c.lineTo(X(x), Y(y)) : c.moveTo(X(x), Y(y));
+      }
+      c.stroke();
+    });
+    c.restore();
+    // walking dots (clamped to the box edge when off-screen)
+    [[2 - d, css('--accent')], [2 + d, css('--good')]].forEach(([x, col]) => {
+      const y = Math.max(y0 + .3, Math.min(y1 - .3, f(x)));
+      c.beginPath(); c.arc(X(x), Y(y), 7, 0, 2 * Math.PI);
+      c.fillStyle = col; c.fill();
+    });
+  }
+  vs.addEventListener('input', drawVA);
+
+  // ---- dominant terms of (3x^2+5x)/(x^2+1) ----
+  const xs = document.getElementById('xslider');
+  function drawTerms() {
+    const x = Math.pow(10, Number(xs.value) / 10); // 1 to 1,000,000
+    const big = 3 * x * x, small = 5 * x, bBig = x * x, bSmall = 1;
+    document.getElementById('xread').textContent = x < 10 ? x.toFixed(2) : Math.round(x).toLocaleString('en-US');
+    const tShare = big / (big + small), bShare = bBig / (bBig + bSmall);
+    document.getElementById('tb').style.width = (100 * tShare) + '%';
+    document.getElementById('ts').style.width = (100 * (1 - tShare)) + '%';
+    document.getElementById('bb').style.width = (100 * bShare) + '%';
+    document.getElementById('bs').style.width = (100 * (1 - bShare)) + '%';
+    document.getElementById('tp').textContent = (100 * tShare).toFixed(tShare > .999 ? 4 : 1) + '%';
+    document.getElementById('fv').textContent = ((big + small) / (bBig + bSmall)).toFixed(6);
+  }
+  xs.addEventListener('input', drawTerms);
+
+  window.addEventListener('resize', drawVA);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawVA);
+  drawVA(); drawTerms();
+
+  // step-through worked examples: reveal one step per tap
+  document.querySelectorAll('[data-steps]').forEach((ol) => {
+    const items = [...ol.children];
+    items.forEach((li, i) => { li.hidden = i > 0; });
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'kit-btn'; btn.textContent = 'Next step';
+    ol.after(btn);
+    let shown = 1;
+    btn.addEventListener('click', () => {
+      if (shown < items.length) { items[shown].hidden = false; shown++; }
+      if (shown >= items.length) btn.remove();
+    });
+  });
+})();
+</script>
+</body></html>

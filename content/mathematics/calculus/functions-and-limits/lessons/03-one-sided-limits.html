@@ -31,6 +31,21 @@
   </header>
 
   <section>
+    <h2>Warm-up: watch the minus sign</h2>
+    <p>One slip from lesson 2 is worth a second look. When the top has $4 - x$ and the bottom has $x - 4$, they’re the same factor <em>with the sign flipped</em>: $4 - x = -(x - 4)$. The factor cancels, but the minus sign stays behind.</p>
+    <p>That cancelling is allowed because the limit only uses $x$ <em>near</em> 4, never 4 itself, so $x - 4$ is never zero while we work.</p>
+  </section>
+
+  <div class="q" data-id="q9" data-type="num" data-answer="-0.25" data-tol="0.001">
+    <p>$\displaystyle\lim_{x\to 4}\frac{4-x}{x(x-4)}$ (decimal is fine; mind the sign)</p>
+    <div class="explain">
+      <p>Rewrite the top: $4 - x = -(x-4)$. So $\frac{-(x-4)}{x(x-4)}$.</p>
+      <p>Cancel $(x - 4)$, which is fine since $x \ne 4$: that leaves $\frac{-1}{x}$.</p>
+      <p>Plug in $x = 4$: $-\frac14 = -0.25$. The answer is negative because of the sign flip in step 1.</p>
+    </div>
+  </div>
+
+  <section>
     <h2>A function with a step in it</h2>
     <p>Real rules often switch at a threshold: a tax band, a postage price, a thermostat. Here is a made-up one with a switch at $x = 2$:</p>
     <p>$$f(x) = \begin{cases} x + 1 & x &lt; 2 \\ x^2 & x \ge 2 \end{cases}$$</p>
