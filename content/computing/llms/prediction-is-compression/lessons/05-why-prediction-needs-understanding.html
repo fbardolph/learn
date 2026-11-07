@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Why prediction needs understanding</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats > div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats > div > span { font-size: .8rem; color: var(--muted); }
+  .row { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .row .kit-btn { min-height: 44px; min-width: 44px; }
+  .row .kit-btn[aria-pressed="true"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .heat { font: .95rem/1.9 var(--mono); word-break: break-all; }
+  .heat > span { border-radius: 2px; }
+  .newtext { width: 100%; box-sizing: border-box; font: .95rem var(--sans); padding: .5rem; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); min-height: 4.5rem; }
+  .cap { font: .8rem var(--sans); color: var(--muted); margin: 0; }
+  .ladder { display: grid; grid-template-columns: 4.5rem 1fr 3.2rem; gap: .25rem .5rem; align-items: center; font: .8rem var(--sans); }
+  .ladder .bar { height: 10px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .ladder .fill { height: 100%; background: var(--accent); }
+  .ladder .fill.seen { background: var(--muted); }
+  .ladder .n { font: .8rem var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+  .ladder .on { font-weight: 650; color: var(--accent); }
+  .sum { font: 1.1rem var(--mono); min-height: 1.6rem; }
+  .tour { font: 1.05rem/2.1 var(--serif); }
+  .tour .tk { font: inherit; padding: .1rem .35rem; min-height: 44px; border-radius: 6px; border: 1px dashed var(--muted); background: transparent; color: var(--ink); cursor: pointer; }
+  .tour .tk[aria-pressed="true"] { border-style: solid; border-color: var(--accent); color: var(--accent); }
+  .tour .tk.t1 { border-color: var(--good); }
+  .tour .tk.t3 { border-color: var(--bad); }
+  .tourinfo { font: .9rem var(--sans); min-height: 4.5rem; }
+  .tourinfo .tier { font-weight: 650; }
+  table.t { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
+  table.t th, table.t td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Prediction, compression and intelligence · Lesson 5</p>
+    <h1>Why prediction needs understanding</h1>
+    <p class="lede">You’ll watch a memorizing predictor hit a wall, and see why the only way past it is to learn how the world works.</p>
+  </header>
+
+  <section>
+    <h2>The cheapest predictor: count</h2>
+    <p>The simplest way to predict the next character is to remember what followed the last few characters in text you’ve read. After “q”, English almost always has “u”. After “th”, “e” is likely. A model that predicts from counts of the last $n$ characters is an <strong>n-gram model</strong>. Before neural networks, this was how language models worked.</p>
+    <p>Below is one, trained on about 2,000 characters of plain English (a short passage about a town, a bakery and a train). Pick how many characters of context it looks back at. It reports bits per character, the Lesson 4 loss, on two things:</p>
+    <ul>
+      <li><strong>Seen text</strong>: the passage it was trained on.</li>
+      <li><strong>New text</strong>: the sentence in the box, which it has never seen. Edit it if you like.</li>
+    </ul>
+    <div class="widget">
+      <div class="row" id="orders"></div>
+      <div class="ladder" id="ladder"></div>
+      <p class="cap">Grey: seen text. Blue: new text. Shorter bar = fewer bits = better prediction.</p>
+      <textarea class="newtext" id="newtext" aria-label="New text to predict">the baker said the morning train was late again, so she kept the bread warm by the stove until the station clock struck seven.</textarea>
+      <div class="heat" id="heat" aria-label="New text shaded by surprise"></div>
+      <p class="cap">Each character of the new text is shaded by how surprised the model was: darker red = more bits.</p>
+    </div>
+    <p>Step through the orders from 0 up to 6. Two things happen at once. On the seen text the bits keep falling: with 5 or 6 characters of context, the model has almost memorized the passage. On the new text the bits fall at first, then stall well above that, and with long enough contexts they can even get worse.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>As the n-gram model looks back further, why does its loss on <em>new</em> text stop improving?</p>
+    <button>Longer contexts contain less information</button>
+    <button data-correct>Most long contexts in new text were seen rarely or never in training, so the counts behind them are useless</button>
+    <button>The model runs out of memory</button>
+    <div class="explain">A 6-character context like “ock st” might appear once in the training passage, or not at all. Counts from one example say almost nothing about the next case. The model has memorized its training text, and memorization doesn’t carry over to text it hasn’t seen.</div>
+  </div>
+
+  <section>
+    <h2>Memorizing vs. generalizing</h2>
+    <p>That gap is the whole story of this lesson. Loss on seen text can be pushed down by <strong>memorization</strong>: storing what you saw. Loss on new text only goes down through <strong>generalization</strong>: learning something true about how the text is produced, which then applies to cases you never saw. A model that does well on its training data but badly on new data is <strong>overfitting</strong>.</p>
+    <p>LLMs are judged on new text, and they see most of their training text only about once. So memorization alone can’t get their loss down. The question is what kind of “something true” lowers it.</p>
+    <p>Here’s the clearest case. A stream of addition problems, two-digit plus two-digit, with the answer as the token to predict. Two predictors:</p>
+    <ul>
+      <li><strong>Memorizer</strong> stores every problem it has seen. On a repeat it’s certain (0 bits). On a new problem it has no idea, so it spreads its bet evenly over the 179 possible sums (20 to 198) and pays $\log_2 179 \approx 7.5$ bits.</li>
+      <li><strong>Rule</strong> has learned to add. It’s certain every time: 0 bits.</li>
+    </ul>
+    <div class="widget">
+      <div class="sum" id="sum">Press a button to stream problems.</div>
+      <div class="row">
+        <button type="button" class="kit-btn primary" id="add10">+10 problems</button>
+        <button type="button" class="kit-btn" id="add1000">+1,000</button>
+        <button type="button" class="kit-btn" id="sreset">Reset</button>
+      </div>
+      <div class="stats">
+        <div><b id="sn">0</b><span>problems</span></div>
+        <div><b id="snew">–</b><span>new to memorizer</span></div>
+        <div><b id="smem">0</b><span>memorizer bits</span></div>
+        <div><b>0</b><span>rule bits</span></div>
+      </div>
+    </div>
+    <p>There are $90 \times 90 = 8{,}100$ possible problems, so repeats are rare: even after 1,000 problems, about 94% were new when they arrived. The memorizer’s bill grows with every problem. The rule’s bill stays at zero; all it ever cost was the few lines it takes to describe adding.</p>
+    <aside class="key"><p><strong>When data keeps coming, the rule is the better compressor.</strong> Memorized answers cost bits forever; a rule costs its own description once. Pushing loss down on endless new text pushes a model toward the rules that produce the text.</p></aside>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="7" data-tol="0.01">
+    <p>Suppose the answers could be any of 128 values, equally likely as far as the memorizer knows. How many bits does it pay on a problem it has never seen?</p>
+    <div class="explain">
+      <p>Each of the 128 values gets probability $\tfrac{1}{128}$.</p>
+      <p>Surprise: $-\log_2 \tfrac{1}{128} = \log_2 128$.</p>
+      <p>$128 = 2^7$, so that’s $7$ bits.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Reading a physics paper, one token at a time</h2>
+    <p>Now real text. Here’s a sentence a physics textbook might contain. Tap each dashed piece to see what a model needs to know to predict it.</p>
+    <div class="widget">
+      <p class="tour" id="tour">A ball is dropped from a height of 20 <button type="button" class="tk t1" data-k="0">metres</button>. Ignoring air <button type="button" class="tk t1" data-k="1">resistance</button>, it falls <button type="button" class="tk" data-k="2">faster</button> and faster and hits the <button type="button" class="tk" data-k="3">ground</button> after about <button type="button" class="tk t3" data-k="4">2</button> seconds, moving at about <button type="button" class="tk t3" data-k="5">20</button> metres per second.</p>
+      <div class="tourinfo" id="tourinfo"><p class="cap">Green border: easy. Plain: needs knowledge of the world. Red border: needs physics and arithmetic.</p></div>
+    </div>
+    <p>For the “2”, the model has to do what a student does:</p>
+    <ol>
+      <li>Distance fallen from rest: $h = \tfrac12 g t^2$, with $g \approx 9.8$ m/s².</li>
+      <li>Solve for $t$: multiply both sides by 2, giving $2h = g t^2$. Divide by $g$: $t^2 = \dfrac{2h}{g}$. Take the square root: $t = \sqrt{\dfrac{2h}{g}}$.</li>
+      <li>Plug in: $t = \sqrt{\dfrac{2 \times 20}{9.8}} = \sqrt{4.08} \approx 2.02$ s.</li>
+    </ol>
+    <p>And for the “20”: speed after falling for $t$ seconds is $v = g t = 9.8 \times 2.02 \approx 19.8$ m/s, about 20.</p>
+    <p>An n-gram model has seen “about 2 seconds” and “about 5 seconds” and “about 10 seconds”, and can only spread its bet across them. A model that can do the calculation puts nearly all its probability on “2”. Change the height to 45 metres and the right answer becomes 3 seconds; the counting model is no wiser, while the calculating one gets it right again.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>A different textbook sentence: “A ball dropped from 80 metres hits the ground after about __ seconds.” Which predictor gives the right number the most probability?</p>
+    <button>One that has memorized the most textbook sentences</button>
+    <button data-correct>One that has learned $t = \sqrt{2h/g}$ and can do the arithmetic</button>
+    <button>They do equally well, since every number is just a token</button>
+    <div class="explain">
+      <p>$t = \sqrt{\dfrac{2 \times 80}{9.8}} = \sqrt{16.3} \approx 4.04$, so about 4 seconds.</p>
+      <p>A memorizer only helps if it has seen this exact setup. The formula works for every height, including ones that never appeared in training.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Where the remaining loss lives</h2>
+    <p>Grammar and common phrases are learned early, because they repeat constantly. Once a model has them, those tokens cost almost nothing. What’s left of the loss is concentrated in tokens like the “2”: names, numbers, dates, the result of a step of reasoning, who did it in a mystery novel.</p>
+    <table class="t">
+      <tr><th>100 tokens of text</th><th>Count</th><th>Bits each</th><th>Total</th></tr>
+      <tr><td>Grammar, phrases</td><td>90</td><td>0.1</td><td>9</td></tr>
+      <tr><td>Facts, results</td><td>10</td><td>6</td><td>60</td></tr>
+    </table>
+    <p>(Made-up round numbers to show the shape, not measurements.) Here 10% of the tokens carry $60 \div 69 \approx 87\%$ of the bits. So once grammar is learned, the only way to lower the loss much further is to get better at the facts and the reasoning. A model trained to keep lowering it is being trained, indirectly, to know things and to work things out.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="0.8" data-tol="0.01">
+    <p>A model spends 0.2 bits on each of 80 easy tokens and 4 bits on each of 16 hard ones. What fraction of its total bits go on the hard tokens? (Give a decimal.)</p>
+    <div class="explain">
+      <p>Easy: $80 \times 0.2 = 16$ bits.</p>
+      <p>Hard: $16 \times 4 = 64$ bits.</p>
+      <p>Total: $16 + 64 = 80$ bits. Fraction on hard tokens: $64 \div 80 = 0.8$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Evidence from inside a model</h2>
+    <p>Is there any sign that trained models actually build such rules inside, rather than just looking as if they do? Two clean experiments say yes, at least for small models on simple worlds.</p>
+    <p><strong>Othello-GPT.</strong> Researchers trained a small GPT on nothing but lists of moves from the board game Othello (“E3, D3, C4, …”), with the goal of predicting a legal next move. It never saw a board. Then they trained a small separate network, a <strong>probe</strong>, to read the board position from the model’s internal numbers, and it could. When they edited those internal numbers to change one square, the model’s predicted moves changed to match the edited board. To predict moves well, it had built an internal picture of the board: a <strong>world model</strong>.</p>
+    <p><strong>Grokking.</strong> Small transformers trained on clock arithmetic (addition that wraps around, like hours on a clock) first memorized their training examples: training loss near zero, new-example loss high, just like the n-gram model above. With much longer training, the loss on new examples suddenly dropped. When researchers took the network apart, they found it had replaced the lookup table with an algorithm built from sines and cosines, treating numbers as rotations around a circle.</p>
+    <aside class="note"><p>Sources: Li et al., <a href="https://arxiv.org/abs/2210.13382">“Emergent World Representations”</a> (2023); Power et al., <a href="https://arxiv.org/abs/2201.02177">“Grokking”</a> (2022); Nanda et al., <a href="https://arxiv.org/abs/2301.05217">“Progress measures for grokking via mechanistic interpretability”</a> (2023).</p></aside>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>What did the probe show about Othello-GPT?</p>
+    <button>It had memorized every game in its training data</button>
+    <button data-correct>The board state could be read from its internal numbers, and changing them changed its predictions</button>
+    <button>It was secretly shown pictures of the board</button>
+    <div class="explain">It only ever saw move lists. The board was something it built for itself, because tracking the board is the most efficient way to know which moves are legal. The editing experiment matters: it shows the model <em>uses</em> that internal board, not just that the information happens to be there.</div>
+  </div>
+
+  <section>
+    <h2>What this does and doesn’t show</h2>
+    <p>The argument is about pressure, not proof. Lowering loss on new text rewards whatever internal structure predicts best for its size. Where a real rule (adding, falling bodies, a game board) is the cheapest route, training pushes toward it. Where a shortcut works on the training data, the model may learn the shortcut instead, and fail when the shortcut breaks.</p>
+    <p>So a low loss tells you the model has captured a lot of the structure behind the text. It doesn’t tell you which parts are real rules and which are shortcuts. Lesson 6 takes up the big bet built on this argument, and the case against it.</p>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>A model’s loss on its training text keeps falling, but its loss on new text has started to rise. What’s happening?</p>
+    <button data-correct>Overfitting: it’s memorizing the training text instead of learning what generalizes</button>
+    <button>It’s grokking, and that’s the generalization kicking in</button>
+    <button>The new text has lower entropy</button>
+    <div class="explain">That’s the n-gram picture at high order: seen-text bits down, new-text bits up. Grokking is the reverse event later on, when loss on new text finally drops.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>In the grokking experiments, what had changed inside the network when loss on new examples suddenly dropped?</p>
+    <button>It had seen the test examples</button>
+    <button>It had memorized more training examples</button>
+    <button data-correct>It had replaced its memorized lookup with an algorithm for the arithmetic</button>
+    <div class="explain">Memorizing more can’t help on examples it never saw. The jump came when it computed the answer (with rotations built from sines and cosines) instead of looking it up.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="num" data-answer="0.86" data-tol="0.01">
+    <p>A memorizer has seen 50 of 350 possible problems. A new problem is drawn at random from all 350. What’s the chance it’s one the memorizer has <em>not</em> seen? (Give a decimal to 2 places.)</p>
+    <div class="explain">
+      <p>Unseen problems: $350 - 50 = 300$.</p>
+      <p>Chance: $300 \div 350 = 0.857 \approx 0.86$.</p>
+      <p>So 86% of the time it pays full price. That’s why memorization stalls as soon as the space of possible inputs is bigger than the training data.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In your own words: why does training a model to predict the next token of physics papers push it to learn some physics?</p>
+    <div class="explain">Grammar is cheap and learned early, so most of the remaining loss sits on tokens like numerical results and conclusions. Those can’t be memorized, because new papers have new setups. The only way to put high probability on the right number for a setup you’ve never seen is to compute it, which means having something like the physics inside. Lowering the loss keeps rewarding that. (It’s pressure, not a guarantee: where a shortcut works on the training data, the model may learn the shortcut instead.)</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  // ---- n-gram ladder ----
+  const CORPUS = `the town sits at the end of the line, and the train comes in twice a day. in the morning it brings the post and the papers, and in the evening it brings people home from the city. the station is small. there is one platform, one bench and a clock that is always a little fast. next to the station there is a bakery. the baker starts work before it is light. she lights the stove, mixes the dough and lets it rise while she makes the coffee. by the time the first train comes in, the bread is out of the oven and the shop smells of it. people from the train stop at the bakery on their way to work. they buy a loaf, or a roll, or a cake for later, and they talk about the weather and the news. the baker knows most of them by name. she knows who wants the bread sliced and who likes it dark on top. when the train is late, the people on the platform come into the shop to wait where it is warm. on cold days the shop is full before the train arrives, and the baker sells more coffee than bread. in the summer the town is quiet. the school is closed, the families go to the sea, and the morning train is half empty. the baker makes less bread and closes the shop early. in the afternoon she sits on the bench by the platform and reads the paper that came in on the morning train. in the winter the days are short and the snow comes down from the hills. the line is sometimes closed for a day or two, and then there is no post and no papers, and the people of the town have only their own news to talk about. the baker says those are the best days. she bakes the same bread as always, but she has time to talk, and the people have time to listen. when the line opens again, the first train comes in slowly, with snow on its roof, and the whole town comes down to the station to see it arrive. the station master rings the bell, the doors open, and the post and the papers come out onto the platform. then the town goes back to its usual work, and the baker goes back to her stove.`;
+  const A = 'abcdefghijklmnopqrstuvwxyz ';
+  const clean = (s) => (' ' + s.toLowerCase().replace(/[^a-z ]+/g, ' ').replace(/ +/g, ' ').trim());
+  const train = clean(CORPUS);
+  const MAXN = 6, LAMBDA = 0.5;
+  // counts[n]: Map context -> Float64Array(27) counts, with total in [27]
+  const counts = [];
+  for (let n = 0; n <= MAXN; n++) {
+    const m = new Map();
+    for (let i = 1; i < train.length; i++) {
+      const ctx = train.slice(Math.max(0, i - n), i);
+      if (ctx.length < n) continue;
+      let c = m.get(ctx); if (!c) { c = new Float64Array(28); m.set(ctx, c); }
+      c[A.indexOf(train[i])]++; c[27]++;
+    }
+    counts.push(m);
+  }
+  // interpolated estimate: blend counts at order n with order n-1, down to add-one unigram
+  function prob(text, i, n, ch) {
+    const k = A.indexOf(ch);
+    let p = 1 / 27;
+    for (let m = 0; m <= n; m++) {
+      if (i - m < 0) break;
+      const c = counts[m].get(text.slice(i - m, i));
+      if (!c) break;
+      p = m === 0 ? (c[k] + 1) / (c[27] + 27) : (c[k] + LAMBDA * p) / (c[27] + LAMBDA);
+    }
+    return p;
+  }
+  function bitsPer(text, n) {
+    const out = [];
+    for (let i = 1; i < text.length; i++) out.push(-Math.log2(prob(text, i, n, text[i])));
+    return out;
+  }
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / Math.max(1, a.length);
+  const seenBits = [];
+  for (let n = 0; n <= MAXN; n++) seenBits.push(mean(bitsPer(train, n)));
+
+  let order = 2;
+  const ordersEl = $('orders');
+  ordersEl.innerHTML = Array.from({ length: MAXN + 1 }, (_, n) => `<button type="button" class="kit-btn" data-n="${n}" aria-label="look back ${n} characters">${n}</button>`).join('');
+  const orderBtns = [...ordersEl.querySelectorAll('button')];
+  orderBtns.forEach((b) => b.addEventListener('click', () => { order = +b.dataset.n; draw(); }));
+
+  function draw() {
+    const text = clean($('newtext').value || ' ');
+    const newBits = [];
+    for (let n = 0; n <= MAXN; n++) newBits.push(mean(bitsPer(text, n)));
+    const MAXB = 6;
+    let html = '<span>context</span><span>bits per character</span><span class="n">bits</span>';
+    for (let n = 0; n <= MAXN; n++) {
+      const on = n === order ? ' on' : '';
+      html += `<span class="${on}">${n} chars</span><div><div class="bar"><div class="fill seen" style="width:${Math.min(100, seenBits[n] / MAXB * 100)}%"></div></div>`
+        + `<div class="bar"><div class="fill" style="width:${Math.min(100, newBits[n] / MAXB * 100)}%"></div></div></div>`
+        + `<span class="n${on}">${seenBits[n].toFixed(2)}<br>${newBits[n].toFixed(2)}</span>`;
+    }
+    $('ladder').innerHTML = html;
+    orderBtns.forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.n === order)));
+    const bits = bitsPer(text, order);
+    $('heat').innerHTML = text.slice(1).split('').map((ch, i) => {
+      const pct = Math.round(Math.min(1, bits[i] / 8) * 85);
+      return `<span style="background:color-mix(in srgb, var(--bad) ${pct}%, transparent)" title="${bits[i].toFixed(1)} bits">${ch === ' ' ? '&nbsp;' : ch}</span>`;
+    }).join('');
+  }
+  $('newtext').addEventListener('input', draw);
+  draw();
+
+  // ---- memorizer vs rule ----
+  let seen = new Set(), nProb = 0, nNew = 0, memBits = 0, logged = false;
+  const COST = Math.log2(179);
+  function stream(k) {
+    let last = '';
+    for (let j = 0; j < k; j++) {
+      const a = 10 + Math.floor(Math.random() * 90), b = 10 + Math.floor(Math.random() * 90);
+      const key = a * 100 + b, fresh = !seen.has(key);
+      nProb++;
+      if (fresh) { nNew++; memBits += COST; seen.add(key); }
+      last = `${a} + ${b} = ${a + b} · ${fresh ? 'new: memorizer pays 7.5 bits' : 'repeat: memorizer pays 0'}`;
+    }
+    $('sum').textContent = last;
+    $('sn').textContent = nProb.toLocaleString();
+    $('snew').textContent = Math.round(nNew / nProb * 100) + '%';
+    $('smem').textContent = Math.round(memBits).toLocaleString();
+    if (!logged && nProb >= 1000) { logged = true; Study.event({ type: 'memorizer', problems: nProb, newShare: +(nNew / nProb).toFixed(3) }); }
+  }
+  $('add10').addEventListener('click', () => stream(10));
+  $('add1000').addEventListener('click', () => stream(1000));
+  $('sreset').addEventListener('click', () => {
+    seen = new Set(); nProb = nNew = memBits = 0;
+    $('sum').textContent = 'Press a button to stream problems.';
+    $('sn').textContent = '0'; $('snew').textContent = '–'; $('smem').textContent = '0';
+  });
+
+  // ---- physics tour ----
+  const INFO = [
+    ['Easy: grammar and units', 'After a number and “a height of”, a unit is coming, and “metres” is the commonest. A counting model gets this.'],
+    ['Easy: a stock phrase', '“Ignoring air …” is almost always followed by “resistance” in physics writing. Pure pattern.'],
+    ['World knowledge', 'Things that are dropped speed up as they fall. A model needs to have absorbed that, though it’s common enough to be nearly a phrase.'],
+    ['World knowledge', 'Dropped balls hit the ground (not the floor, the water, the target) unless the text said otherwise. Knowing the scene, not just the words.'],
+    ['Physics and arithmetic', 'Only $t = \\sqrt{2h/g} \\approx 2.02$ s makes “2” the right number. No phrase in the sentence gives it away.'],
+    ['Physics and arithmetic', 'Speed $v = gt \\approx 9.8 \\times 2.02 \\approx 19.8$ m/s. Predicting “20” means chaining a second calculation onto the first.'],
+  ];
+  const tks = [...document.querySelectorAll('#tour .tk')];
+  tks.forEach((b) => b.addEventListener('click', () => {
+    tks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    const [tier, txt] = INFO[+b.dataset.k];
+    const el = $('tourinfo');
+    el.innerHTML = `<p><span class="tier">${tier}.</span> ${txt}</p>`;
+    if (Study.renderMath) Study.renderMath(el);
+  }));
+})();
+</script>
+</body></html>
