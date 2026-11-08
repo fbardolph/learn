@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>What a gold standard is</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .coins { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .coins label { font: 500 .85rem var(--sans); }
+  .coins select { min-height: 44px; font: 1rem var(--sans); border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 0 .4rem; }
+  .par-line { font: 600 1.15rem var(--mono); text-align: center; padding: .6rem; border-radius: 10px; background: var(--accent-soft); }
+  .par-why { font: .9rem/1.45 var(--sans); color: var(--muted); margin: 0; }
+  .pts { position: relative; height: 54px; margin: .2rem 0 .4rem; }
+  .pts > .band { position: absolute; top: 18px; height: 16px; background: var(--good-soft); border: 1px solid var(--good); border-radius: 4px; }
+  .pts > .tick { position: absolute; top: 4px; width: 2px; height: 44px; background: var(--accent); }
+  .pts > .lab { position: absolute; top: 38px; font: .7rem var(--mono); color: var(--muted); transform: translateX(-50%); white-space: nowrap; }
+  .verdict { font: 600 1rem/1.4 var(--sans); margin: 0; }
+  .verdict.ship { color: var(--bad); }
+  .flow .row { display: grid; grid-template-columns: 4.5rem 1fr 3.4rem; align-items: center; gap: .5rem; font: .9rem var(--sans); }
+  .flow .track { height: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+  .flow .fill { height: 100%; background: var(--accent); transition: width .3s; }
+  .flow .fill.p { background: var(--mark); }
+  .flow .msg { font: .92rem/1.45 var(--sans); margin: 0; min-height: 2.8em; }
+  .flow .nav { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .flow .nav > button { flex: 1; min-height: 44px; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">History · The 19th century · The gold standard and the Rothschilds · Lesson 1</p>
+    <h1>What a gold standard is</h1>
+    <p class="lede">A pound was a fixed weight of gold. Follow that one rule and you get fixed exchange rates, gold shipped across oceans, and prices that rise and fall without anyone deciding.</p>
+  </header>
+
+  <section>
+    <h2>Warm-up</h2>
+    <p>You met Britain’s return to gold in <em>A map of the century</em>. That date anchors this whole topic.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>After the wars against Napoleon, in what year could you once again hand a Bank of England note across the counter and get gold for it?</p>
+    <button>1815</button>
+    <button data-correct>1821</button>
+    <button>1844</button>
+    <div class="explain"><strong>1821.</strong> Waterloo was 1815; Parliament voted to go back to gold in 1819; the Bank actually started paying out gold again in 1821. (1844 is the Bank Charter Act, which tied note issue to gold.) Below you’ll see why the Bank had stopped paying in the first place.</div>
+  </div>
+
+  <section>
+    <h2>A pound is a weight</h2>
+    <p>In 1817 the Royal Mint began striking a new coin, the <strong>sovereign</strong>. It was worth one pound, and it held <strong>7.32 grams of pure gold</strong> (alloyed with a little copper to make it hard). That number is the whole idea. Under a <strong>gold standard</strong>, a country’s unit of money is defined as a fixed weight of gold, and the authorities promise two things:</p>
+    <ol>
+      <li><strong>Convertibility:</strong> paper money can be swapped for gold at that fixed rate, on demand. A £5 Bank of England note was a promise to hand over five sovereigns.</li>
+      <li><strong>Free flow:</strong> anyone can melt coins, export gold, or bring gold to the Mint to be coined.</li>
+    </ol>
+    <p>Britain drifted onto gold in the 1700s (Isaac Newton, as Master of the Mint, set the gold coin too high against silver in 1717, so silver coins vanished from circulation) and made it law in 1816. For most of the century it was nearly alone. The rest of the world mostly used silver, or both metals, until the 1870s, the story of lesson 4.</p>
+  </section>
+
+  <section>
+    <h2>Why the Bank stopped paying</h2>
+    <p>The promise had already been broken once. In February 1797, with Britain at war with revolutionary France and rumours of a French landing in Wales, people rushed to swap notes for gold. The Bank of England’s vaults were draining, so the government ordered it to stop paying out gold. This <strong>Restriction</strong> lasted through all the wars with Napoleon. Paper pounds kept circulating, but they slipped below their gold value, and prices rose.</p>
+    <p>That is why 1821 mattered. Going back to gold at the <em>old</em> weight, rather than a lighter one, was a statement: a pound would be worth the same 7.32 grams it had been before the war. The price was painful: prices had to fall back to fit, which hurt farmers and debtors. But for the next century, apart from brief crises, a British pound was as good as gold, and the world came to trust it.</p>
+    <aside class="key"><p>A gold standard is a promise: this much paper = this much gold, on demand. It holds only as long as people believe it, and governments tend to suspend it in wars.</p></aside>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>What did the Bank of England stop doing in 1797, and why?</p>
+    <button>Printing notes, because paper was scarce in wartime</button>
+    <button data-correct>Paying gold for its notes, because a war panic was draining its gold</button>
+    <button>Lending to the government, because Parliament forbade it</button>
+    <div class="explain">A wartime run (fear of a French invasion) had people swapping notes for gold, so the government suspended convertibility: the Restriction of 1797–1821. Notes still circulated, but they were no longer a claim on gold you could cash.</div>
+  </div>
+
+  <section>
+    <h2>Exchange rates fall out for free</h2>
+    <p>Here is the clever bit. If a pound is 7.32 g of gold and an American dollar is 1.50 g, then a pound is worth $7.32 \div 1.50 \approx 4.87$ dollars. Nobody negotiates it. It falls out of the two definitions, and economists call it the <strong>mint par</strong>. Try any pair below. These are the gold contents each country set by law (France from 1803, Germany from 1873, the United States in practice from 1879).</p>
+    <div class="widget" id="par">
+      <div class="coins">
+        <label>One unit of…<select id="par-a"></select></label>
+        <label>…is worth this many<select id="par-b"></select></label>
+      </div>
+      <p class="par-line" id="par-out"></p>
+      <p class="par-why" id="par-why"></p>
+    </div>
+  </section>
+
+  <div class="q" data-id="q3" data-type="num" data-answer="20.43" data-tol="0.05">
+    <p>A sovereign holds 7.322 g of gold; a German mark holds 0.3584 g. How many marks to the pound? (Two decimal places.)</p>
+    <div class="explain">Divide the gold in a pound by the gold in a mark:
+      $$\frac{7.322}{0.3584} \approx 20.43$$
+      So £1 ≈ 20.43 marks. Check: $20.43 \times 0.3584 \approx 7.322$ g. If you got 0.049, you divided the other way round, which gives pounds per mark.</div>
+  </div>
+
+  <section>
+    <h2>Why gold crossed the ocean</h2>
+    <p>In practice a merchant in New York who owed money in London didn’t send gold. He bought a <em>bill on London</em> (lesson 2 of the map), a paper claim payable there. The price of those bills, the market exchange rate, moved up and down with supply and demand. But it couldn’t move far from par, because there was always another option: buy gold in New York at the fixed price, ship it, and get pounds for it at the fixed price in London.</p>
+    <p>Shipping wasn’t free: freight, insurance, and the interest lost while the gold was at sea came to roughly half a percent, a round illustrative figure here (the real cost varied with the season and the ship). So the rate stayed in a narrow band around par. Its edges are the <strong>gold points</strong>. Move the market rate and see what a sensible merchant does.</p>
+    <div class="widget" id="gp">
+      <label>Market price of £1 in New York: <span class="readout" id="gp-rate"></span>
+        <input type="range" id="gp-slider" min="4.80" max="4.94" step="0.005" value="4.87">
+      </label>
+      <div class="pts" id="gp-pts"></div>
+      <p class="verdict" id="gp-verdict"></p>
+    </div>
+    <p>So under the gold standard, exchange rates between gold countries were fixed in all but tiny wobbles, for decades. A London investor buying American railroad bonds didn’t have to worry about the dollar falling. That is part of why so much money crossed borders before 1914.</p>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>The market price of £1 in New York jumps to $4.95, well above par. What happens?</p>
+    <button>Nothing: under the gold standard the market rate is illegal to change</button>
+    <button data-correct>It pays to ship gold to London instead of buying bills, so gold flows out of New York and the rate is pushed back toward par</button>
+    <button>The Bank of England lowers the gold content of the pound</button>
+    <div class="explain">Above the upper gold point, buying gold at the fixed price in New York and shipping it ($4.8665 plus ~0.5% ≈ $4.89 per pound’s worth) is cheaper than paying $4.95 for a bill. Demand for bills drops, and the rate falls back. The band is enforced by people chasing profit, not by law.</div>
+  </div>
+
+  <section>
+    <h2>The automatic thermostat</h2>
+    <p>Gold moving between countries did something bigger than keep exchange rates steady. In 1752 the Scottish philosopher <strong>David Hume</strong> described what happens next, a loop now called the <strong>price–specie flow mechanism</strong> (“specie” means coin):</p>
+    <ol>
+      <li>Say British prices are high. Foreign goods look cheap, so Britain imports more than it exports.</li>
+      <li>It pays for the difference in gold, so gold flows out.</li>
+      <li>Less gold means less money in Britain, so prices there fall. Abroad, more gold means prices rise.</li>
+      <li>Now British goods are cheaper, exports recover, and the flow stops.</li>
+    </ol>
+    <p>Step it through. Each “year”, the country with higher prices loses gold to the other in proportion to the gap. Prices here simply track the gold stock, which is the cartoon version of Hume.</p>
+    <div class="widget flow" id="flow">
+      <div class="row"><span>Britain</span><div class="track"><div class="fill" id="fb-g"></div></div><span class="readout" id="fb-gv"></span></div>
+      <div class="row"><span>France</span><div class="track"><div class="fill" id="ff-g"></div></div><span class="readout" id="ff-gv"></span></div>
+      <p class="par-why">Bars: each country’s gold stock, which sets its price level (100 = where prices started).</p>
+      <p class="msg" id="flow-msg"></p>
+      <div class="nav">
+        <button type="button" class="kit-btn" id="flow-shock">New gold field in Britain</button>
+        <button type="button" class="kit-btn primary" id="flow-step">Next year ›</button>
+        <button type="button" class="kit-btn" id="flow-reset">Reset</button>
+      </div>
+    </div>
+    <p>In real life central banks helped the thermostat along. When gold was leaving, the Bank of England raised its interest rate, <strong>Bank Rate</strong>. Higher interest pulled money into London and squeezed borrowing at home, which pushed prices down faster. In the 1920s Keynes and others called this behaviour following the <strong>“rules of the game”</strong>: when you lose gold, tighten; when you gain it, loosen.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="mcq">
+    <p>In Hume’s mechanism, why does a country that imports too much eventually stop?</p>
+    <button>The government bans imports once the gold runs low</button>
+    <button data-correct>Paying in gold shrinks its money supply, its prices fall, and its goods become competitive again</button>
+    <button>Its currency is devalued, making imports dearer</button>
+    <div class="explain">Under gold there’s no devaluation: the pound’s gold weight is fixed. The adjustment has to come through prices. Gold leaves, money tightens, prices (and often wages and jobs) fall until exports pick up. Self-correcting, but the correction can hurt.</div>
+  </div>
+
+  <section>
+    <h2>The bargain</h2>
+    <p>Put the pieces together and the gold standard is a trade-off:</p>
+    <ul>
+      <li><strong>What you get:</strong> money that holds its value over decades, fixed exchange rates, and a signal to lenders that you won’t inflate your debts away. Countries “on gold” could borrow more cheaply in London.</li>
+      <li><strong>What you give up:</strong> control. You can’t print money to fight a slump. The money supply depends on how much gold is mined. When gold was scarce relative to a growing world economy, as it was from the 1870s to the 1890s, prices had to fall everywhere: the deflation of the Long Depression.</li>
+    </ul>
+    <aside class="note"><p>Hold on to the deflation point. When Germany and the United States switched to gold in the early 1870s (lesson 4), they added to the demand for a limited metal just as the 1873 crash hit.</p></aside>
+  </section>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>Which pair of promises defines a gold standard?</p>
+    <button>A fixed interest rate and a balanced budget</button>
+    <button data-correct>Notes can be swapped for a fixed weight of gold on demand, and gold can move and be coined freely</button>
+    <button>All coins are gold and paper money is banned</button>
+    <div class="explain">Convertibility at a fixed rate plus free movement of gold. Paper money was everywhere; what mattered was that it could be cashed in.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="25.22" data-tol="0.05">
+    <p>A French franc held 0.2903 g of gold and a sovereign 7.322 g. How many francs to the pound? (Two decimal places.)</p>
+    <div class="explain">$$\frac{7.322}{0.2903} \approx 25.22$$ So £1 ≈ 25.22 francs, the rate that stood, with small wobbles, from the 1820s to 1914.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>Gold is flowing out of London. Under the “rules of the game”, what does the Bank of England do?</p>
+    <button>Cuts Bank Rate to encourage borrowing</button>
+    <button data-correct>Raises Bank Rate, drawing money into London and tightening credit at home</button>
+    <button>Suspends convertibility until the outflow stops</button>
+    <div class="explain">Raise the rate: foreign money comes to earn the higher interest, and dearer credit pushes British prices down, so the gold stops leaving. Suspending convertibility was the emergency exit (1797), not the rule.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In two sentences: what did a country gain by joining the gold standard, and what did it give up?</p>
+    <div class="explain">It gained stable money, fixed exchange rates with other gold countries and cheaper borrowing, because lenders trusted it not to inflate. It gave up control of its money supply: it couldn’t print money in a slump, and when gold was scarce its prices had to fall.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  // Fine gold per unit, grams, from each country's coinage law.
+  const CUR = [
+    ['British pound (£)', 7.32238, 'Sovereign, 1817'],
+    ['US dollar ($)', 1.50463, '$20.67 per troy ounce'],
+    ['French franc', 0.290323, 'Franc germinal, 1803'],
+    ['German mark', 0.358423, '2,790 marks per kg, 1873'],
+  ];
+  const a = document.getElementById('par-a'), b = document.getElementById('par-b');
+  CUR.forEach(([n], i) => { a.add(new Option(n, i)); b.add(new Option(n, i)); });
+  a.value = 0; b.value = 1;
+  const short = (n) => n.replace(/ \(.*\)/, '');
+  function par() {
+    const A = CUR[a.value], B = CUR[b.value];
+    const r = A[1] / B[1];
+    document.getElementById('par-out').textContent = `1 ${short(A[0])} = ${r < 1 ? r.toFixed(4) : r.toFixed(2)} ${short(B[0])}${r === 1 ? '' : 's'}`;
+    document.getElementById('par-why').textContent = `${A[1].toFixed(4)} g ÷ ${B[1].toFixed(4)} g. (${A[2]}; ${B[2]}.)`;
+  }
+  a.addEventListener('change', par); b.addEventListener('change', par); par();
+
+  // Gold points, $ per £, with an illustrative 0.5% shipping cost.
+  const PAR = 4.8665, COST = 0.005, LO = 4.80, HI = 4.94;
+  const lower = PAR * (1 - COST), upper = PAR * (1 + COST);
+  const pct = (x) => (100 * (x - LO) / (HI - LO)).toFixed(2) + '%';
+  const pts = document.getElementById('gp-pts');
+  pts.innerHTML = `<div class="band" style="left:${pct(lower)};width:calc(${pct(upper)} - ${pct(lower)})"></div>`
+    + `<div class="lab" style="left:${pct(lower)}">${lower.toFixed(3)}</div><div class="lab" style="left:${pct(PAR)};top:0">par ${PAR}</div>`
+    + `<div class="lab" style="left:${pct(upper)}">${upper.toFixed(3)}</div><div class="tick" id="gp-tick"></div>`;
+  const s = document.getElementById('gp-slider'), tick = document.getElementById('gp-tick'), v = document.getElementById('gp-verdict');
+  function gp() {
+    const x = +s.value;
+    document.getElementById('gp-rate').textContent = '$' + x.toFixed(3);
+    tick.style.left = pct(x);
+    if (x > upper) { v.className = 'verdict ship'; v.textContent = `A New Yorker who owes £1,000 in London: bills cost $${(x * 1000).toFixed(0)}, shipping gold costs about $${(upper * 1000).toFixed(0)}. Ship gold. Gold leaves New York, and bill sellers have to cut their price.`; }
+    else if (x < lower) { v.className = 'verdict ship'; v.textContent = `A New Yorker who is owed £1,000 in London would get only $${(x * 1000).toFixed(0)} selling that claim. Better to collect the pounds in London, buy gold there and ship it home: about $${(lower * 1000).toFixed(0)}. Gold flows from London to New York, and the rate is pushed back up.`; }
+    else { v.className = 'verdict'; v.textContent = 'Inside the gold points: buying a bill is cheaper than shipping gold, so no gold moves.'; }
+  }
+  s.addEventListener('input', gp); gp();
+
+  // Price-specie flow: prices track gold; the high-price country loses gold each year.
+  let G, year;
+  const msg = document.getElementById('flow-msg');
+  function reset() { G = [100, 100]; year = 0; msg.textContent = 'Both countries start level: same gold, same prices, trade balanced. Try a shock.'; draw(); }
+  function draw() {
+    [['fb', 0], ['ff', 1]].forEach(([id, i]) => {
+      document.getElementById(id + '-g').style.width = Math.min(100, G[i] / 1.6) + '%';
+      document.getElementById(id + '-gv').textContent = Math.round(G[i]);
+    });
+  }
+  document.getElementById('flow-shock').addEventListener('click', () => {
+    G[0] += 50; year = 0; draw();
+    msg.textContent = 'A gold strike (think California 1848 or Australia 1851) adds gold in Britain. More money: British prices rise, so French goods look cheap.';
+  });
+  document.getElementById('flow-step').addEventListener('click', () => {
+    const gap = G[0] - G[1];
+    if (Math.abs(gap) < 1) { msg.textContent = 'Prices are level again, so trade balances and gold stops moving. Note the new level: both countries ended up with higher prices than before.'; return; }
+    const move = 0.3 * gap; G[0] -= move; G[1] += move; year++; draw();
+    msg.textContent = `Year ${year}: Britain ${gap > 0 ? 'imports more than it exports and pays the difference with' : 'exports more and receives'} ${Math.abs(move).toFixed(0)} units of gold. The gap in prices shrinks.`;
+  });
+  document.getElementById('flow-reset').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body></html>
