@@ -174,10 +174,22 @@
   </div>
 
   <section>
-    <h2>What this does and doesn’t show</h2>
-    <p>The argument is about pressure, not proof. Lowering loss on new text rewards whatever internal structure predicts best for its size. Where a real rule (adding, falling bodies, a game board) is the cheapest route, training pushes toward it. Where a shortcut works on the training data, the model may learn the shortcut instead, and fail when the shortcut breaks.</p>
-    <p>So a low loss tells you the model has captured a lot of the structure behind the text. It doesn’t tell you which parts are real rules and which are shortcuts. Lesson 6 takes up the big bet built on this argument, and the case against it.</p>
+    <h2>Parrot or world model?</h2>
+    <p>This is one of the live arguments about LLMs, and you’ll hear both labels.</p>
+    <p><strong>The parrot view.</strong> In a 2021 paper, Emily Bender, Timnit Gebru and colleagues called language models <strong>stochastic parrots</strong>: systems that stitch together sequences of words they have seen, guided by the odds of what goes with what, without any grasp of what the words mean. The point underneath is that a model trained only on text sees the form of language, never the things it is about.</p>
+    <p><strong>The world-model view.</strong> The experiments above point the other way, at least sometimes. Othello-GPT built a board it was never shown. Probes of large open models can read a place’s position on the map and an event’s date straight out of their internal numbers. And when Anthropic traced how one of its Claude models writes rhyming couplets, it found the model choosing the rhyming word for the end of the second line <em>before</em> writing that line, then writing toward it. That’s planning, not word-by-word parroting.</p>
+    <p><strong>The honest middle.</strong> World models inside LLMs are real but patchy. One study trained a model on New York taxi trips. It gave valid turn-by-turn directions almost perfectly, but the street map implied by its internals was full of impossible streets, and it fell apart on detours. Models also <strong>hallucinate</strong>: they produce fluent, confident text that is false. That’s what you’d expect where a model has learned what an answer sounds like but not the facts behind it.</p>
+    <p>The loss argument explains both sides. Lowering loss on new text rewards whatever internal structure predicts best for the model’s size. Where a real rule (adding, falling bodies, a game board) is the cheapest route, training pushes toward it. Where a shortcut works on the training data, the model may learn the shortcut instead, and fail when the shortcut breaks. So a low loss tells you a lot of structure has been captured, but not which parts are rules and which are shortcuts. Lesson 6 takes up the big bet built on this argument, and the case against it.</p>
+    <aside class="note"><p>Sources: Bender et al., <a href="https://dl.acm.org/doi/10.1145/3442188.3445922">“On the Dangers of Stochastic Parrots”</a> (2021); Gurnee &amp; Tegmark, <a href="https://arxiv.org/abs/2310.02207">“Language Models Represent Space and Time”</a> (2023); Anthropic, <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html">“On the Biology of a Large Language Model”</a> (2025); Vafa et al., <a href="https://arxiv.org/abs/2406.03689">“Evaluating the World Model Implicit in a Generative Model”</a> (2024).</p></aside>
   </section>
+
+  <div class="q" data-id="q10" data-type="mcq">
+    <p>Why does the rhyming experiment count against the pure “stochastic parrot” picture?</p>
+    <button>Because the model’s poems rhymed</button>
+    <button data-correct>Because the model picked the line’s final word before writing the words leading up to it</button>
+    <button>Because the model had never seen a poem in training</button>
+    <div class="explain">Rhyming alone proves little: a pure pattern-copier can produce rhymes. The telling part was what happened inside the model. The rhyme word was chosen first, and the line was built to arrive at it. Choosing a target and working toward it is planning, which goes beyond picking each next word from what usually follows.</div>
+  </div>
 
   <section>
     <h2>Check</h2>
