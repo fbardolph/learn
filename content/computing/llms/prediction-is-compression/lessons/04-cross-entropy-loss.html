@@ -123,14 +123,14 @@
     <p>Training doesn’t look at one prediction. It averages the loss over every position in a huge pile of text. If the text really comes from some true distribution $p$ and the model predicts $q$, that average settles at</p>
     <p>$$H(p, q) = \sum p \,(-\log q),$$</p>
     <p>the <strong>cross-entropy</strong>: how often each outcome really happens, times what the model pays when it does.</p>
-    <p>Back to the weather from Lesson 2. The truth is sun $\tfrac12$, cloud $\tfrac14$, rain $\tfrac14$, so the entropy is $1.5$ bits. In bits:</p>
+    <p>Back to the weather from Lesson 2. The truth is sun $\tfrac12$, cloud $\tfrac14$, rain $\tfrac14$, so the entropy is $1.5$ bits. Each term below is <em>how often that weather really happens</em> × <em>(bits the model pays when it does)</em>, in the order sun, cloud, rain. The number in brackets is $-\log_2$ of the model’s probability: $\tfrac12$ costs 1 bit, $\tfrac14$ costs 2.</p>
     <table class="t">
       <tr><th>Model predicts</th><th>Cross-entropy</th><th>Wasted</th></tr>
       <tr><td>$\tfrac12, \tfrac14, \tfrac14$ (the truth)</td><td>$\tfrac12(1) + \tfrac14(2) + \tfrac14(2) = 1.5$</td><td>0</td></tr>
       <tr><td>$\tfrac13, \tfrac13, \tfrac13$</td><td>$\log_2 3 = 1.585$</td><td>0.085</td></tr>
       <tr><td>$\tfrac14, \tfrac14, \tfrac12$</td><td>$\tfrac12(2) + \tfrac14(2) + \tfrac14(1) = 1.75$</td><td>0.25</td></tr>
     </table>
-    <p>Cross-entropy is never below the entropy. The best a model can do is predict the true probabilities, and then it pays exactly the entropy. Any gap is bits wasted by a wrong model. (That gap has a name you’ll meet in papers: the <strong>KL divergence</strong>.)</p>
+    <p>Cross-entropy is never below the entropy (here 1.5 bits: the first row, where the model predicts the truth). The <em>Wasted</em> column is each row minus that 1.5. The best a model can do is predict the true probabilities, and then it pays exactly the entropy. Any gap is bits wasted by a wrong model. (That gap has a name you’ll meet in papers: the <strong>KL divergence</strong>.)</p>
     <div class="widget">
       <label><span>True chance of heads, p: <span class="readout" id="pv"></span></span>
         <input type="range" id="ps" min="0.05" max="0.95" step="0.01" value="0.5"></label>

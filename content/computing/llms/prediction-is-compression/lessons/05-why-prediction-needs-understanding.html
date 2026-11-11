@@ -47,6 +47,30 @@
   </header>
 
   <section>
+    <h2>Warm-up: two from Lesson 4</h2>
+    <p>Two quick ones on the steps that tripped people up last time. Cross-entropy is an <em>average</em>: each outcome’s cost counts in proportion to how often it really happens. And nats are just $-\ln$ instead of $-\log_2$.</p>
+  </section>
+
+  <div class="q" data-id="q11" data-type="num" data-answer="1.74" data-tol="0.01">
+    <p>A coin is fair, but a model predicts heads $0.9$, tails $0.1$. What’s the cross-entropy in bits? (Use $-\log_2 0.9 \approx 0.152$ and $-\log_2 0.1 \approx 3.322$.)</p>
+    <div class="explain">
+      <p>Heads really happens half the time, and each time costs $0.152$ bits: $\tfrac12 \times 0.152 = 0.076$.</p>
+      <p>Tails really happens half the time, and each time costs $3.322$ bits: $\tfrac12 \times 3.322 = 1.661$.</p>
+      <p>Add: $0.076 + 1.661 = 1.737 \approx 1.74$ bits. The weights are the <em>true</em> chances ($\tfrac12$ each), not the model’s ($0.9$, $0.1$). Adding $0.152 + 3.322$ without the halves would be the cost of seeing one heads <em>and</em> one tails, not the average per toss.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q12" data-type="num" data-answer="2.079" data-tol="0.01">
+    <p>The model gave the actual next token probability $\tfrac18$. What’s the loss in nats? (Use $\ln 2 \approx 0.693$.)</p>
+    <div class="explain">
+      <p>Loss in nats is $-\ln \tfrac18$.</p>
+      <p>The log of a reciprocal is minus the log: $\ln \tfrac18 = -\ln 8$, so $-\ln \tfrac18 = \ln 8$.</p>
+      <p>$8 = 2^3$, and the log of a power brings the power down: $\ln 8 = 3 \ln 2 \approx 3 \times 0.693 = 2.079$ nats.</p>
+      <p>Check in bits: $-\log_2 \tfrac18 = 3$ bits, and $3 \times 0.693 = 2.079$. One bit is $0.693$ nats.</p>
+    </div>
+  </div>
+
+  <section>
     <h2>The cheapest predictor: count</h2>
     <p>The simplest way to predict the next character is to remember what followed the last few characters in text you’ve read. After “q”, English almost always has “u”. After “th”, “e” is likely. A model that predicts from counts of the last $n$ characters is an <strong>n-gram model</strong>. Before neural networks, this was how language models worked.</p>
     <p>Below is one, trained on about 2,000 characters of plain English (a short passage about a town, a bakery and a train). Pick how many characters of context it looks back at. It reports bits per character, the Lesson 4 loss, on two things:</p>

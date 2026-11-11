@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The scaling bet</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats > div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats > div > span { font-size: .8rem; color: var(--muted); }
+  .cmp { display: flex; flex-direction: column; gap: .55rem; font: .85rem var(--sans); }
+  .cmp .who { display: flex; justify-content: space-between; gap: .5rem; }
+  .cmp .who .tot { font: .85rem var(--mono); font-variant-numeric: tabular-nums; }
+  .cmp .who.win { color: var(--good); font-weight: 650; }
+  .cmp .bar { display: flex; height: 12px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .cmp .m { background: var(--bad); }
+  .cmp .d { background: var(--accent); }
+  .key2 { display: flex; gap: 1rem; font: .8rem var(--sans); color: var(--muted); }
+  .key2 i { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; vertical-align: -1px; margin-right: .3rem; }
+  .lossbar { display: flex; height: 22px; border-radius: 4px; overflow: hidden; background: var(--line); }
+  .lossbar .fl { background: var(--good); }
+  .lossbar .gp { background: var(--accent); transition: width .2s; }
+  .cap { font: .8rem var(--sans); color: var(--muted); margin: 0; }
+  table.t { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
+  table.t th, table.t td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Prediction, compression and intelligence · Lesson 6</p>
+    <h1>The scaling bet</h1>
+    <p class="lede">If compressing text well takes understanding, then a bigger compressor fed more text should understand more. You’ll see the prize built on that idea, the bet the AI labs made on it, and where it may run out.</p>
+  </header>
+
+  <section>
+    <h2>A prize for compressing Wikipedia</h2>
+    <p>In 2006 the computer scientist Marcus Hutter put up his own money for a contest. Its premise is this whole leaf in one line: compressing text well takes knowledge, so a better compressor is a step towards intelligence.</p>
+    <p>The <strong>Hutter Prize</strong> works like this today:</p>
+    <ul>
+      <li>The file is <em>enwik9</em>: the first $10^9$ bytes (1 GB) of an English Wikipedia dump.</li>
+      <li>Your score is the size of the compressed file <em>plus</em> the size of the program that decompresses it. You can’t hide knowledge in the decompressor for free.</li>
+      <li>It has to run on one ordinary computer, with limits on time and memory, and no GPU.</li>
+      <li>The pot is €500,000. Beat the record by 1% and you win 1% of it, €5,000.</li>
+    </ul>
+    <p>The last award confirmed at the time of writing went to Kaido Orav and Byron Knoll in September 2024: 110,793,128 bytes. Their program, like most winners, is a hand-tuned blend of many small predictors feeding an arithmetic coder, exactly the machine from Lesson 3.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="0.886" data-tol="0.005">
+    <p>The record squeezes $10^9$ bytes of text into 110,793,128 bytes. How many bits does it spend per original byte (roughly per character)?</p>
+    <div class="explain">
+      <p>Compressed size in bits: $110{,}793{,}128 \times 8 = 886{,}345{,}024$ bits.</p>
+      <p>Per original byte: $886{,}345{,}024 \div 1{,}000{,}000{,}000 \approx 0.886$ bits.</p>
+      <p>Under one bit per character, against 8 bits for plain storage. By Lesson 4, that’s the same as saying the predictor inside has a cross-entropy of about 0.886 bits per character on Wikipedia.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Why the winners aren’t language models</h2>
+    <p>A frontier LLM predicts Wikipedia better than any prize entry. So why doesn’t a lab just enter one? Because of the second rule: the decompressor counts. To decode, you need the exact same model, so its weights are part of the file.</p>
+    <p>That makes the true cost of compressing a pile of data two numbers added together:</p>
+    <p>$$\text{total} = \text{size of the model} + \text{size of the data, coded with the model}.$$</p>
+    <p>It’s Lesson 5’s rule versus memorizer again: a model is paid for once; a better prediction saves bits on every character. Slide the amount of text and watch who wins. (Round illustrative numbers: real gzip gets about 2.6 bits per character on Wikipedia, and the prize winner is real; the two neural models are made up but the right shape.)</p>
+    <div class="widget">
+      <label><span>Text to compress: <span class="readout" id="dv"></span></span>
+        <input type="range" id="ds" min="6" max="14" step="0.25" value="9"></label>
+      <div class="cmp" id="cmp"></div>
+      <div class="key2"><span><i style="background:var(--bad)"></i>model / program</span><span><i style="background:var(--accent)"></i>coded data</span></div>
+    </div>
+    <p>At 1 GB, the frontier model’s weights alone are hundreds of times bigger than the whole uncompressed file. Push the slider towards 10 TB, roughly the scale of text a frontier model is trained on, and the picture flips: the giant model’s weights are now small next to the bits it saves.</p>
+    <p>The ideal version of this sum has a name. The <strong>Kolmogorov complexity</strong> of some data is the length of the shortest program that prints it. Nobody can compute it exactly, but every compressor is an upper bound on it, and the best explanation of the data is the one that makes the program shortest.</p>
+    <aside class="key"><p><strong>A big model is a good compressor only for a big world.</strong> Its size is a fixed cost; its predictions save bits on everything it ever sees. That’s why the bet on prediction is also a bet on scale.</p></aside>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="225" data-tol="1">
+    <p>A model whose weights take 100 MB codes text at 1 bit per character. What’s the total cost, in MB, of compressing 1 GB ($10^9$ characters) with it?</p>
+    <div class="explain">
+      <p>Coded data: $10^9 \times 1$ bit $= 10^9$ bits.</p>
+      <p>In bytes: $10^9 \div 8 = 125{,}000{,}000$ bytes $= 125$ MB.</p>
+      <p>Add the model: $100 + 125 = 225$ MB.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>Why can’t you win the Hutter Prize by entering a frontier LLM, even though it predicts Wikipedia better than any entry?</p>
+    <button>LLMs can’t do lossless compression</button>
+    <button data-correct>Its weights count towards the score, and they’re far bigger than the 1 GB file itself</button>
+    <button>Wikipedia isn’t in its training data</button>
+    <div class="explain">Any predictor can drive an arithmetic coder losslessly (Lesson 3). The problem is the fixed cost. Hundreds of gigabytes of weights to save a few tens of megabytes is a bad trade at 1 GB. It only pays off at a scale of trillions of characters.</div>
+  </div>
+
+  <section>
+    <h2>Sutskever’s argument</h2>
+    <p>Ilya Sutskever co-founded OpenAI and was its chief scientist through GPT-4; in 2024 he left to start Safe Superintelligence. He has been the clearest voice for the idea that next-token prediction is enough. In a 2023 interview with Dwarkesh Patel he put it like this: predicting the next token well “means that you understand the underlying reality that led to the creation of that token.”</p>
+    <p>The argument runs on what you already know:</p>
+    <ol>
+      <li>Text is written by people, about a world. It’s a shadow of both.</li>
+      <li>Once grammar is learned, the remaining loss sits on facts, results and choices (Lesson 5).</li>
+      <li>Predicting those on <em>new</em> text can’t be done by memorizing. It takes modelling what the writer knows, wants and would conclude.</li>
+      <li>So keep lowering the loss, with a model big enough to hold that knowledge and enough text to need it, and understanding has to come along.</li>
+    </ol>
+    <p>The <strong>scaling hypothesis</strong> is the practical form of the bet: keep the same simple recipe, make the model, the data and the compute bigger, and new abilities keep arriving. From GPT-2 (2019) to GPT-3 (2020) to GPT-4 (2023), that’s roughly what happened, and the labs spent billions on it.</p>
+    <p>One striking piece of support: in 2023, DeepMind researchers used Chinchilla, a 70-billion-parameter model trained mainly on text, as a compressor for things that aren’t text. Fed raw bytes, it shrank ImageNet image patches to 43.4% of their size, beating PNG (58.5%), and LibriSpeech audio to 16.4%, beating FLAC (30.3%). A text predictor had learned patterns general enough to carry over to pictures and sound. (Those sizes leave out the weights, so by the two-part rule above it’s a demonstration, not a practical compressor.)</p>
+    <aside class="note"><p>Sources: <a href="https://www.hutter1.net/prize/index.htm">Hutter Prize</a>; <a href="https://www.dwarkesh.com/p/ilya-sutskever">Dwarkesh Patel, interview with Ilya Sutskever</a> (2023); Delétang et al., <a href="https://arxiv.org/abs/2309.10668">“Language Modeling Is Compression”</a> (2023).</p></aside>
+  </section>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>What did the “Language Modeling Is Compression” experiment show?</p>
+    <button>LLMs are the best practical compressors for images</button>
+    <button data-correct>A model trained mainly on text compressed images and audio better than PNG and FLAC, if you don’t count its weights</button>
+    <button>Compression and prediction are different problems</button>
+    <div class="explain">The striking part is transfer: patterns learned from text helped predict pixels and sound. The weights weren’t counted, so it isn’t a practical image compressor. It’s evidence that what the model learned is more general than “which word follows which”.</div>
+  </div>
+
+  <section>
+    <h2>What more compute buys</h2>
+    <p>Lesson 4 gave the floor: cross-entropy can’t go below the entropy of the text itself. What scaling shrinks is the <em>gap</em> above that floor. Measured across many training runs, that gap shrinks in a steady pattern: each 10× more compute cuts it by about the same fraction. (The next leaf on pretraining covers these <em>scaling laws</em> properly; here the gap halves every 10×, an illustrative rate.)</p>
+    <div class="widget">
+      <label><span>Training compute: <span class="readout" id="cv"></span></span>
+        <input type="range" id="cs" min="0" max="8" step="1" value="0"></label>
+      <div class="lossbar" aria-hidden="true"><div class="fl" id="fl"></div><div class="gp" id="gp"></div></div>
+      <p class="cap">Green: the floor (the text’s own entropy, 0.8 bits here). Blue: the gap that more compute can still close.</p>
+      <div class="stats">
+        <div><b id="lv">–</b><span>loss (bits/token)</span></div>
+        <div><b id="gv">–</b><span>gap above floor</span></div>
+        <div><b id="bv">–</b><span>bits this last 10× bought</span></div>
+      </div>
+    </div>
+    <p>Each 10× buys half as much as the one before. The first 10× saves a whole bit; by 100,000,000× compute, another 10× saves less than a hundredth. That looks like a dead end, but remember where the remaining loss lives: on the hard tokens, the facts and the reasoning steps. A sliver of average loss can be the difference between getting a proof right and getting it wrong.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="1000" data-tol="0">
+    <p>A model sits 0.4 bits above the floor. If each 10× more compute halves the gap, how many times more compute does it take to get the gap down to 0.05 bits?</p>
+    <div class="explain">
+      <p>Halve until you reach 0.05: $0.4 \to 0.2 \to 0.1 \to 0.05$. That’s 3 halvings.</p>
+      <p>Each halving costs 10×, so the total is $10 \times 10 \times 10 = 1{,}000$ times the compute.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>The case against</h2>
+    <p>The bet has serious critics, and since 2024 one of them has been Sutskever himself.</p>
+    <p><strong>The data wall.</strong> Compute keeps growing; human-written text doesn’t. At the NeurIPS conference in December 2024 Sutskever said pre-training “as we know it will unquestionably end,” because “we have but one internet.” Running out of fresh, good text to train on is called the <strong>data wall</strong>.</p>
+    <p><strong>Text is a thin slice of the world.</strong> Yann LeCun, Meta’s long-time chief AI scientist, argues that predicting words can’t get you to human-like intelligence: a small child takes in more about how the world works through their eyes than any model reads in text, and predicting the next token of text, one at a time, is the wrong kind of target. He wants models that learn by predicting what happens in the world (from video, say) in an abstract form, not pixel by pixel or word by word.</p>
+    <p><strong>Low loss isn’t the thing you want.</strong> Lesson 5’s warning: loss rewards whatever predicts best, including shortcuts. A model can be fluent and confidently wrong (hallucination), and the loss curve can’t tell you which parts it got by rules and which by shortcuts.</p>
+    <p><strong>The end of the age of scaling?</strong> In a November 2025 interview, again with Dwarkesh Patel, Sutskever split recent history into an age of research (roughly 2012–2020), an age of scaling (2020–2025) and, now, a return to an age of research. His complaint: today’s models ace hard tests but generalize much worse than people do, and making them 100× bigger would help, but wouldn’t transform them.</p>
+    <p>What the labs did when pre-training slowed is the subject of the post-training leaf: reinforcement learning on answers that can be checked, and models that think for longer before answering.</p>
+    <aside class="key"><p><strong>Three links, three strengths.</strong> Prediction = compression is mathematics (Lesson 3). Compression needs understanding is an argument, with clean evidence in small worlds (Lesson 5). Scale gets you there is a bet, which paid off for years and is now openly debated.</p></aside>
+    <aside class="note"><p>Sources: Sutskever, NeurIPS 2024 Test of Time talk (13 December 2024); <a href="https://www.dwarkesh.com/p/ilya-sutskever-2">Dwarkesh Patel, second interview with Ilya Sutskever</a> (November 2025); LeCun, <a href="https://openreview.net/pdf?id=BZ5a1r-kVsf">“A Path Towards Autonomous Machine Intelligence”</a> (2022).</p></aside>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>What is the “data wall”?</p>
+    <button>The limit set by the text’s entropy</button>
+    <button data-correct>Compute keeps growing but the supply of good human-written text doesn’t, so you can’t keep scaling data</button>
+    <button>The point where a model’s weights outweigh the data it compresses</button>
+    <div class="explain">The entropy floor limits how low loss can go on any amount of text. The data wall is a supply problem: the scaling recipe needs more fresh text each round, and there’s only one internet.</div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="1.4" data-tol="0.01">
+    <p>80% of the tokens in some text are easy and cost a model 0.5 bits each; 20% are hard and cost 5 bits each. What’s its average loss in bits per token?</p>
+    <div class="explain">
+      <p>Weight each cost by how often it happens, as in cross-entropy.</p>
+      <p>Easy: $0.8 \times 0.5 = 0.4$ bits.</p>
+      <p>Hard: $0.2 \times 5 = 1.0$ bit.</p>
+      <p>Average: $0.4 + 1.0 = 1.4$ bits per token. (Adding $0.5 + 5 = 5.5$ forgets the weights.)</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>In the Hutter Prize, what counts towards an entry’s size?</p>
+    <button>Only the compressed file</button>
+    <button data-correct>The compressed file plus the decompressor program</button>
+    <button>The compressor’s running time</button>
+    <div class="explain">Counting the decompressor stops you hiding Wikipedia inside the program. It also makes the prize a two-part sum, model plus coded data, which is why small, clever predictors win at 1 GB.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="mcq">
+    <p>An extra 10× compute lowers a model’s average loss by only 0.01 bits per token. Why might that still matter?</p>
+    <button>It doesn’t: the model has hit the entropy floor</button>
+    <button data-correct>The remaining loss sits on hard tokens, so a small average drop can mean many more facts and reasoning steps right</button>
+    <button>Smaller loss always means a smaller model</button>
+    <div class="explain">Easy tokens already cost almost nothing, so what’s left is mostly the hard ones (Lesson 5). A 0.01-bit average drop, concentrated on the few tokens that carry answers, can be a visible jump in ability. And a falling loss means it hasn’t reached the floor yet.</div>
+  </div>
+
+  <div class="q" data-id="q10" data-type="self">
+    <p>In two or three sentences: state Sutskever’s case that next-token prediction leads to understanding, and give one objection.</p>
+    <div class="explain">Text is produced by people reasoning about a world. Once grammar is cheap, the loss that’s left is on facts and conclusions in new text, which can’t be memorized, so predicting it well forces a model to capture the reality behind the text; scale gives it the room to. Objections: the data wall (we’re running out of fresh text); text is a thin, ungrounded slice of the world (LeCun); low loss can come from shortcuts, so it doesn’t guarantee understanding; and Sutskever’s own 2025 view that models still generalize far worse than people.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const fmt = (b) => {
+    const u = [['TB', 1e12], ['GB', 1e9], ['MB', 1e6], ['KB', 1e3]];
+    for (const [n, v] of u) if (b >= v) { const x = b / v; return (x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2)) + ' ' + n; }
+    return Math.round(b) + ' B';
+  };
+
+  // ---- two-part code ----
+  const MODELS = [
+    { name: 'gzip (no model)', size: 1e5, bpc: 2.6 },
+    { name: 'Prize-style predictor', size: 5e5, bpc: 0.89 },
+    { name: 'Small neural model', size: 1e8, bpc: 0.8 },
+    { name: 'Frontier LLM', size: 2e11, bpc: 0.4 },
+  ];
+  let logged = false;
+  function drawCmp() {
+    const n = Math.pow(10, +$('ds').value);
+    $('dv').textContent = fmt(n);
+    const rows = MODELS.map((m) => ({ ...m, data: n * m.bpc / 8 }));
+    rows.forEach((r) => { r.tot = r.size + r.data; });
+    const best = Math.min(...rows.map((r) => r.tot));
+    const max = Math.max(...rows.map((r) => r.tot));
+    $('cmp').innerHTML = rows.map((r) => {
+      const scale = 100 / max;
+      return `<div><div class="who${r.tot === best ? ' win' : ''}"><span>${r.name}${r.tot === best ? ' · smallest' : ''}</span><span class="tot">${fmt(r.tot)}</span></div>`
+        + `<div class="bar"><div class="m" style="width:${r.size * scale}%"></div><div class="d" style="width:${r.data * scale}%"></div></div></div>`;
+    }).join('');
+    if (!logged && n >= 1e13) { logged = true; Study.event({ type: 'two-part-code', reached: '10TB' }); }
+  }
+  $('ds').addEventListener('input', drawCmp);
+  drawCmp();
+
+  // ---- power-law gap ----
+  const FLOOR = 0.8, GAP0 = 2.0, TOP = FLOOR + GAP0;
+  function drawLoss() {
+    const k = +$('cs').value;
+    const gap = GAP0 * Math.pow(2, -k);
+    const prev = k > 0 ? GAP0 * Math.pow(2, -(k - 1)) : null;
+    $('cv').textContent = (k === 0 ? '1' : Number(Math.pow(10, k)).toLocaleString()) + '×';
+    $('fl').style.width = (FLOOR / TOP * 100) + '%';
+    $('gp').style.width = (gap / TOP * 100) + '%';
+    $('lv').textContent = (FLOOR + gap).toFixed(3);
+    $('gv').textContent = gap.toFixed(3);
+    $('bv').textContent = prev === null ? '–' : (prev - gap).toFixed(3);
+  }
+  $('cs').addEventListener('input', drawLoss);
+  drawLoss();
+})();
+</script>
+</body></html>
