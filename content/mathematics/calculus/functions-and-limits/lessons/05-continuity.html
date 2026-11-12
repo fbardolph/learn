@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Continuity</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .plot { width: 100%; height: 240px; display: block; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); touch-action: pan-y; }
+  .seg { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; }
+  .seg > button { min-height: 44px; padding: 0 .8rem; border-radius: 22px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: 600 .9rem var(--sans); cursor: pointer; }
+  .seg > button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .checks { list-style: none; margin: .5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; font-family: var(--sans); font-size: .92rem; }
+  .checks > li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .4rem; align-items: start; }
+  .checks > li > .mark { font-weight: 700; text-align: center; }
+  .checks > li.ok > .mark { color: var(--good); }
+  .checks > li.no > .mark { color: var(--bad); }
+  .verdict { font: 600 .95rem var(--sans); margin: .5rem 0 0; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; font-family: var(--sans); }
+  .pair > div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: .5rem .6rem; min-width: 0; }
+  .pair > div > span { display: block; font-size: .8rem; color: var(--muted); }
+  .pair b { font: 600 1.05rem var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .row-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 1.6rem 1fr; gap: .5rem; align-items: start; }
+  .steps li::before { content: counter(s); font: 650 .85rem/1.6rem var(--sans); width: 1.6rem; height: 1.6rem; border-radius: .8rem; background: var(--accent-soft); color: var(--accent); text-align: center; }
+  .steps li > div { min-width: 0; overflow-x: auto; }
+  .steps li > div p { margin: 0; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">Calculus · Functions and limits · Lesson 5</p>
+    <h1>Continuity</h1>
+    <p class="lede">“You can draw it without lifting your pen,” made precise. It’s also the reason “just plug in” worked for so many limits.</p>
+  </header>
+
+  <section>
+    <h2>Three ways to lift your pen</h2>
+    <p>You’ve already met every way a graph can break at a point: a <strong>hole</strong> (Lesson 1), a <strong>jump</strong> (Lesson 3) and a <strong>blow-up</strong> (Lesson 4). Continuity is simply “none of those happen here”.</p>
+    <p>A function $f$ is <strong>continuous at $a$</strong> when three things are all true:</p>
+    <ol>
+      <li>$f(a)$ exists: there is a dot at $x = a$.</li>
+      <li>$\displaystyle\lim_{x\to a} f(x)$ exists: the left and right sides head to the same height.</li>
+      <li>They’re equal: $\displaystyle\lim_{x\to a} f(x) = f(a)$. The dot sits where the curve was heading.</li>
+    </ol>
+    <p>Tap through the cases below and watch which test fails at $x = 1$.</p>
+    <div class="widget">
+      <div class="seg" id="cases" role="group" aria-label="Choose a graph">
+        <button type="button" data-k="ok" aria-pressed="true">Unbroken</button>
+        <button type="button" data-k="hole">Hole</button>
+        <button type="button" data-k="moved">Moved dot</button>
+        <button type="button" data-k="jump">Jump</button>
+        <button type="button" data-k="blow">Blow-up</button>
+      </div>
+      <canvas class="plot" id="cplot" aria-label="Graph of the chosen function near x = 1"></canvas>
+      <ul class="checks" id="checks">
+        <li><span class="mark"></span><span>1. $f(1)$ exists</span></li>
+        <li><span class="mark"></span><span>2. $\lim_{x\to1} f(x)$ exists</span></li>
+        <li><span class="mark"></span><span>3. limit $= f(1)$</span></li>
+      </ul>
+      <p class="verdict" id="verdict"></p>
+    </div>
+    <aside class="key"><p>Continuous at $a$ means $\displaystyle\lim_{x\to a} f(x) = f(a)$. That one equation quietly demands all three: a dot, a limit, and the two agreeing.</p></aside>
+  </section>
+
+  <div class="q" data-id="q1" data-type="mcq">
+    <p>$f(x) = \dfrac{x^2-1}{x-1}$ is not continuous at $x = 1$. Which test fails <em>first</em>?</p>
+    <button data-correct>1: $f(1)$ doesn’t exist</button>
+    <button>2: the limit doesn’t exist</button>
+    <button>Only 3: the limit and $f(1)$ disagree</button>
+    <div class="explain">Plugging in gives $\frac00$, so there’s no value at $x = 1$: test 1 fails. The limit is fine. For $x \ne 1$ it equals $x + 1$, so the limit is $2$. It’s the “Hole” case.</div>
+  </div>
+
+  <section>
+    <h2>Patching a hole</h2>
+    <p>Holes and moved dots are the mild kind. The limit exists, so you can repair the function by putting the dot back where the curve was heading. These are called <strong>removable</strong> discontinuities. For $\frac{x^2-1}{x-1}$, add the rule “and $f(1) = 2$”. Now all three tests pass.</p>
+    <p>Jumps and blow-ups can’t be patched. No single dot can sit at two heights, or at infinity.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="num" data-answer="6" data-tol="0.001">
+    <p>What value should $f(3)$ have to make $f(x) = \dfrac{x^2-9}{x-3}$ continuous at $x = 3$?</p>
+    <div class="explain">
+      <p>Factor the top: $x^2 - 9 = (x-3)(x+3)$.</p>
+      <p>For $x \ne 3$: $\frac{(x-3)(x+3)}{x-3} = x + 3$.</p>
+      <p>So $\lim_{x\to3} f(x) = 3 + 3 = 6$. Set $f(3) = 6$ and the hole is filled.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Continuous for free</h2>
+    <p>You don’t have to run the three tests on every function. These are continuous everywhere they’re defined:</p>
+    <ul>
+      <li>polynomials, like $3x^2 - x + 7$: everywhere;</li>
+      <li>fractions of polynomials, like $\frac{x+1}{x^2-4}$: everywhere the bottom isn’t 0;</li>
+      <li>$\sqrt{x}$ for $x \ge 0$, plus $\sin x$, $\cos x$ and $2^x$: everywhere;</li>
+      <li>and anything built from these by adding, multiplying, dividing (bottom not 0) or plugging one into another.</li>
+    </ul>
+    <p>That’s the payoff. When a limit was “just plug in” back in Lesson 2, you were using continuity: for a continuous function, $\lim_{x\to a} f(x) = f(a)$ <em>by definition</em>. The only interesting limits are at the points where continuity fails, which is why we kept hunting for $\frac00$.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>Where is $\dfrac{x+1}{x^2-4}$ discontinuous?</p>
+    <button>Only at $x = -1$</button>
+    <button>Only at $x = 2$</button>
+    <button data-correct>At $x = 2$ and $x = -2$</button>
+    <button>Nowhere: it’s a fraction of polynomials</button>
+    <div class="explain">It breaks where the bottom is 0: $x^2 - 4 = 0$ gives $x^2 = 4$, so $x = 2$ or $x = -2$. At $x = -1$ the <em>top</em> is 0, which is fine: $\frac{0}{-3} = 0$.</div>
+  </div>
+
+  <section>
+    <h2>Gluing two pieces together</h2>
+    <p>A common exam move: a function given in two pieces, with an unknown to choose so the seam doesn’t break.</p>
+    <p>$$f(x) = \begin{cases} x^2 + k & x < 2 \\ 3x - 1 & x \ge 2 \end{cases}$$</p>
+    <p>Each piece is a polynomial, so the only possible break is the seam at $x = 2$. Tap through:</p>
+    <div class="widget">
+      <ol class="steps" data-steps>
+        <li><div><p>Left limit uses the left piece: $\lim_{x\to2^-} (x^2 + k) = 2^2 + k = 4 + k$.</p></div></li>
+        <li><div><p>Right limit uses the right piece: $\lim_{x\to2^+} (3x - 1) = 3(2) - 1 = 5$. That’s also $f(2)$, since $x = 2$ belongs to the right piece.</p></div></li>
+        <li><div><p>Continuous means the sides meet: $4 + k = 5$.</p></div></li>
+        <li><div><p>Subtract 4 from both sides: $k = 1$.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="2.6667" data-tol="0.01">
+    <p>Find $k$ so this is continuous: $f(x) = \begin{cases} kx + 1 & x < 3 \\ x^2 & x \ge 3 \end{cases}$ (a decimal is fine)</p>
+    <div class="explain">
+      <p>Left limit: $k(3) + 1 = 3k + 1$. Right limit and $f(3)$: $3^2 = 9$.</p>
+      <p>Set equal: $3k + 1 = 9$. Subtract 1: $3k = 8$. Divide by 3: $k = \frac83 \approx 2.667$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>The intermediate value theorem</h2>
+    <p>Here is why continuity matters beyond tidiness. At 6 a.m. it’s 4°C, at noon it’s 15°C. Temperature doesn’t teleport, so at some moment in between it was exactly 10°C. You can’t say <em>when</em> without more information, but you know it happened.</p>
+    <aside class="key"><p><strong>Intermediate value theorem (IVT):</strong> if $f$ is continuous on $[a, b]$, then $f$ hits every height between $f(a)$ and $f(b)$ somewhere in between.</p></aside>
+    <p>The best-known use is finding roots. Take $f(x) = x^3 - x - 1$:</p>
+    <ul>
+      <li>$f(1) = 1 - 1 - 1 = -1$ (below zero)</li>
+      <li>$f(2) = 8 - 2 - 1 = 5$ (above zero)</li>
+    </ul>
+    <p>It’s a polynomial, so it’s continuous, and 0 lies between $-1$ and $5$. So there’s a root between 1 and 2. To narrow it down, check the midpoint and keep whichever half still has a sign change. Each tap halves the window:</p>
+    <div class="widget">
+      <canvas class="plot" id="bplot" aria-label="Graph of x cubed minus x minus 1 with the search window shaded"></canvas>
+      <div class="pair">
+        <div><span>window</span><b id="bwin"></b></div>
+        <div><span>midpoint $m$ and sign of $f(m)$</span><b id="bmid"></b></div>
+      </div>
+      <div class="row-btns">
+        <button type="button" class="kit-btn" id="bhalve">Halve</button>
+        <button type="button" class="kit-btn" id="breset">Reset</button>
+      </div>
+    </div>
+    <p>Ten taps pin the root to within $\frac{1}{1024}$: it’s about $1.3247$. Calculators find roots in much the same way.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="self">
+    <p>$f(x) = \dfrac1x$ has $f(-1) = -1$ and $f(1) = 1$, yet $f(x)$ is never 0. Why doesn’t that break the IVT?</p>
+    <div class="explain">The IVT needs $f$ continuous on the <em>whole</em> interval $[-1, 1]$. $\frac1x$ isn’t: it blows up at $x = 0$, jumping from $-\infty$ on the left to $+\infty$ on the right. The graph gets from negative to positive by lifting the pen, so it never has to cross 0.</div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>$g(x) = \begin{cases} x + 1 & x < 0 \\ x - 1 & x \ge 0 \end{cases}$. At $x = 0$, $g$ has…</p>
+    <button>a removable hole</button>
+    <button data-correct>a jump: not removable</button>
+    <button>no break: it’s continuous</button>
+    <div class="explain">Left limit: $0 + 1 = 1$. Right limit: $0 - 1 = -1$. They disagree, so the two-sided limit doesn’t exist (test 2 fails). No choice of $g(0)$ can fix that, so it isn’t removable.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>Halving for $f(x) = x^3 - x - 1$ on $[1, 2]$: $f(1.5) = 3.375 - 1.5 - 1 = 0.875$. The root is in…</p>
+    <button data-correct>$[1, 1.5]$</button>
+    <button>$[1.5, 2]$</button>
+    <button>can’t tell</button>
+    <div class="explain">$f(1) = -1 &lt; 0$ and $f(1.5) = 0.875 &gt; 0$, so the sign changes on $[1, 1.5]$, and the IVT puts a root there. On $[1.5, 2]$ both ends are positive, so there’s no guarantee.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="num" data-answer="-1" data-tol="0.001">
+    <p>Find $a$ so this is continuous at $x = 1$: $h(x) = \begin{cases} 2x + a & x < 1 \\ x^2 & x \ge 1 \end{cases}$</p>
+    <div class="explain">
+      <p>Left: $2(1) + a = 2 + a$. Right and $h(1)$: $1^2 = 1$.</p>
+      <p>Set equal: $2 + a = 1$. Subtract 2: $a = -1$.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="mcq">
+    <p>Which does the IVT guarantee?</p>
+    <button>$\dfrac{1}{x-2}$ equals 0 somewhere in $[0, 3]$</button>
+    <button data-correct>$x^5 + x - 1$ equals 0 somewhere in $[0, 1]$</button>
+    <button>$x^2$ equals 0 somewhere in $[1, 3]$</button>
+    <div class="explain">$x^5 + x - 1$ is a polynomial (continuous), with $f(0) = -1$ and $f(1) = 1$. Zero is in between, so there’s a root. The first breaks at $x = 2$, so the IVT doesn’t apply. The third is $1$ at $x=1$ and $9$ at $x=3$, so 0 isn’t between them.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  function frame(cv, x0, x1, y0, y1) {
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight, pad = 22;
+    cv.width = w * dpr; cv.height = h * dpr;
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const X = (x) => pad + (x - x0) / (x1 - x0) * (w - 2 * pad);
+    const Y = (y) => h - pad - (y - y0) / (y1 - y0) * (h - 2 * pad);
+    c.clearRect(0, 0, w, h);
+    c.strokeStyle = css('--line'); c.lineWidth = 1; c.fillStyle = css('--muted'); c.font = '11px ' + css('--sans');
+    return { c, X, Y, w, h, pad };
+  }
+  function curve(F, f, a, b, y0, y1) {
+    const { c, X, Y, w, h, pad } = F;
+    c.save(); c.beginPath(); c.rect(pad, pad / 2, w - 1.5 * pad, h - 1.5 * pad); c.clip();
+    c.strokeStyle = css('--ink'); c.lineWidth = 2.5; c.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const x = a + (b - a) * i / 200, y = Math.max(y0 - 5, Math.min(y1 + 5, f(x)));
+      i ? c.lineTo(X(x), Y(y)) : c.moveTo(X(x), Y(y));
+    }
+    c.stroke(); c.restore();
+  }
+  function dot(F, x, y, open) {
+    const { c, X, Y } = F;
+    c.beginPath(); c.arc(X(x), Y(y), 6, 0, 2 * Math.PI);
+    if (open) { c.fillStyle = css('--paper'); c.fill(); c.strokeStyle = css('--ink'); c.lineWidth = 2; c.stroke(); }
+    else { c.fillStyle = css('--accent'); c.fill(); }
+  }
+
+  // ---- the three tests ----
+  const g = (x) => 2 + 0.8 * (x - 1) - 0.3 * (x - 1) * (x - 1);
+  const CASES = {
+    ok:    { t: [1, 1, 1], v: 'Continuous at x = 1.' },
+    hole:  { t: [0, 1, 0], v: 'Removable: fill the hole with f(1) = 2.' },
+    moved: { t: [1, 1, 0], v: 'Removable: move the dot down to 2.' },
+    jump:  { t: [1, 0, 0], v: 'Jump: the sides disagree. Not removable.' },
+    blow:  { t: [0, 0, 0], v: 'Blow-up: vertical asymptote. Not removable.' },
+  };
+  let kase = 'ok';
+  const cv = document.getElementById('cplot');
+  function drawCase() {
+    const x0 = -1, x1 = 3, y0 = -1, y1 = 5;
+    const F = frame(cv, x0, x1, y0, y1), { c, X, Y, h, pad, w } = F;
+    for (let x = x0; x <= x1; x++) { c.beginPath(); c.moveTo(X(x), pad / 2); c.lineTo(X(x), h - pad); c.stroke(); c.fillText(x, X(x) - 3, h - 6); }
+    for (let y = 0; y <= 4; y += 2) { c.beginPath(); c.moveTo(pad, Y(y)); c.lineTo(w - pad / 2, Y(y)); c.stroke(); c.fillText(y, 4, Y(y) + 4); }
+    const e = 1e-3;
+    if (kase === 'blow') {
+      const f = (x) => 2 + 0.4 / (x - 1);
+      c.setLineDash([5, 5]); c.strokeStyle = css('--muted'); c.beginPath(); c.moveTo(X(1), pad / 2); c.lineTo(X(1), h - pad); c.stroke(); c.setLineDash([]);
+      curve(F, f, x0, 1 - e, y0, y1); curve(F, f, 1 + e, x1, y0, y1);
+    } else if (kase === 'jump') {
+      curve(F, g, x0, 1, y0, y1); curve(F, (x) => g(x) + 1.5, 1, x1, y0, y1);
+      dot(F, 1, 2, true); dot(F, 1, 3.5, false);
+    } else {
+      curve(F, g, x0, x1, y0, y1);
+      if (kase === 'ok') dot(F, 1, 2, false);
+      if (kase === 'hole') dot(F, 1, 2, true);
+      if (kase === 'moved') { dot(F, 1, 2, true); dot(F, 1, 3.5, false); }
+    }
+    const k = CASES[kase];
+    [...document.getElementById('checks').children].forEach((li, i) => {
+      li.className = k.t[i] ? 'ok' : 'no';
+      li.querySelector('.mark').textContent = k.t[i] ? '✓' : '✗';
+    });
+    document.getElementById('verdict').textContent = k.v;
+  }
+  document.querySelectorAll('#cases > button').forEach((b) => b.addEventListener('click', () => {
+    kase = b.dataset.k;
+    document.querySelectorAll('#cases > button').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    drawCase();
+  }));
+
+  // ---- bisection on x^3 - x - 1 ----
+  const p = (x) => x * x * x - x - 1;
+  const bv = document.getElementById('bplot');
+  let lo = 1, hi = 2;
+  const sgn = (v) => (v < 0 ? '−' : '+');
+  function drawBis() {
+    const x0 = 0.8, x1 = 2.1, y0 = -2, y1 = 6;
+    const F = frame(bv, x0, x1, y0, y1), { c, X, Y, h, pad, w } = F;
+    c.fillStyle = css('--accent-soft'); c.fillRect(X(lo), pad / 2, Math.max(2, X(hi) - X(lo)), h - 1.5 * pad);
+    c.fillStyle = css('--muted');
+    [1, 1.5, 2].forEach((x) => { c.fillText(x, X(x) - 6, h - 6); });
+    c.strokeStyle = css('--muted'); c.lineWidth = 1.5; c.beginPath(); c.moveTo(pad, Y(0)); c.lineTo(w - pad / 2, Y(0)); c.stroke();
+    curve(F, p, x0, x1, y0, y1);
+    [[lo, p(lo)], [hi, p(hi)]].forEach(([x, y]) => {
+      c.beginPath(); c.arc(X(x), Y(y), 6, 0, 2 * Math.PI); c.fillStyle = y < 0 ? css('--bad') : css('--good'); c.fill();
+    });
+    const m = (lo + hi) / 2;
+    document.getElementById('bwin').textContent = '[' + lo.toFixed(4) + ', ' + hi.toFixed(4) + ']';
+    document.getElementById('bmid').textContent = m.toFixed(4) + '  ' + sgn(p(m));
+  }
+  document.getElementById('bhalve').addEventListener('click', () => {
+    const m = (lo + hi) / 2;
+    if (p(m) < 0) lo = m; else hi = m;
+    drawBis();
+  });
+  document.getElementById('breset').addEventListener('click', () => { lo = 1; hi = 2; drawBis(); });
+
+  const redraw = () => { drawCase(); drawBis(); };
+  window.addEventListener('resize', redraw);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+  redraw();
+
+  // step-through worked examples: reveal one step per tap
+  document.querySelectorAll('[data-steps]').forEach((ol) => {
+    const items = [...ol.children];
+    items.forEach((li, i) => { li.hidden = i > 0; });
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'kit-btn'; btn.textContent = 'Next step';
+    ol.after(btn);
+    let shown = 1;
+    btn.addEventListener('click', () => {
+      if (shown < items.length) { items[shown].hidden = false; shown++; }
+      if (shown >= items.length) btn.remove();
+    });
+  });
+})();
+</script>
+</body></html>
