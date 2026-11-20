@@ -176,6 +176,15 @@
     </div>
   </div>
 
+  <div class="q" data-id="q11" data-type="num" data-answer="0.970" data-tol="0.01">
+    <p>Training dashboards usually show loss in nats. The same model’s 1.4 bits per token is how many nats? (One bit $\approx 0.693$ nats.)</p>
+    <div class="explain">
+      <p>A nat is a bigger unit than a bit ($e \approx 2.718$ is bigger than 2), so the number of nats is <em>smaller</em> than the number of bits.</p>
+      <p>Each bit is worth $0.693$ nats: $1.4 \times 0.693 = 0.9702 \approx 0.97$ nats.</p>
+      <p>Sanity check: 1 bit is 0.693 nats, so 1.4 bits should be a bit under 1 nat. Dividing ($1.4 \div 0.693 \approx 2.02$) goes the wrong way.</p>
+    </div>
+  </div>
+
   <div class="q" data-id="q8" data-type="mcq">
     <p>In the Hutter Prize, what counts towards an entry’s size?</p>
     <button>Only the compressed file</button>
