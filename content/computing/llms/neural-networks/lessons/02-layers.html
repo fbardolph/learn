@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Layers</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats > div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats > div > span { font-size: .8rem; color: var(--muted); }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .row .kit-btn { min-height: 44px; min-width: 44px; }
+  .row .kit-btn[aria-pressed="true"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .curve { width: 100%; height: auto; display: block; }
+  .curve .ax { stroke: var(--line); stroke-width: 1; }
+  .curve .target { fill: none; stroke: var(--muted); stroke-width: 5; opacity: .35; }
+  .curve .ln { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+  .curve .kink { fill: var(--good); }
+  .curve text { fill: var(--muted); font: 11px var(--sans); }
+  .unit { border-top: 1px solid var(--line); padding-top: .4rem; }
+  .unit > p { margin: 0; font: 600 .85rem var(--sans); }
+  table.t { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
+  table.t th, table.t td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Neural networks and gradient descent · Lesson 2</p>
+    <h1>Layers</h1>
+    <p class="lede">You’ll beat XOR with a second layer, build a curve out of straight pieces, and see why stacking layers beats making one layer wider.</p>
+  </header>
+
+  <section>
+    <h2>Neurons feeding neurons</h2>
+    <p>Lesson 1 ended stuck: one neuron draws one straight line, and XOR needs more. The fix is to let neurons read the outputs of other neurons.</p>
+    <p>A <strong>layer</strong> is a group of neurons that all read the same inputs. Stack them: the first layer reads the data, the next reads the first layer’s outputs, and so on. The layers in between input and output are called <strong>hidden layers</strong>, because you never see their values directly. A stack like this is a <strong>multi-layer perceptron</strong>, or <strong>MLP</strong>.</p>
+    <p>XOR with two hidden ReLU neurons and one output:</p>
+    <ul>
+      <li>$h_1 = \text{ReLU}(x_1 + x_2)$, which counts how many inputs are on</li>
+      <li>$h_2 = \text{ReLU}(x_1 + x_2 - 1)$, which only fires when both are on</li>
+      <li>$\text{out} = h_1 - 2h_2$</li>
+    </ul>
+    <table class="t">
+      <tr><th>$x_1, x_2$</th><th>$h_1$</th><th>$h_2$</th><th>$h_1 - 2h_2$</th></tr>
+      <tr><td>0, 0</td><td>$\text{ReLU}(0) = 0$</td><td>$\text{ReLU}(-1) = 0$</td><td>$0 - 0 = 0$</td></tr>
+      <tr><td>1, 0</td><td>$\text{ReLU}(1) = 1$</td><td>$\text{ReLU}(0) = 0$</td><td>$1 - 0 = 1$</td></tr>
+      <tr><td>0, 1</td><td>$1$</td><td>$0$</td><td>$1$</td></tr>
+    </table>
+    <p>The hidden layer turned the inputs into two new features, “how many” and “both”, and in those terms XOR is simple: count, minus a penalty for both.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="0" data-tol="0.001">
+    <p>Finish the table: what does the network output for $x_1 = 1$, $x_2 = 1$?</p>
+    <div class="explain">
+      <p>$h_1 = \text{ReLU}(1 + 1) = \text{ReLU}(2) = 2$.</p>
+      <p>$h_2 = \text{ReLU}(1 + 1 - 1) = \text{ReLU}(1) = 1$.</p>
+      <p>$\text{out} = 2 - 2 \times 1 = 0$. Both on gives no, so it’s XOR.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Why the squashing function is essential</h2>
+    <p>Suppose you left out ReLU and just stacked weighted sums. Layer 1: $y = 2x + 1$. Layer 2: $\text{out} = 3y - 4$. Substitute:</p>
+    <p>$$\text{out} = 3(2x + 1) - 4 = 6x + 3 - 4 = 6x - 1$$</p>
+    <p>Two layers, and the result is one weighted sum plus a bias, which a single neuron could do. That always happens: a weighted sum of weighted sums is a weighted sum. Without a nonlinearity between them, a hundred layers collapse to one and you’re back to drawing a single straight line.</p>
+    <p>ReLU breaks the collapse. It’s the bend between layers that lets the next layer do something new.</p>
+  </section>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>Layer 1 computes $y = 4x - 2$ and layer 2 computes $\text{out} = 0.5y + 3$, with no activation in between. Which single neuron does the same job?</p>
+    <button>$\text{out} = 4.5x + 1$</button>
+    <button data-correct>$\text{out} = 2x + 2$</button>
+    <button>$\text{out} = 2x + 3$</button>
+    <div class="explain">
+      <p>Substitute $y$: $\text{out} = 0.5(4x - 2) + 3$.</p>
+      <p>Expand: $0.5 \times 4x = 2x$ and $0.5 \times (-2) = -1$, so $\text{out} = 2x - 1 + 3 = 2x + 2$.</p>
+      <p>Two layers, one straight line. That’s why every real network puts an activation between layers.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Curves from bends</h2>
+    <p>One input $x$, one output. A hidden ReLU neuron $\text{ReLU}(x - c)$ is flat until $x = c$, then rises with slope 1: a single bend at $c$. The output neuron adds several of these up, each times its own weight $a$. Adding bends gives a curve made of straight pieces.</p>
+    <p>Your job: match the grey hill with three hidden neurons. Each one has a bend position $c$ and an output weight $a$ (which sets how much the slope changes at that bend).</p>
+    <div class="widget">
+      <svg class="curve" id="bends" viewBox="0 0 320 190" role="img" aria-label="Target hill and the network's curve"></svg>
+      <div id="units"></div>
+      <div class="stats">
+        <div><b id="err"></b><span>average gap</span></div>
+        <div><b id="ok"></b><span>matched?</span></div>
+      </div>
+    </div>
+    <p>Hint: the hill’s slope is 0, then $+1$ from $x = -1$, then $-1$ from $x = 0$, then 0 again from $x = 1$. At each bend, $a$ is how much the slope changes.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>Which weights build the hill $\text{ReLU}(x+1) + a_2\,\text{ReLU}(x) + a_3\,\text{ReLU}(x-1)$?</p>
+    <button>$a_2 = -1$, $a_3 = 1$</button>
+    <button data-correct>$a_2 = -2$, $a_3 = 1$</button>
+    <button>$a_2 = -1$, $a_3 = -1$</button>
+    <div class="explain">
+      <p>Track the slope from left to right. Before $-1$: 0. After the first bend: $0 + 1 = 1$.</p>
+      <p>At $x = 0$ the slope must go from $+1$ to $-1$, a change of $-2$, so $a_2 = -2$.</p>
+      <p>At $x = 1$ it must go from $-1$ back to $0$, a change of $+1$, so $a_3 = 1$.</p>
+      <p>Same $1, -2$ pattern as the XOR network: a count, minus twice a later count.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Wide or deep?</h2>
+    <p>With enough hidden neurons in a single layer you can put a bend anywhere and match <em>any</em> reasonable curve as closely as you like. That’s a theorem (the universal approximation theorem, 1989). So why do real networks have many layers?</p>
+    <p>Because a wide layer pays per bend. Each extra neuron adds roughly one more bend. Stacking layers multiplies instead. Take a two-neuron layer that makes a tent on $[0, 1]$:</p>
+    <p>$$T(x) = 2\,\text{ReLU}(x) - 4\,\text{ReLU}(x - 0.5)$$</p>
+    <p>Check: $T(0) = 0$. $T(0.5) = 2(0.5) - 0 = 1$. $T(1) = 2(1) - 4(0.5) = 2 - 2 = 0$. Up and back down.</p>
+    <p>Now feed the tent’s output into another copy of the same layer. As $x$ goes from 0 to 1, $T(x)$ sweeps 0→1 and back 1→0, so the second tent gets run through twice: two peaks. A third layer runs over each of those twice: four peaks.</p>
+    <div class="widget">
+      <div class="row" id="depth">
+        <button type="button" class="kit-btn" data-k="1">1</button>
+        <button type="button" class="kit-btn" data-k="2">2</button>
+        <button type="button" class="kit-btn" data-k="3">3</button>
+        <button type="button" class="kit-btn" data-k="4">4</button>
+        <button type="button" class="kit-btn" data-k="5">5</button>
+      </div>
+      <svg class="curve" id="tent" viewBox="0 0 320 150" role="img" aria-label="The tent layer applied several times"></svg>
+      <div class="stats">
+        <div><b id="tk"></b><span>layers</span></div>
+        <div><b id="tn"></b><span>neurons used</span></div>
+        <div><b id="tp"></b><span>peaks</span></div>
+        <div><b id="tw"></b><span>one wide layer would need about</span></div>
+      </div>
+    </div>
+    <p>Depth doubles the peaks with every layer; width only adds. With 10 layers of 2 neurons you get 512 peaks, which would take about 1,000 neurons in one layer. Real data isn’t a neat zigzag, but it is full of patterns built from patterns. In an image network, early layers pick out edges, later ones combine edges into shapes, later still shapes into objects. Each layer builds on the features the previous one found, the way “how many” and “both” made XOR easy.</p>
+    <aside class="key"><p><strong>Layers let neurons build features out of features.</strong> The activation between layers is what stops them collapsing into one. Depth multiplies what a network can express; width only adds.</p></aside>
+  </section>
+
+  <div class="q" data-id="q4" data-type="num" data-answer="32" data-tol="0.5">
+    <p>How many peaks does the tent layer give when stacked 6 deep?</p>
+    <div class="explain">
+      <p>Each layer doubles the peaks: 1 layer gives 1 peak, so $k$ layers give $2^{k-1}$.</p>
+      <p>$k = 6$: $2^{5} = 32$ peaks, from just 12 neurons.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Counting parameters in a stack</h2>
+    <p>Between two layers, every neuron in the second reads every output of the first. So a layer that reads $m$ numbers and has $n$ neurons has $m \times n$ weights plus $n$ biases.</p>
+    <p>This is exactly what sits inside every transformer block (the attention topic will show you the rest of the block). In GPT-3 each block’s MLP takes the 12,288 numbers that represent a token, widens them to a hidden layer 4 times as big, $4 \times 12{,}288 = 49{,}152$ neurons, applies the activation, and narrows back to 12,288:</p>
+    <p>$$12{,}288 \times 49{,}152 \approx 604 \text{ million weights in, and the same out}$$</p>
+    <p>So about 1.2 billion parameters per block. With 96 blocks, that’s about 116 billion of GPT-3’s 175 billion: two-thirds of the model is these plain layers.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="79510" data-tol="0.5">
+    <p>A digit-reader has 784 pixel inputs, a hidden layer of 100 neurons and an output layer of 10. How many parameters in total?</p>
+    <div class="explain">
+      <p>Hidden layer: $784 \times 100 = 78{,}400$ weights, plus 100 biases: $78{,}500$.</p>
+      <p>Output layer: it reads the 100 hidden outputs, so $100 \times 10 = 1{,}000$ weights, plus 10 biases: $1{,}010$.</p>
+      <p>Total: $78{,}500 + 1{,}010 = 79{,}510$. Ten times Lesson 1’s single-layer version, and it can learn features the single layer can’t.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q6" data-type="mcq">
+    <p>Someone builds a 50-layer network but forgets the activation functions. What can it compute?</p>
+    <button>Anything a 50-layer network with ReLU can</button>
+    <button data-correct>Only what a single layer can: one weighted sum per output, so straight lines and flat planes</button>
+    <button>Nothing at all: it outputs 0</button>
+    <div class="explain">Without a nonlinearity, each layer is a weighted sum plus a bias, and substituting one into the next just gives another weighted sum plus a bias. All 50 collapse into one.</div>
+  </div>
+
+  <div class="q" data-id="q7" data-type="mcq">
+    <p>In the XOR network, what did the two hidden neurons $h_1$ and $h_2$ detect?</p>
+    <button>Whether $x_1$ was on, and whether $x_2$ was on</button>
+    <button data-correct>How many inputs were on, and whether both were</button>
+    <button>XOR directly, twice</button>
+    <div class="explain">$h_1 = \text{ReLU}(x_1 + x_2)$ is the count. $h_2 = \text{ReLU}(x_1 + x_2 - 1)$ is 1 only when both are on. The output combines them: count minus twice “both”.</div>
+  </div>
+
+  <div class="q" data-id="q8" data-type="num" data-answer="116" data-tol="3">
+    <p>A model has 96 blocks, each with an MLP of about 1.2 billion parameters. Roughly how many billion parameters are in MLPs?</p>
+    <div class="explain">$96 \times 1.2 = 115.2$, or about 116 billion using the unrounded 1.208 billion per block. That’s GPT-3: about two-thirds of its 175 billion parameters.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="self">
+    <p>In your own words: why do networks use many layers rather than one very wide one?</p>
+    <div class="explain">One wide layer can in principle match any curve, but it pays for each bend with a neuron. Each extra layer builds on the features the previous layer found, so complexity multiplies: the tent stack doubles its peaks per layer. Real data is made of patterns built from patterns (edges, shapes, objects), which is what depth is good at.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const relu = (v) => Math.max(0, v);
+
+  // Bend builder
+  const units = [{ c: -1.5, a: 0.5 }, { c: 0.5, a: 0 }, { c: 1.5, a: 0 }];
+  const XMIN = -2, XMAX = 2, YMIN = -1, YMAX = 2;
+  const L = 30, R = 310, T = 10, B = 165;
+  const xs = (x) => L + (x - XMIN) / (XMAX - XMIN) * (R - L);
+  const ys = (y) => B - (Math.max(YMIN, Math.min(YMAX, y)) - YMIN) / (YMAX - YMIN) * (B - T);
+  const target = (x) => Math.max(0, 1 - Math.abs(x));
+  const net = (x) => units.reduce((s, u) => s + u.a * relu(x - u.c), 0);
+  let logged = false;
+
+  // Built by script after the kit has rendered math, so plain-text labels.
+  const SUB = ['₁', '₂', '₃'];
+  $('units').innerHTML = units.map((u, i) => `<div class="unit"><p>Neuron ${i + 1}: a${SUB[i]} · ReLU(x − c${SUB[i]})</p>`
+    + `<label><span>bend c${SUB[i]}: <span class="readout" data-r="c${i}"></span></span><input type="range" min="-2" max="2" step="0.1" data-u="${i}" data-k="c" aria-label="bend of neuron ${i + 1}"></label>`
+    + `<label><span>weight a${SUB[i]}: <span class="readout" data-r="a${i}"></span></span><input type="range" min="-3" max="3" step="0.1" data-u="${i}" data-k="a" aria-label="weight of neuron ${i + 1}"></label></div>`).join('');
+  const inputs = [...document.querySelectorAll('#units input')];
+  inputs.forEach((inp) => { inp.value = units[+inp.dataset.u][inp.dataset.k]; });
+
+  function line(f) { let d = ''; for (let i = 0; i <= 160; i++) { const x = XMIN + i / 160 * (XMAX - XMIN); d += (i ? 'L' : 'M') + xs(x).toFixed(1) + ' ' + ys(f(x)).toFixed(1); } return d; }
+  const targetPath = line(target);
+  function drawBends() {
+    let gap = 0;
+    for (let i = 0; i <= 80; i++) { const x = XMIN + i / 80 * (XMAX - XMIN); gap += Math.abs(net(x) - target(x)); }
+    gap /= 81;
+    $('bends').innerHTML = `<line class="ax" x1="${L}" y1="${ys(0)}" x2="${R}" y2="${ys(0)}"/><line class="ax" x1="${xs(0)}" y1="${T}" x2="${xs(0)}" y2="${B}"/>`
+      + `<path class="target" d="${targetPath}"/><path class="ln" d="${line(net)}"/>`
+      + units.map((u) => `<circle class="kink" cx="${xs(u.c)}" cy="${ys(net(u.c))}" r="4"/>`).join('')
+      + `<text x="${L}" y="${B + 18}">x = −2</text><text x="${R}" y="${B + 18}" text-anchor="end">x = 2</text><text x="${xs(0)}" y="${B + 18}" text-anchor="middle">0</text>`
+      + `<text x="${xs(0) - 4}" y="${ys(1) + 4}" text-anchor="end">1</text>`;
+    units.forEach((u, i) => {
+      document.querySelector(`[data-r="c${i}"]`).textContent = u.c.toFixed(1);
+      document.querySelector(`[data-r="a${i}"]`).textContent = u.a.toFixed(1);
+    });
+    $('err').textContent = gap.toFixed(3);
+    const ok = gap < 0.02;
+    $('ok').textContent = ok ? 'yes' : 'not yet';
+    if (ok && !logged) { logged = true; Study.event({ type: 'bends-matched', units: units.map((u) => [u.c, u.a]) }); }
+  }
+  inputs.forEach((inp) => inp.addEventListener('input', () => { units[+inp.dataset.u][inp.dataset.k] = Number(inp.value); drawBends(); }));
+  drawBends();
+
+  // Tent stacking
+  const tent = (x) => 2 * relu(x) - 4 * relu(x - 0.5);
+  const TL = 20, TR = 310, TT = 10, TB = 130;
+  function drawTent(k) {
+    const f = (x) => { let v = x; for (let i = 0; i < k; i++) v = tent(v); return v; };
+    let d = '';
+    const n = 1200;
+    for (let i = 0; i <= n; i++) { const x = i / n; d += (i ? 'L' : 'M') + (TL + x * (TR - TL)).toFixed(2) + ' ' + (TB - f(x) * (TB - TT)).toFixed(2); }
+    $('tent').innerHTML = `<line class="ax" x1="${TL}" y1="${TB}" x2="${TR}" y2="${TB}"/><path class="ln" d="${d}"/>`
+      + `<text x="${TL}" y="${TB + 16}">x = 0</text><text x="${TR}" y="${TB + 16}" text-anchor="end">x = 1</text>`;
+    const peaks = 2 ** (k - 1);
+    $('tk').textContent = k; $('tn').textContent = 2 * k; $('tp').textContent = peaks; $('tw').textContent = 2 * peaks;
+    document.querySelectorAll('#depth .kit-btn').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.k === k)));
+  }
+  document.querySelectorAll('#depth .kit-btn').forEach((b) => b.addEventListener('click', () => drawTent(+b.dataset.k)));
+  drawTent(1);
+})();
+</script>
+</body></html>

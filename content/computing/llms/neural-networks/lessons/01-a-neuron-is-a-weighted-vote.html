@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A neuron is a weighted vote</title>
+<link rel="stylesheet" href="../../../../../kit/lesson.css">
+<style>
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--sans); }
+  .stats > div { display: flex; flex-direction: column; }
+  .stats b { font: 650 1.5rem var(--serif); font-variant-numeric: tabular-nums; }
+  .stats > div > span { font-size: .8rem; color: var(--muted); }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .row .kit-btn { min-height: 44px; }
+  .row .kit-btn[aria-pressed="true"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .plane, .curve { width: 100%; max-width: 340px; height: auto; display: block; margin: 0 auto; }
+  .plane .on { fill: var(--accent); opacity: .16; }
+  .plane .ax { stroke: var(--line); stroke-width: 1; }
+  .plane .yes { fill: var(--ink); }
+  .plane .no { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+  .plane .ok { stroke: var(--good); stroke-width: 3; fill: none; }
+  .plane .bad { stroke: var(--bad); stroke-width: 3; fill: none; }
+  .plane text, .curve text { fill: var(--muted); font: 11px var(--sans); }
+  .curve .ax { stroke: var(--line); stroke-width: 1; }
+  .curve .step { fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 4 3; }
+  .curve .sig { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+  .curve .relu { fill: none; stroke: var(--good); stroke-width: 2.5; }
+  .curve .dot-sig { fill: var(--accent); }
+  .curve .dot-relu { fill: var(--good); }
+  .curve .zl { stroke: var(--ink); stroke-width: 1; opacity: .4; }
+  table.t { border-collapse: collapse; width: 100%; font: .9rem var(--sans); font-variant-numeric: tabular-nums; }
+  table.t th, table.t td { border-bottom: 1px solid var(--line); padding: .35rem .3rem; text-align: left; }
+</style>
+<link rel="icon" href="../../../../../kit/site-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../../../../kit/site-icon-180.png">
+<link rel="manifest" href="../../../../../manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Learning">
+<meta name="theme-color" content="#f5f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+</head><body>
+<main class="lesson">
+  <header>
+    <p class="eyebrow">How LLMs work · Neural networks and gradient descent · Lesson 1</p>
+    <h1>A neuron is a weighted vote</h1>
+    <p class="lede">You’ll build the single unit that every neural network is made of, tune one by hand, and find the one problem it can’t solve alone.</p>
+  </header>
+
+  <section>
+    <h2>A decision you already make</h2>
+    <p>Saturday morning: park or not? Three things go into it, each a yes (1) or no (0):</p>
+    <ul>
+      <li>$x_1$: is it sunny?</li>
+      <li>$x_2$: is it raining?</li>
+      <li>$x_3$: does someone have a cold?</li>
+    </ul>
+    <p>They don’t count equally. Sun pulls you out a bit, rain keeps you in a lot, and a cold matters somewhat. Give each a number for how hard it pushes, and a minus sign when it pushes against:</p>
+    <p>$$z = 2x_1 - 4x_2 - 1.5x_3 + 0.5$$</p>
+    <p>Go if $z$ comes out above 0. The final $+0.5$ is your mood on a blank day: with all three inputs at 0, you’d mildly lean towards going.</p>
+    <p>Sunny, dry, someone has a cold: $z = 2(1) - 4(0) - 1.5(1) + 0.5 = 2 - 0 - 1.5 + 0.5 = 1$. Above 0, so you go.</p>
+  </section>
+
+  <section>
+    <h2>That’s a neuron</h2>
+    <p>An artificial <strong>neuron</strong> does exactly this. It takes some numbers in, multiplies each by its own <strong>weight</strong>, adds them up, and adds one more number, the <strong>bias</strong>:</p>
+    <p>$$z = w_1x_1 + w_2x_2 + \dots + w_nx_n + b$$</p>
+    <ul>
+      <li>A big positive weight: this input strongly argues “yes”.</li>
+      <li>A negative weight: this input argues “no”.</li>
+      <li>A weight near 0: this input is ignored.</li>
+      <li>The bias: how easily the neuron says yes when the inputs are quiet. It moves the threshold.</li>
+    </ul>
+    <p>Then it passes $z$ through a fixed function to get its output. More on that function in a moment.</p>
+    <p>Inputs don’t have to be 0 or 1. They can be pixel brightnesses, or the outputs of other neurons. In GPT-3, a neuron in the first layer of each block reads 12,288 numbers at once.</p>
+  </section>
+
+  <div class="q" data-id="q1" data-type="num" data-answer="1.5" data-tol="0.01">
+    <p>A neuron has weights $2$, $-3$, $0.5$ and bias $-1$. Its inputs are $1$, $0$, $1$. What is $z$?</p>
+    <div class="explain">
+      <p>Multiply each input by its weight: $2 \times 1 = 2$, $\;-3 \times 0 = 0$, $\;0.5 \times 1 = 0.5$.</p>
+      <p>Add them: $2 + 0 + 0.5 = 2.5$.</p>
+      <p>Add the bias: $2.5 + (-1) = 1.5$.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q2" data-type="mcq">
+    <p>You raise a neuron’s bias from $-1$ to $+2$ and leave the weights alone. What changes?</p>
+    <button>Every input now counts for more</button>
+    <button data-correct>The neuron says yes more easily: it needs less push from its inputs</button>
+    <button>Nothing, the bias is only used when all inputs are 0</button>
+    <div class="explain">The bias is added every time, whatever the inputs are, so it shifts $z$ up by 3 for every input. Inputs that used to land just below 0 now land above it. The weights, which set how much each input counts, haven’t moved.</div>
+  </div>
+
+  <section>
+    <h2>Tune one by hand</h2>
+    <p>Here’s a neuron with two inputs, $x_1$ and $x_2$, each 0 or 1. The four dots are the four possible inputs. A filled dot should get a yes, a hollow dot a no. The shaded region is where your neuron says yes ($z &gt; 0$). Its edge is always a straight line, because $w_1x_1 + w_2x_2 + b = 0$ is the equation of a line.</p>
+    <div class="widget">
+      <div class="row" id="sets">
+        <button type="button" class="kit-btn" data-set="and">AND</button>
+        <button type="button" class="kit-btn" data-set="or">OR</button>
+        <button type="button" class="kit-btn" data-set="xor">XOR</button>
+      </div>
+      <svg class="plane" id="plane" viewBox="0 0 300 300" role="img" aria-label="Input plane with four points and the neuron's yes region"></svg>
+      <label><span>Weight $w_1$: <span class="readout" id="w1v"></span></span>
+        <input type="range" id="w1" min="-3" max="3" step="0.1" value="0.5"></label>
+      <label><span>Weight $w_2$: <span class="readout" id="w2v"></span></span>
+        <input type="range" id="w2" min="-3" max="3" step="0.1" value="-0.5"></label>
+      <label><span>Bias $b$: <span class="readout" id="bv"></span></span>
+        <input type="range" id="b" min="-3" max="3" step="0.1" value="0.3"></label>
+      <div class="stats">
+        <div><b id="score"></b><span>dots right</span></div>
+        <div><b id="solved"></b><span>solved</span></div>
+      </div>
+    </div>
+    <p>Try <strong>AND</strong> (yes only when both inputs are 1), then <strong>OR</strong> (yes when either is). Hint for AND: make both weights 1 and find a bias so that one input alone isn’t enough. Then try <strong>XOR</strong>: yes when exactly one input is 1.</p>
+  </section>
+
+  <div class="q" data-id="q3" data-type="mcq">
+    <p>With $w_1 = w_2 = 1$, which bias makes the neuron compute AND?</p>
+    <button>$b = 0.5$</button>
+    <button>$b = -0.5$</button>
+    <button data-correct>$b = -1.5$</button>
+    <div class="explain">
+      <p>Check all four inputs with $b = -1.5$:</p>
+      <p>$(0,0)$: $0 + 0 - 1.5 = -1.5$, no. $(1,0)$ and $(0,1)$: $1 - 1.5 = -0.5$, no. $(1,1)$: $2 - 1.5 = 0.5$, yes.</p>
+      <p>$b = -0.5$ gives OR instead: one input alone reaches $1 - 0.5 = 0.5$. Same weights, different bias, different rule.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q4" data-type="mcq">
+    <p>Why can no setting of the sliders solve XOR?</p>
+    <button>The weights would need to be bigger than 3</button>
+    <button data-correct>The yes dots sit on opposite corners, and one straight line can’t put both of them on one side with both no dots on the other</button>
+    <button>XOR needs a negative bias, and that always fails</button>
+    <div class="explain">The yes dots are $(1,0)$ and $(0,1)$, the no dots $(0,0)$ and $(1,1)$: diagonal pairs. Any straight line that has both yes corners on its yes side also takes in at least one no corner. A single neuron can only draw one straight line, however big its weights. Lesson 2 fixes this with a second layer.</div>
+  </div>
+
+  <section>
+    <h2>The squashing function</h2>
+    <p>So far the neuron outputs a hard yes or no: 1 if $z &gt; 0$, else 0. That’s a <em>step</em>. Real networks replace it with a smoother <strong>activation function</strong>, for a reason you’ll meet in Lesson 3: training works by nudging weights a little and seeing whether things improve, and a step gives no signal for small nudges. It’s flat everywhere except at the jump.</p>
+    <p>Two activations to know:</p>
+    <ul>
+      <li><strong>Sigmoid</strong>: $\sigma(z) = \dfrac{1}{1 + e^{-z}}$. A smooth step from 0 to 1, with $\sigma(0) = 0.5$. Reads as a probability.</li>
+      <li><strong>ReLU</strong> (“rectified linear unit”): $\text{ReLU}(z) = \max(0, z)$. Negative becomes 0; positive passes through unchanged. Crude, cheap, and the workhorse of modern networks, along with smooth cousins of it.</li>
+    </ul>
+    <div class="widget">
+      <svg class="curve" id="acts" viewBox="0 0 320 180" role="img" aria-label="Step, sigmoid and ReLU plotted against z"></svg>
+      <label><span>$z$: <span class="readout" id="zv"></span></span>
+        <input type="range" id="z" min="-4" max="4" step="0.1" value="1"></label>
+      <div class="stats">
+        <div><b id="os"></b><span>step</span></div>
+        <div><b id="og"></b><span>sigmoid</span></div>
+        <div><b id="or"></b><span>ReLU</span></div>
+      </div>
+    </div>
+    <p>Dashed: step. Blue: sigmoid. Green: ReLU.</p>
+  </section>
+
+  <div class="q" data-id="q5" data-type="num" data-answer="0" data-tol="0.001">
+    <p>A ReLU neuron computes $z = -1.5$. What does it output?</p>
+    <div class="explain">$\text{ReLU}(-1.5) = \max(0, -1.5) = 0$. A ReLU neuron with negative $z$ is silent: it outputs 0, whatever the size of the negative number.</div>
+  </div>
+
+  <section>
+    <h2>You’ve met sigmoid before</h2>
+    <p>Lesson 4 of the prediction topic turned logits into probabilities with softmax. Take softmax over just two options, with logits $z$ and $0$:</p>
+    <p>$$p = \frac{e^{z}}{e^{z} + e^{0}} = \frac{e^{z}}{e^{z} + 1}$$</p>
+    <p>Divide top and bottom by $e^{z}$. On top, $e^{z} \div e^{z} = 1$. On the bottom, $e^{z} \div e^{z} = 1$ and $1 \div e^{z} = e^{-z}$:</p>
+    <p>$$p = \frac{1}{1 + e^{-z}} = \sigma(z)$$</p>
+    <p>So a sigmoid neuron is a two-way softmax: “yes” has logit $z$, “no” has logit 0.</p>
+  </section>
+
+  <div class="q" data-id="q6" data-type="num" data-answer="0.731" data-tol="0.005">
+    <p>A sigmoid neuron has $z = 1$. What’s its output? (Use $e^{-1} \approx 0.368$.)</p>
+    <div class="explain">
+      <p>$\sigma(1) = \dfrac{1}{1 + e^{-1}} = \dfrac{1}{1 + 0.368} = \dfrac{1}{1.368}$.</p>
+      <p>$1 \div 1.368 \approx 0.731$.</p>
+      <p>Check with the softmax view: logits $1$ and $0$ give $2.718 \div (2.718 + 1) = 2.718 \div 3.718 \approx 0.731$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Parameters</h2>
+    <p>The weights and the bias are the neuron’s <strong>parameters</strong>: the numbers that training adjusts. Everything else (the inputs, the choice of ReLU) is either data or fixed design.</p>
+    <p>A neuron with $n$ inputs has $n$ weights and 1 bias, so $n + 1$ parameters. A layer of neurons that all read the same inputs needs that many per neuron:</p>
+    <table class="t">
+      <tr><th>What</th><th>Count</th></tr>
+      <tr><td>One neuron, 3 inputs</td><td>$3 + 1 = 4$</td></tr>
+      <tr><td>5 neurons, each reading the same 3 inputs</td><td>$5 \times 4 = 20$</td></tr>
+      <tr><td>GPT-3, the whole model</td><td>about 175 billion</td></tr>
+    </table>
+    <p>When you hear “a 70B model”, that’s 70 billion of these knobs. Each is just a weight or a bias like the ones you set with the sliders above. None was set by hand.</p>
+    <aside class="key"><p><strong>A neuron is a weighted sum plus a bias, passed through a simple function.</strong> Its weights and bias are its parameters. One neuron can only draw one straight line through its inputs.</p></aside>
+  </section>
+
+  <div class="q" data-id="q7" data-type="num" data-answer="7850" data-tol="0.5">
+    <p>A tiny digit-reader looks at a 28 × 28 image, so 784 pixel inputs. Its single layer has 10 neurons (one per digit), each reading all 784 pixels. How many parameters?</p>
+    <div class="explain">
+      <p>Per neuron: 784 weights + 1 bias = 785.</p>
+      <p>Ten neurons: $10 \times 785 = 7850$.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Check</h2>
+  </section>
+
+  <div class="q" data-id="q8" data-type="mcq">
+    <p>A neuron has a weight of $-5$ on input $x_2$. What does that tell you?</p>
+    <button>$x_2$ is ignored</button>
+    <button data-correct>$x_2$ argues strongly for “no”: when it rises, $z$ falls fast</button>
+    <button>$x_2$ is always negative</button>
+    <div class="explain">Each unit of $x_2$ subtracts 5 from $z$. The sign of the weight says which way the input votes; its size says how loudly. A weight near 0 would mean “ignored”.</div>
+  </div>
+
+  <div class="q" data-id="q9" data-type="num" data-answer="0" data-tol="0.001">
+    <p>A ReLU neuron has weights $1$ and $1$ and bias $-1$. Input $(0.3, 0.4)$. Output?</p>
+    <div class="explain">
+      <p>$z = 1(0.3) + 1(0.4) - 1 = 0.7 - 1 = -0.3$.</p>
+      <p>$\text{ReLU}(-0.3) = 0$.</p>
+    </div>
+  </div>
+
+  <div class="q" data-id="q10" data-type="mcq">
+    <p>What does “training” change in a neural network?</p>
+    <button>The activation function</button>
+    <button>The inputs</button>
+    <button data-correct>The parameters: every weight and bias</button>
+    <div class="explain">Training adjusts the parameters so the outputs match the data better. The inputs are the data, and the activation function is fixed when the network is designed.</div>
+  </div>
+
+  <div class="q" data-id="q11" data-type="self">
+    <p>In your own words: what does one neuron compute, and why can’t one neuron do XOR?</p>
+    <div class="explain">It multiplies each input by a weight, adds them up with a bias to get $z$, and passes $z$ through an activation (step, sigmoid, ReLU). The boundary between yes and no is where $z = 0$, which is a straight line. XOR’s yes cases are diagonally opposite corners, and no single straight line separates them from the other two.</div>
+  </div>
+</main>
+
+<script src="../../../../../kit/public.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  // Neuron on the input plane
+  const SETS = {
+    and: [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 1]],
+    or:  [[0, 0, 0], [1, 0, 1], [0, 1, 1], [1, 1, 1]],
+    xor: [[0, 0, 0], [1, 0, 1], [0, 1, 1], [1, 1, 0]],
+  };
+  let set = 'and';
+  const solvedSets = new Set(), logged = new Set();
+  const LO = -0.4, HI = 1.4, P0 = 24, P1 = 276;
+  const px = (v) => P0 + (v - LO) / (HI - LO) * (P1 - P0);
+  const py = (v) => P1 - (v - LO) / (HI - LO) * (P1 - P0);
+  const N = 30, cell = (P1 - P0) / N;
+
+  function drawPlane() {
+    const w1 = Number($('w1').value), w2 = Number($('w2').value), b = Number($('b').value);
+    $('w1v').textContent = w1.toFixed(1); $('w2v').textContent = w2.toFixed(1); $('bv').textContent = b.toFixed(1);
+    let s = '';
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+      const x1 = LO + (i + 0.5) / N * (HI - LO), x2 = LO + (j + 0.5) / N * (HI - LO);
+      if (w1 * x1 + w2 * x2 + b > 0) s += `<rect class="on" x="${(P0 + i * cell).toFixed(1)}" y="${(P1 - (j + 1) * cell).toFixed(1)}" width="${(cell + 0.3).toFixed(1)}" height="${(cell + 0.3).toFixed(1)}"/>`;
+    }
+    s += `<line class="ax" x1="${px(0)}" y1="${P0}" x2="${px(0)}" y2="${P1}"/><line class="ax" x1="${P0}" y1="${py(0)}" x2="${P1}" y2="${py(0)}"/>`;
+    s += `<text x="${px(1)}" y="${py(0) + 30}" text-anchor="middle">x₁ = 1</text><text x="${px(0) - 6}" y="${py(1) + 4}" text-anchor="end">x₂ = 1</text>`;
+    let right = 0;
+    for (const [x1, x2, y] of SETS[set]) {
+      const out = w1 * x1 + w2 * x2 + b > 0 ? 1 : 0, ok = out === y;
+      if (ok) right++;
+      s += `<circle class="${ok ? 'ok' : 'bad'}" cx="${px(x1)}" cy="${py(x2)}" r="16"/><circle class="${y ? 'yes' : 'no'}" cx="${px(x1)}" cy="${py(x2)}" r="9"/>`;
+    }
+    $('plane').innerHTML = s;
+    $('score').textContent = right + ' / 4';
+    if (right === 4) solvedSets.add(set);
+    $('solved').textContent = ['and', 'or', 'xor'].filter((k) => solvedSets.has(k)).map((k) => k.toUpperCase()).join(', ') || '–';
+    if (right === 4 && !logged.has(set)) { logged.add(set); Study.event({ type: 'neuron-solved', set, w1, w2, b }); }
+    document.querySelectorAll('#sets .kit-btn').forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.set === set)));
+  }
+  ['w1', 'w2', 'b'].forEach((id) => $(id).addEventListener('input', drawPlane));
+  document.querySelectorAll('#sets .kit-btn').forEach((btn) => btn.addEventListener('click', () => { set = btn.dataset.set; drawPlane(); }));
+  drawPlane();
+
+  // Activation functions
+  const L = 30, R = 310, T = 10, B = 150, ZMIN = -4, ZMAX = 4, YMIN = -0.2, YMAX = 2;
+  const xs = (z) => L + (z - ZMIN) / (ZMAX - ZMIN) * (R - L);
+  const ys = (y) => B - (Math.min(y, YMAX) - YMIN) / (YMAX - YMIN) * (B - T);
+  const sig = (z) => 1 / (1 + Math.exp(-z));
+  function path(f) { let d = ''; for (let i = 0; i <= 80; i++) { const z = ZMIN + i / 80 * (ZMAX - ZMIN); d += (i ? 'L' : 'M') + xs(z).toFixed(1) + ' ' + ys(f(z)).toFixed(1); } return d; }
+  const base = `<line class="ax" x1="${L}" y1="${ys(0)}" x2="${R}" y2="${ys(0)}"/><line class="ax" x1="${xs(0)}" y1="${T}" x2="${xs(0)}" y2="${B}"/>`
+    + `<path class="step" d="M${xs(ZMIN)} ${ys(0)} L${xs(0)} ${ys(0)} L${xs(0)} ${ys(1)} L${xs(ZMAX)} ${ys(1)}"/>`
+    + `<path class="sig" d="${path(sig)}"/><path class="relu" d="${path((z) => Math.max(0, z))}"/>`
+    + `<text x="${L}" y="${B + 18}">z = −4</text><text x="${R}" y="${B + 18}" text-anchor="end">z = 4</text>`
+    + `<text x="${xs(0) - 4}" y="${ys(1) + 4}" text-anchor="end">1</text><text x="${xs(0) - 4}" y="${ys(2) + 9}" text-anchor="end">2</text>`;
+  function drawActs() {
+    const z = Number($('z').value);
+    $('acts').innerHTML = base + `<line class="zl" x1="${xs(z)}" y1="${T}" x2="${xs(z)}" y2="${B}"/>`
+      + `<circle class="dot-sig" cx="${xs(z)}" cy="${ys(sig(z))}" r="5"/><circle class="dot-relu" cx="${xs(z)}" cy="${ys(Math.max(0, z))}" r="5"/>`;
+    $('zv').textContent = z.toFixed(1);
+    $('os').textContent = z > 0 ? '1' : '0';
+    $('og').textContent = sig(z).toFixed(3);
+    $('or').textContent = Math.max(0, z).toFixed(1);
+  }
+  $('z').addEventListener('input', drawActs);
+  drawActs();
+})();
+</script>
+</body></html>
