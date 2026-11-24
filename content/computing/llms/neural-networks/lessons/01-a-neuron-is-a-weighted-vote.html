@@ -82,9 +82,10 @@
 
   <div class="q" data-id="q2" data-type="mcq">
     <p>You raise a neuron’s bias from $-1$ to $+2$ and leave the weights alone. What changes?</p>
-    <button>Every input now counts for more</button>
-    <button data-correct>The neuron says yes more easily: it needs less push from its inputs</button>
-    <button>Nothing, the bias is only used when all inputs are 0</button>
+    <button>Every input now counts for more in the vote</button>
+    <button data-correct>It fires more easily: it needs less push from its inputs</button>
+    <button>Nothing: the bias only matters when every input is 0</button>
+    <button>It fires less easily: a higher bias raises the bar</button>
     <div class="explain">The bias is added every time, whatever the inputs are, so it shifts $z$ up by 3 for every input. Inputs that used to land just below 0 now land above it. The weights, which set how much each input counts, haven’t moved.</div>
   </div>
 
@@ -126,9 +127,10 @@
 
   <div class="q" data-id="q4" data-type="mcq">
     <p>Why can no setting of the sliders solve XOR?</p>
-    <button>The weights would need to be bigger than 3</button>
-    <button data-correct>The yes dots sit on opposite corners, and one straight line can’t put both of them on one side with both no dots on the other</button>
-    <button>XOR needs a negative bias, and that always fails</button>
+    <button>The weights it needs are larger than the sliders allow</button>
+    <button data-correct>Its yes dots are on opposite corners; no straight line splits them</button>
+    <button>XOR needs a negative bias, and negative biases always fail</button>
+    <button>A step function outputs only 0 or 1, too few values for XOR</button>
     <div class="explain">The yes dots are $(1,0)$ and $(0,1)$, the no dots $(0,0)$ and $(1,1)$: diagonal pairs. Any straight line that has both yes corners on its yes side also takes in at least one no corner. A single neuron can only draw one straight line, however big its weights. Lesson 2 fixes this with a second layer.</div>
   </div>
 
@@ -204,9 +206,10 @@
 
   <div class="q" data-id="q8" data-type="mcq">
     <p>A neuron has a weight of $-5$ on input $x_2$. What does that tell you?</p>
-    <button>$x_2$ is ignored</button>
-    <button data-correct>$x_2$ argues strongly for “no”: when it rises, $z$ falls fast</button>
-    <button>$x_2$ is always negative</button>
+    <button>$x_2$ is ignored, since negative weights count as zero</button>
+    <button data-correct>$x_2$ argues for “no”: as it rises, $z$ falls fast</button>
+    <button>$x_2$ itself must always be a negative number</button>
+    <button>$x_2$ argues weakly for “yes”, five times less than usual</button>
     <div class="explain">Each unit of $x_2$ subtracts 5 from $z$. The sign of the weight says which way the input votes; its size says how loudly. A weight near 0 would mean “ignored”.</div>
   </div>
 
@@ -220,10 +223,11 @@
 
   <div class="q" data-id="q10" data-type="mcq">
     <p>What does “training” change in a neural network?</p>
-    <button>The activation function</button>
-    <button>The inputs</button>
+    <button>The activation function each neuron uses</button>
+    <button>The inputs, cleaned up to fit the data better</button>
     <button data-correct>The parameters: every weight and bias</button>
-    <div class="explain">Training adjusts the parameters so the outputs match the data better. The inputs are the data, and the activation function is fixed when the network is designed.</div>
+    <button>The number of layers and neurons per layer</button>
+    <div class="explain">Training adjusts the parameters so the outputs match the data better. The inputs are the data. The activation function and the number of layers and neurons are fixed when the network is designed.</div>
   </div>
 
   <div class="q" data-id="q11" data-type="self">

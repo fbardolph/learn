@@ -170,9 +170,10 @@
 
   <div class="q" data-id="q6" data-type="mcq">
     <p>Someone builds a 50-layer network but forgets the activation functions. What can it compute?</p>
-    <button>Anything a 50-layer network with ReLU can</button>
-    <button data-correct>Only what a single layer can: one weighted sum per output, so straight lines and flat planes</button>
-    <button>Nothing at all: it outputs 0</button>
+    <button>Anything a 50-layer ReLU network can, only slower</button>
+    <button data-correct>Only what one layer can: straight lines and flat planes</button>
+    <button>Nothing useful: every output collapses to zero</button>
+    <button>Curves, but only gentle ones with no sharp bends</button>
     <div class="explain">Without a nonlinearity, each layer is a weighted sum plus a bias, and substituting one into the next just gives another weighted sum plus a bias. All 50 collapse into one.</div>
   </div>
 

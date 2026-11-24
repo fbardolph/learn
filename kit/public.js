@@ -110,6 +110,12 @@
 
     if (type === 'mcq') {
       const opts = [...q.querySelectorAll(':scope > button, :scope .options > button')];
+      // Shuffle the options on every load so the answer's position gives nothing away.
+      // "Both / neither / all / none…" options stay last, where they read naturally.
+      const tail = (b) => /^(both|neither|all|none)\b/i.test(b.textContent.trim());
+      const order = opts.filter((b) => !tail(b));
+      for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+      [...order, ...opts.filter(tail)].forEach((b) => b.parentNode.insertBefore(b, q.querySelector('.explain')?.parentNode === b.parentNode ? q.querySelector('.explain') : null));
       opts.forEach((b) => b.setAttribute('data-option', ''));
       opts.forEach((b) => b.addEventListener('click', () => {
         if (q.classList.contains('locked')) return;
