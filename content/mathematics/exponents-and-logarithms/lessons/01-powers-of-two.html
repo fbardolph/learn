@@ -150,7 +150,7 @@
   <div class="q" data-id="q8" data-type="mcq">
     <p>An event’s probability is cut in half. What happens to its surprise?</p>
     <button>It doubles</button>
-    <button data-correct>It goes up by exactly 1 bit</button>
+    <button data-correct>It goes up by 1 bit</button>
     <button>It halves</button>
     <button>It goes down by 1 bit</button>
     <div class="explain">Halving $p$ is one more step down the ladder: the exponent goes from, say, $-3$ to $-4$. So $-\log_2 p$ goes from 3 to 4. One halving, one extra bit, whatever $p$ was. It only <em>looks</em> like doubling at the start, going from 1 bit to 2. From $\tfrac18$ to $\tfrac1{16}$ the surprise goes from 3 to 4 bits, not 6. What doubles is the “1 in $N$” number: 1 in 8 becomes 1 in 16.</div>
@@ -158,11 +158,11 @@
 
   <div class="q" data-id="q9" data-type="mcq">
     <p>What is $\log_2 0$?</p>
-    <button>0</button>
-    <button>$-1$</button>
-    <button data-correct>It doesn’t exist: no power of 2 equals 0</button>
-    <button>1</button>
-    <div class="explain">$2^y$ is always positive. Halving gets you ever closer to 0 but never there, so $\log_2 x$ heads toward $-\infty$ as $x$ shrinks to 0. In surprise terms: an event you said was impossible ($p = 0$) would be infinitely surprising.</div>
+    <button>$0$: the log of nothing is nothing</button>
+    <button>$-1$: one halving below $\log_2 1$</button>
+    <button data-correct>None: no power of 2 equals 0</button>
+    <button>$1$, because $2^0$ equals 1</button>
+    <div class="explain">$2^0 = 1$ tells you $\log_2 1 = 0$, which is a different question. One halving below 1 is $\tfrac12$, so $\log_2 \tfrac12 = -1$. But $2^y$ is always positive. Halving gets you ever closer to 0 but never there, so $\log_2 x$ heads toward $-\infty$ as $x$ shrinks to 0. In surprise terms: an event you said was impossible ($p = 0$) would be infinitely surprising.</div>
   </div>
 
   <div class="q" data-id="q10" data-type="self">

@@ -127,10 +127,10 @@
 
   <div class="q" data-id="q4" data-type="mcq">
     <p>Why can no setting of the sliders solve XOR?</p>
-    <button>The weights it needs are larger than the sliders allow</button>
-    <button data-correct>Its yes dots are on opposite corners; no straight line splits them</button>
+    <button>The weights it needs are bigger than the sliders allow</button>
+    <button data-correct>Its yes corners are diagonal, so no one line splits them</button>
     <button>XOR needs a negative bias, and negative biases always fail</button>
-    <button>A step function outputs only 0 or 1, too few values for XOR</button>
+    <button>A step function’s 0-or-1 output is too few values for XOR</button>
     <div class="explain">The yes dots are $(1,0)$ and $(0,1)$, the no dots $(0,0)$ and $(1,1)$: diagonal pairs. Any straight line that has both yes corners on its yes side also takes in at least one no corner. A single neuron can only draw one straight line, however big its weights. Lesson 2 fixes this with a second layer.</div>
   </div>
 

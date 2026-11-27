@@ -181,8 +181,8 @@
     <p>In the XOR network, what did the two hidden neurons $h_1$ and $h_2$ detect?</p>
     <button>Whether $x_1$ was on, and whether $x_2$ was on</button>
     <button data-correct>How many inputs were on, and whether both were</button>
-    <button>XOR directly, twice</button>
-    <div class="explain">$h_1 = \text{ReLU}(x_1 + x_2)$ is the count. $h_2 = \text{ReLU}(x_1 + x_2 - 1)$ is 1 only when both are on. The output combines them: count minus twice “both”.</div>
+    <button>Whether exactly one was on, and whether neither was</button>
+    <div class="explain">$h_1 = \text{ReLU}(x_1 + x_2)$ is the count. $h_2 = \text{ReLU}(x_1 + x_2 - 1)$ is 1 only when both are on. The output combines them: count minus twice “both”. Neither hidden neuron computes XOR (“exactly one”) by itself, because a single neuron can’t, as Lesson 1 showed. XOR only appears at the output.</div>
   </div>
 
   <div class="q" data-id="q8" data-type="num" data-answer="116" data-tol="3">
