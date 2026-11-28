@@ -132,9 +132,9 @@
 
   <div class="q" data-id="q5" data-type="mcq">
     <p>Why do human guessers beat the letter-frequency estimate by so much?</p>
-    <button>They memorised the frequency table more accurately</button>
-    <button data-correct>They use context: spelling, grammar and meaning narrow down the next character</button>
-    <button>Letter-frequency estimates ignore the space character</button>
+    <button>They know the letter frequencies more accurately</button>
+    <button data-correct>They use the letters and words that came before</button>
+    <button>The frequency estimate ignores the space character</button>
     <div class="explain">After “th” the next letter is very likely <em>e</em>; after “the capital of France is ” it’s almost surely <em>P</em>. The probabilities that matter are <em>conditional</em> on what came before, and those are far more lopsided, so the average surprise is far lower.</div>
   </div>
 
@@ -159,10 +159,11 @@
 
   <div class="q" data-id="q8" data-type="mcq">
     <p>A model’s training loss falls from 3.0 to 2.5 nats per token. What happened?</p>
-    <button>It now uses fewer tokens</button>
-    <button data-correct>On average it is less surprised by the real next token: it predicts better, so it would compress better</button>
-    <button>Its vocabulary got smaller</button>
-    <div class="explain">The loss is the average of $-\ln p$ for the token that actually came next. Lower loss means higher probability on the right answers. In bits it went from about 4.3 to 3.6 per token.</div>
+    <button>It splits the same text into fewer tokens</button>
+    <button data-correct>It gives the real next token more probability</button>
+    <button>It has a smaller vocabulary to choose from</button>
+    <button>It is more confident, whether right or wrong</button>
+    <div class="explain">The loss is the average of $-\ln p$ for the token that actually came next. Lower loss means higher probability on the right answers: on average it's less surprised by the real next token, so it predicts better and would compress better. Being confident only helps when it's confident about the right token; confident mistakes push the loss up. In bits it went from about 4.3 to 3.6 per token.</div>
   </div>
 
   <div class="q" data-id="q9" data-type="self">

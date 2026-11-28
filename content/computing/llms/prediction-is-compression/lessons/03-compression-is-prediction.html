@@ -154,8 +154,9 @@
   <div class="q" data-id="q4" data-type="mcq">
     <p>The sender compresses with a great model, and the receiver decodes with a slightly different one. What happens?</p>
     <button>The output is slightly blurry but mostly right</button>
-    <button data-correct>Decoding goes wrong: the slices are cut in different places, so the number lands in the wrong symbols</button>
-    <button>It works, just with a bigger file</button>
+    <button data-correct>The output turns to garbage after the first mismatch</button>
+    <button>It decodes correctly, just from a bigger file</button>
+    <button>Only the rare symbols come out wrong</button>
     <div class="explain">Decoding asks “which slice is $x$ in?”, and the slices come from the model’s probabilities. Different probabilities give different slice boundaries, and after the first mismatch every later symbol is garbage. Sender and receiver must share the exact same predictor.</div>
   </div>
 
@@ -189,9 +190,10 @@
 
   <div class="q" data-id="q8" data-type="mcq">
     <p>Why does arithmetic coding beat a code that gives each symbol its own bit string, like 0 / 10 / 11?</p>
-    <button>It uses a bigger alphabet</button>
-    <button data-correct>It can spend a fraction of a bit on a confident prediction, because it codes the whole message as one number</button>
-    <button>It throws away rare symbols</button>
+    <button>It uses a bigger alphabet of codewords</button>
+    <button data-correct>A likely symbol can cost under one bit</button>
+    <button>It quietly drops the rarest symbols</button>
+    <button>It sends the probabilities along too</button>
     <div class="explain">Separate codewords cost at least 1 bit each. Arithmetic coding multiplies widths across the whole message, so a symbol with probability 0.99 costs 0.0145 bits. It’s lossless: nothing is thrown away.</div>
   </div>
 
